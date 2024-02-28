@@ -1,0 +1,54 @@
+  txa:pha
+
+//  if activePage=1 then inc(y,56);
+  lda y
+  ldy activePage
+  beq skPage
+  add #56
+skPage:
+
+  asl @   // y to table index
+  tay
+
+// x shr 3 (with sign keep)
+  lda x
+
+calcSCR:
+  add adr.YSCR,y
+  sta scr
+  lda adr.YSCR+1,y
+  add #0
+  sta scr+1
+
+//
+
+  ldx height
+
+lline:
+  ldy width
+  dey
+lbyte:
+  lda (adr),y
+  sta (scr),y
+  dey
+  bpl lbyte
+
+  lda scr
+  add _LNWIDTH:#16
+  sta scr
+  lda scr+1
+  adc #0
+  sta scr+1
+
+  lda adr
+  add width
+  sta adr
+  lda adr+1
+  adc #0
+  sta adr+1
+
+  dex
+  bne lline
+
+exPutImg:
+  pla:tax

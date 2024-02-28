@@ -1,0 +1,1445 @@
+mads 2.1.6
+    84 					opt l+
+   102
+   103 				.print 'ZPAGE: ',zpage,'..',zpend-1
+   103 				ZPAGE: $0080..$00D3
+   104
+   105 				.print 'RTBUF: ',@buf,'..',@buf+255
+   105 				RTBUF: $0400..$04FF
+   106
+   107 				.print 'RTLIB: ',RTLIB,'..',*-1
+   107 				RTLIB: $E000..$DFFF
+   108
+   109 				; ------------------------------------------------------------
+   110
+   111 E000			START
+   112 E000 BA				tsx
+   113 E001 8E 58 E5			stx MAIN.@halt+1
+   114
+   115 				.ifdef psptr
+   116 					mwa #PROGRAMSTACK psptr
+   117 				.fi
+   118
+   119 E004 A2 00			ldx #$00
+   120 E006 86 80			stx bp						; BP = 0
+   121
+   122 E008 CA				dex						; X = 255
+   123
+   124 E009				UNITINITIALIZATION
+Macro: UNITINITIALIZATION [Source: graph.a65]
+   125
+   126 E009			.local	MAIN						; PROCEDURE
+   127
+   128 E009 4C 57 E5			jmp l_0004
+   129
+   130 				; ------------------------------------------------------------
+   131
+   132 E00C			.local	SYSTEM						; UNIT
+   133
+   134 				; ------------------------------------------------------------
+   135
+   136 = 0101			__PORTB_BANKS	= $0101
+   137 = 0648			M_PI_2	= $0648
+   138 = 0192			D_PI_2	= $0192
+   139 = 0004			D_PI_180	= $04
+   140 = 0000			MGTIA	= $00
+   141 = 0080			MVBXE	= $80
+   142 = 0000			VBXE_XDLADR	= $00
+   143 = 00E0			VBXE_BCBTMP	= $E0
+   144 = 0100			VBXE_BCBADR	= $0100
+   145 = 1000			VBXE_MAPADR	= $1000
+   146 = 1000			VBXE_CHBASE	= $1000
+   147 = 5000			VBXE_OVRADR	= $5000
+   148 = B000			VBXE_WINDOW	= $B000
+   149 = 0000			IDLI	= $00
+   150 = 0001			IVBL	= $01
+   151 = 0001			IVBLD	= $01
+   152 = 0002			IVBLI	= $02
+   153 = 0003			ITIM1	= $03
+   154 = 0004			ITIM2	= $04
+   155 = 0005			ITIM4	= $05
+   156 = 00FE			CH_DELCHR	= $FE
+   157 = 009B			CH_ENTER	= $9B
+   158 = 001B			CH_ESC	= $1B
+   159 = 001C			CH_CURS_UP	= $1C
+   160 = 001D			CH_CURS_DOWN	= $1D
+   161 = 001E			CH_CURS_LEFT	= $1E
+   162 = 001F			CH_CURS_RIGHT	= $1F
+   163 = 007F			CH_TAB	= $7F
+   164 = 009B			CH_EOL	= $9B
+   165 = 007D			CH_CLR	= $7D
+   166 = 00FD			CH_BELL	= $FD
+   167 = 007E			CH_DEL	= $7E
+   168 = 009C			CH_DELLINE	= $9C
+   169 = 009D			CH_INSLINE	= $9D
+   170 = 0000			PAL_PMCOLOR0	= $00
+   171 = 0001			PAL_PMCOLOR1	= $01
+   172 = 0002			PAL_PMCOLOR2	= $02
+   173 = 0003			PAL_PMCOLOR3	= $03
+   174 = 0004			PAL_COLOR0	= $04
+   175 = 0005			PAL_COLOR1	= $05
+   176 = 0006			PAL_COLOR2	= $06
+   177 = 0007			PAL_COLOR3	= $07
+   178 = 0008			PAL_COLBAK	= $08
+   179 = 0000			COLOR_BLACK	= $00
+   180 = 000E			COLOR_WHITE	= $0E
+   181 = 0032			COLOR_RED	= $32
+   182 = 0096			COLOR_CYAN	= $96
+   183 = 0068			COLOR_VIOLET	= $68
+   184 = 00C4			COLOR_GREEN	= $C4
+   185 = 0074			COLOR_BLUE	= $74
+   186 = 00EE			COLOR_YELLOW	= $EE
+   187 = 0028			COLOR_ORANGE	= $28
+   188 = 00E4			COLOR_BROWN	= $E4
+   189 = 003C			COLOR_LIGHTRED	= $3C
+   190 = 0004			COLOR_GRAY1	= $04
+   191 = 0006			COLOR_GRAY2	= $06
+   192 = 000A			COLOR_GRAY3	= $0A
+   193 = 00CC			COLOR_LIGHTGREEN	= $CC
+   194 = 007C			COLOR_LIGHTBLUE	= $7C
+   195 = 0004			FMOPENREAD	= $04
+   196 = 0008			FMOPENWRITE	= $08
+   197 = 0009			FMOPENAPPEND	= $09
+   198 = 000C			FMOPENREADWRITE	= $0C
+   199 = E576			SCREENWIDTH	= DATAORIGIN+$0000
+   200 = E578			SCREENHEIGHT	= DATAORIGIN+$0002
+   201 = E57A			DATESEPARATOR	= DATAORIGIN+$0004
+   202 = E57B			FILEMODE	= DATAORIGIN+$0005
+   203 = E57C			GRAPHMODE	= DATAORIGIN+$0006
+   204 = E57D			IORESULT	= DATAORIGIN+$0007
+   205 = E57E			EOLN	= DATAORIGIN+$0008
+   206 = D20A			RND	= $D20A
+   207 = 02C0			adr.PALETTE	= $02C0
+   208 E00C			.var PALETTE	= adr.PALETTE .word
+   209 = D012			adr.HPALETTE	= $D012
+   210 E00C			.var HPALETTE	= adr.HPALETTE .word
+   211 = E57F			RNDSEED	= DATAORIGIN+$0009
+   212
+   213 = E00C C0 02		PALETTE
+   213 = E00E 12 D0		HPALETTE
+   213 				.endl							; UNIT SYSTEM
+   214
+   215 E010			.local	PUTIMAGE					; PROCEDURE | ASSEMBLER | REGISTER
+   216
+   217 				; -------------------  ASM Block 00000063  -------------------
+   218
+   219 E010			 icl 'asm/put-image.a65' 
+Source: put-image.a65
+     1 E010 8A 48		  txa:pha
+     2
+     3 				//  if activePage=1 then inc(y,56);
+     4 E012 A5 84		  lda y
+     5 E014 A4 D4		  ldy activePage
+     6 E016 F0 03		  beq skPage
+     7 E018 18 69 38		  add #56
+     8 E01B			skPage:
+     9
+    10 E01B 0A			  asl @   // y to table index
+    11 E01C A8			  tay
+    12
+    13 				// x shr 3 (with sign keep)
+    14 E01D A5 8C		  lda x
+    15
+    16 E01F			calcSCR:
+    17 E01F 18 79 00 06		  add adr.YSCR,y
+    18 E023 85 58		  sta scr
+    19 E025 B9 01 06		  lda adr.YSCR+1,y
+    20 E028 18 69 00		  add #0
+    21 E02B 85 59		  sta scr+1
+    22
+    23 				//
+    24
+    25 E02D AE 82 E5		  ldx height
+    26
+    27 E030			lline:
+    28 E030 AC 81 E5		  ldy width
+    29 E033 88			  dey
+    30 E034			lbyte:
+    31 E034 B1 88		  lda (adr),y
+    32 E036 91 58		  sta (scr),y
+    33 E038 88			  dey
+    34 E039 10 F9		  bpl lbyte
+    35
+    36 E03B A5 58		  lda scr
+    37 E03D 18 69 10		  add _LNWIDTH:#16
+    38 E040 85 58		  sta scr
+    39 E042 A5 59		  lda scr+1
+    40 E044 69 00		  adc #0
+    41 E046 85 59		  sta scr+1
+    42
+    43 E048 A5 88		  lda adr
+    44 E04A 18 6D 81 E5		  add width
+    45 E04E 85 88		  sta adr
+    46 E050 A5 89		  lda adr+1
+    47 E052 69 00		  adc #0
+    48 E054 85 89		  sta adr+1
+    49
+    50 E056 CA			  dex
+    51 E057 D0 D7		  bne lline
+    52
+    53 E059			exPutImg:
+    54 E059 68 AA		  pla:tax
+   220 				; ------------------------------------------------------------
+   221
+   222 = 0088			ADR	= :EDX
+   223 = 008C			X	= :ECX
+   224 = 0084			Y	= :EAX
+   225 = E581			WIDTH	= DATAORIGIN+$000B
+   226 = E582			HEIGHT	= DATAORIGIN+$000C
+   227
+   228 = E581			@VarData	= WIDTH
+   229 = 0002			@VarDataSize	= 2
+   230
+   231 E05B			@exit
+   232 					.ifdef @new
+   233 					lda <@VarData
+   234 					sta :ztmp
+   235 					lda >@VarData
+   236 					ldy #@VarDataSize-1
+   237 					jmp @FreeMem
+   238 					els
+   239 E05B 60				rts						; ret
+   240 					eif
+   241 				.endl
+   242
+   243 E05C			.local	PUTSPRITE					; PROCEDURE | ASSEMBLER | REGISTER
+   244
+   245 				; -------------------  ASM Block 00000064  -------------------
+   246
+   247 E05C			 icl 'asm/put-sprite-or.a65' 
+Source: put-sprite-or.a65
+     1 E05C 8A 48		  txa:pha
+     2
+     3 				//  if activePage=1 then inc(y,56);
+     4 E05E A5 84		  lda y
+     5 E060 A4 D4		  ldy activePage
+     6 E062 F0 03		  beq skPage
+     7 E064 18 69 38		  add #56
+     8 E067			skPage:
+     9
+    10 				//  scr:=Pointer(YSCR[y]+x shr 3);
+    11 E067 0A			  asl @
+    12 E068 A8			  tay
+    13
+    14 E069 A5 8C		  lda x
+    15 E06B 10 08		  bpl positiveX
+    16 E06D			negativeX:
+    17 E06D 09 07		  ora #%111
+    18 E06F 38			  sec
+    19 E070 6A			  ror @
+    20 E071 6A			  ror @
+    21 E072 6A			  ror @
+    22 E073 30 03		  bmi calcScr ; always jump
+    23
+    24 E075			positiveX:
+    25 E075 4A			  lsr @
+    26 E076 4A			  lsr @
+    27 E077 4A			  lsr @
+    28
+    29 E078			calcSCR:
+    30 E078 18 79 00 06		  add adr.YSCR,y
+    31 E07C 85 58		  sta scr
+    32 E07E B9 01 06		  lda adr.YSCR+1,y
+    33 E081 18 69 00		  add #0
+    34 E084 85 59		  sta scr+1
+    35
+    36 E086 A5 8C		  lda x
+    37 E088 29 07		  and #7
+    38 E08A 8D BD E0		  sta sh
+    39 E08D D0 2D		  bne lline
+    40
+    41 				//
+    42 				// --
+    43 				//
+    44
+    45 E08F			lsimple:
+    46 E08F AE 84 E5		  ldx height
+    47
+    48 E092			lln:
+    49 E092 AC 83 E5		  ldy width
+    50 E095 88			  dey
+    51 E096			lbyte:
+    52 E096 B1 88		  lda (adr),y
+    53 E098 11 58		  ora (scr),y
+    54 E09A 91 58		  sta (scr),y
+    55 E09C 88			  dey
+    56 E09D 10 F7		  bpl lbyte
+    57
+    58 E09F A5 58		  lda scr
+    59 E0A1 18 69 10		  add _LNWIDTH1:#16
+    60 E0A4 85 58		  sta scr
+    61 E0A6 90 02 E6 59		  scc:inc scr+1
+    62
+    63 E0AA A5 88		  lda adr
+    64 E0AC 18 6D 83 E5		  add width
+    65 E0B0 85 88		  sta adr
+    66 E0B2 90 02 E6 89		  scc:inc adr+1
+    67
+    68 E0B6 CA			  dex
+    69 E0B7 D0 D9		  bne lln
+    70
+    71 E0B9 4C 15 E2		  jmp exPutImg
+    72
+    73 				//
+    74 				// --
+    75 				//
+    76 E0BC			lline:
+    77 E0BC A2 00		  ldx sh:#00
+    78 E0BE AC 83 E5		  ldy width
+    79 E0C1 A9 00		  lda #0
+    80 E0C3 99 DA 00		  sta $da,y
+    81 E0C6 88			  dey
+    82
+    83 E0C7 C0 04		  cpy #4
+    84 E0C9 D0 56		  bne l4
+    85
+    86 				//
+    87 				// --
+    88 E0CB			l5:
+    89 E0CB B1 88		  lda (adr),y
+    90 E0CD 85 DE		  sta $de
+    91 E0CF 88			  dey
+    92 E0D0 B1 88		  lda (adr),y
+    93 E0D2 85 DD		  sta $dd
+    94 E0D4 88			  dey
+    95 E0D5 B1 88		  lda (adr),y
+    96 E0D7 85 DC		  sta $dc
+    97 E0D9 88			  dey
+    98 E0DA B1 88		  lda (adr),y
+    99 E0DC 85 DB		  sta $db
+   100 E0DE 88			  dey
+   101 E0DF B1 88		  lda (adr),y
+   102 E0E1 85 DA		  sta $da
+   103
+   104 E0E3			lb5:
+   105 E0E3 18			  clc
+   106 E0E4 66 DA		  ror $da
+   107 E0E6 66 DB		  ror $db
+   108 E0E8 66 DC		  ror $dc
+   109 E0EA 66 DD		  ror $dd
+   110 E0EC 66 DE		  ror $de
+   111 E0EE 66 DF		  ror $df
+   112 E0F0 CA			  dex
+   113 E0F1 D0 F0		  bne lb5
+   114
+   115 E0F3 A0 05		  ldy #5
+   116 E0F5 A5 DF		  lda $df
+   117 E0F7 11 58		  ora (scr),y
+   118 E0F9 91 58		  sta (scr),y
+   119 E0FB 88			  dey
+   120 E0FC A5 DE		  lda $de
+   121 E0FE 11 58		  ora (scr),y
+   122 E100 91 58		  sta (scr),y
+   123 E102 88			  dey
+   124 E103 A5 DD		  lda $dd
+   125 E105 11 58		  ora (scr),y
+   126 E107 91 58		  sta (scr),y
+   127 E109 88			  dey
+   128 E10A A5 DC		  lda $dc
+   129 E10C 11 58		  ora (scr),y
+   130 E10E 91 58		  sta (scr),y
+   131 E110 88			  dey
+   132 E111 A5 DB		  lda $db
+   133 E113 11 58		  ora (scr),y
+   134 E115 91 58		  sta (scr),y
+   135 E117 88			  dey
+   136 E118 A5 DA		  lda $da
+   137 E11A 11 58		  ora (scr),y
+   138 E11C 91 58		  sta (scr),y
+   139 E11E 4C F6 E1		  jmp nxt
+   140 				// --
+   141 				//
+   142
+   143 E121			l4:
+   144 E121 C0 03		  cpy #3
+   145 E123 D0 48		  bne l3
+   146
+   147 				//
+   148 				// --
+   149 E125 B1 88		  lda (adr),y
+   150 E127 85 DD		  sta $dd
+   151 E129 88			  dey
+   152 E12A B1 88		  lda (adr),y
+   153 E12C 85 DC		  sta $dc
+   154 E12E 88			  dey
+   155 E12F B1 88		  lda (adr),y
+   156 E131 85 DB		  sta $db
+   157 E133 88			  dey
+   158 E134 B1 88		  lda (adr),y
+   159 E136 85 DA		  sta $da
+   160
+   161 E138			lb4:
+   162 E138 18			  clc
+   163 E139 66 DA		  ror $da
+   164 E13B 66 DB		  ror $db
+   165 E13D 66 DC		  ror $dc
+   166 E13F 66 DD		  ror $dd
+   167 E141 66 DE		  ror $de
+   168 E143 CA			  dex
+   169 E144 D0 F2		  bne lb4
+   170
+   171 E146 A0 04		  ldy #4
+   172 E148 A5 DE		  lda $de
+   173 E14A 11 58		  ora (scr),y
+   174 E14C 91 58		  sta (scr),y
+   175 E14E 88			  dey
+   176 E14F A5 DD		  lda $dd
+   177 E151 11 58		  ora (scr),y
+   178 E153 91 58		  sta (scr),y
+   179 E155 88			  dey
+   180 E156 A5 DC		  lda $dc
+   181 E158 11 58		  ora (scr),y
+   182 E15A 91 58		  sta (scr),y
+   183 E15C 88			  dey
+   184 E15D A5 DB		  lda $db
+   185 E15F 11 58		  ora (scr),y
+   186 E161 91 58		  sta (scr),y
+   187 E163 88			  dey
+   188 E164 A5 DA		  lda $da
+   189 E166 11 58		  ora (scr),y
+   190 E168 91 58		  sta (scr),y
+   191 E16A 4C F6 E1		  jmp nxt
+   192 				// --
+   193 				//
+   194
+   195 E16D			l3:
+   196 E16D C0 02		  cpy #2
+   197 E16F D0 3A		  bne l2
+   198
+   199 				//
+   200 				// --
+   201 E171 B1 88		  lda (adr),y
+   202 E173 85 DC		  sta $dc
+   203 E175 88			  dey
+   204 E176 B1 88		  lda (adr),y
+   205 E178 85 DB		  sta $db
+   206 E17A 88			  dey
+   207 E17B B1 88		  lda (adr),y
+   208 E17D 85 DA		  sta $da
+   209
+   210 E17F			lb3:
+   211 E17F 18			  clc
+   212 E180 66 DA		  ror $da
+   213 E182 66 DB		  ror $db
+   214 E184 66 DC		  ror $dc
+   215 E186 66 DD		  ror $dd
+   216 E188 CA			  dex
+   217 E189 D0 F4		  bne lb3
+   218
+   219 E18B A0 03		  ldy #3
+   220 E18D A5 DD		  lda $dd
+   221 E18F 11 58		  ora (scr),y
+   222 E191 91 58		  sta (scr),y
+   223 E193 88			  dey
+   224 E194 A5 DC		  lda $dc
+   225 E196 11 58		  ora (scr),y
+   226 E198 91 58		  sta (scr),y
+   227 E19A 88			  dey
+   228 E19B A5 DB		  lda $db
+   229 E19D 11 58		  ora (scr),y
+   230 E19F 91 58		  sta (scr),y
+   231 E1A1 88			  dey
+   232 E1A2 A5 DA		  lda $da
+   233 E1A4 11 58		  ora (scr),y
+   234 E1A6 91 58		  sta (scr),y
+   235 E1A8 4C F6 E1		  jmp nxt
+   236 				// --
+   237 				//
+   238
+   239 E1AB			l2:
+   240 E1AB C0 01		  cpy #1
+   241 E1AD D0 2C		  bne l1
+   242
+   243 				//
+   244 				// --
+   245 E1AF B1 88		  lda (adr),y
+   246 E1B1 85 DB		  sta $db
+   247 E1B3 88			  dey
+   248 E1B4 B1 88		  lda (adr),y
+   249 E1B6 85 DA		  sta $da
+   250
+   251 E1B8			lb2:
+   252 E1B8 18			  clc
+   253 E1B9 66 DA		  ror $da
+   254 E1BB 66 DB		  ror $db
+   255 E1BD 66 DC		  ror $dc
+   256 E1BF CA			  dex
+   257 E1C0 D0 F6		  bne lb2
+   258
+   259 E1C2 A0 02		  ldy #2
+   260 E1C4 A5 DC		  lda $dc
+   261 E1C6 11 58		  ora (scr),y
+   262 E1C8 91 58		  sta (scr),y
+   263 E1CA 88			  dey
+   264 E1CB A5 DB		  lda $db
+   265 E1CD 11 58		  ora (scr),y
+   266 E1CF 91 58		  sta (scr),y
+   267 E1D1 88			  dey
+   268 E1D2 A5 DA		  lda $da
+   269 E1D4 11 58		  ora (scr),y
+   270 E1D6 91 58		  sta (scr),y
+   271 E1D8 4C F6 E1		  jmp nxt
+   272 				// --
+   273 				//
+   274
+   275 E1DB			l1:
+   276 E1DB B1 88		  lda (adr),y
+   277 E1DD 85 DA		  sta $da
+   278
+   279 				//
+   280 				// --
+   281 E1DF			lb1:
+   282 E1DF 18			  clc
+   283 E1E0 66 DA		  ror $da
+   284 E1E2 66 DB		  ror $db
+   285 E1E4 CA			  dex
+   286 E1E5 D0 F8		  bne lb1
+   287
+   288 E1E7 A0 01		  ldy #1
+   289 E1E9 A5 DB		  lda $db
+   290 E1EB 11 58		  ora (scr),y
+   291 E1ED 91 58		  sta (scr),y
+   292 E1EF 88			  dey
+   293 E1F0 A5 DA		  lda $da
+   294 E1F2 11 58		  ora (scr),y
+   295 E1F4 91 58		  sta (scr),y
+   296
+   297 				//
+   298 				// --
+   299 				//
+   300
+   301 E1F6			nxt:
+   302 E1F6 A5 58		  lda scr
+   303 E1F8 18 69 10		  add _LNWIDTH2:#16
+   304 E1FB 85 58		  sta scr
+   305 E1FD 90 02 E6 59		  scc:inc scr+1
+   306
+   307 E201 A5 88		  lda adr
+   308 E203 18 6D 83 E5		  add width
+   309 E207 85 88		  sta adr
+   310 E209 90 02 E6 89		  scc:inc adr+1
+   311
+   312 E20D CE 84 E5		  dec height
+   313 E210 F0 03		  beq exPutImg
+   314 E212 4C BC E0		  jmp lline
+   315
+   316 E215			exPutImg:
+   317 E215 68 AA		  pla:tax
+   248 				; ------------------------------------------------------------
+   249
+   250 = 0088			ADR	= :EDX
+   251 = 008C			X	= :ECX
+   252 = 0084			Y	= :EAX
+   253 = E583			WIDTH	= DATAORIGIN+$000D
+   254 = E584			HEIGHT	= DATAORIGIN+$000E
+   255
+   256 = E583			@VarData	= WIDTH
+   257 = 0002			@VarDataSize	= 2
+   258
+   259 E217			@exit
+   260 					.ifdef @new
+   261 					lda <@VarData
+   262 					sta :ztmp
+   263 					lda >@VarData
+   264 					ldy #@VarDataSize-1
+   265 					jmp @FreeMem
+   266 					els
+   267 E217 60				rts						; ret
+   268 					eif
+   269 				.endl
+   270
+   271 E218			.local	PUTSPRITEXOR					; PROCEDURE | ASSEMBLER | REGISTER
+   272
+   273 				; -------------------  ASM Block 00000065  -------------------
+   274
+   275 E218			 icl 'asm/put-sprite-xor.a65' 
+Source: put-sprite-xor.a65
+     1 E218 8A 48		  txa:pha
+     2
+     3 E21A A5 8C		  lda x
+     4 E21C 29 07		  and #7
+     5 E21E 8D 55 E2		  sta sh
+     6 E221 D0 31		  bne lline
+     7
+     8 				//
+     9 				// --
+    10 				//
+    11
+    12 E223			lsimple:
+    13 E223 AE 86 E5		  ldx height
+    14
+    15 E226			lln:
+    16 E226 AC 85 E5		  ldy width
+    17 E229 88			  dey
+    18 E22A			lbyte:
+    19 E22A B1 88		  lda (adr),y
+    20 E22C 51 58		  eor (scr),y
+    21 E22E 91 58		  sta (scr),y
+    22 E230 88			  dey
+    23 E231 10 F7		  bpl lbyte
+    24
+    25 E233 A5 58		  lda scr
+    26 E235 18 69 10		  add #16
+    27 E238 85 58		  sta scr
+    28 E23A A5 59		  lda scr+1
+    29 E23C 69 00		  adc #0
+    30 E23E 85 59		  sta scr+1
+    31
+    32 E240 A5 88		  lda adr
+    33 E242 18 6D 85 E5		  add width
+    34 E246 85 88		  sta adr
+    35 E248 A5 89		  lda adr+1
+    36 E24A 69 00		  adc #0
+    37 E24C 85 89		  sta adr+1
+    38
+    39 E24E CA			  dex
+    40 E24F D0 D5		  bne lln
+    41
+    42 E251 4C B4 E3		  jmp exPutImg
+    43
+    44 				//
+    45 				// --
+    46 				//
+    47 E254			lline:
+    48 E254 A2 00		  ldx sh:#00
+    49 E256 AC 85 E5		  ldy width
+    50 E259 A9 00		  lda #0
+    51 E25B 99 DA 00		  sta $da,y
+    52 E25E 88			  dey
+    53
+    54 E25F C0 04		  cpy #4
+    55 E261 D0 56		  bne l4
+    56
+    57 E263			l5:
+    58 E263 B1 88		  lda (adr),y
+    59 E265 85 DE		  sta $de
+    60 E267 88			  dey
+    61 E268 B1 88		  lda (adr),y
+    62 E26A 85 DD		  sta $dd
+    63 E26C 88			  dey
+    64 E26D B1 88		  lda (adr),y
+    65 E26F 85 DC		  sta $dc
+    66 E271 88			  dey
+    67 E272 B1 88		  lda (adr),y
+    68 E274 85 DB		  sta $db
+    69 E276 88			  dey
+    70 E277 B1 88		  lda (adr),y
+    71 E279 85 DA		  sta $da
+    72
+    73 E27B			lb5:
+    74 E27B 18			  clc
+    75 E27C 66 DA		  ror $da
+    76 E27E 66 DB		  ror $db
+    77 E280 66 DC		  ror $dc
+    78 E282 66 DD		  ror $dd
+    79 E284 66 DE		  ror $de
+    80 E286 66 DF		  ror $df
+    81 E288 CA			  dex
+    82 E289 D0 F0		  bne lb5
+    83
+    84 E28B A0 05		  ldy #5
+    85 E28D A5 DF		  lda $df
+    86 E28F 51 58		  eor (scr),y
+    87 E291 91 58		  sta (scr),y
+    88 E293 88			  dey
+    89 E294 A5 DE		  lda $de
+    90 E296 51 58		  eor (scr),y
+    91 E298 91 58		  sta (scr),y
+    92 E29A 88			  dey
+    93 E29B A5 DD		  lda $dd
+    94 E29D 51 58		  eor (scr),y
+    95 E29F 91 58		  sta (scr),y
+    96 E2A1 88			  dey
+    97 E2A2 A5 DC		  lda $dc
+    98 E2A4 51 58		  eor (scr),y
+    99 E2A6 91 58		  sta (scr),y
+   100 E2A8 88			  dey
+   101 E2A9 A5 DB		  lda $db
+   102 E2AB 51 58		  eor (scr),y
+   103 E2AD 91 58		  sta (scr),y
+   104 E2AF 88			  dey
+   105 E2B0 A5 DA		  lda $da
+   106 E2B2 51 58		  eor (scr),y
+   107 E2B4 91 58		  sta (scr),y
+   108 E2B6 4C 91 E3		  jmp nxt
+   109
+   110 E2B9			l4:
+   111 E2B9 C0 03		  cpy #3
+   112 E2BB D0 48		  bne l3
+   113
+   114 E2BD B1 88		  lda (adr),y
+   115 E2BF 85 DD		  sta $dd
+   116 E2C1 88			  dey
+   117 E2C2 B1 88		  lda (adr),y
+   118 E2C4 85 DC		  sta $dc
+   119 E2C6 88			  dey
+   120 E2C7 B1 88		  lda (adr),y
+   121 E2C9 85 DB		  sta $db
+   122 E2CB 88			  dey
+   123 E2CC B1 88		  lda (adr),y
+   124 E2CE 85 DA		  sta $da
+   125
+   126 E2D0			lb4:
+   127 E2D0 18			  clc
+   128 E2D1 66 DA		  ror $da
+   129 E2D3 66 DB		  ror $db
+   130 E2D5 66 DC		  ror $dc
+   131 E2D7 66 DD		  ror $dd
+   132 E2D9 66 DE		  ror $de
+   133 E2DB CA			  dex
+   134 E2DC D0 F2		  bne lb4
+   135
+   136 E2DE A0 04		  ldy #4
+   137 E2E0 A5 DE		  lda $de
+   138 E2E2 51 58		  eor (scr),y
+   139 E2E4 91 58		  sta (scr),y
+   140 E2E6 88			  dey
+   141 E2E7 A5 DD		  lda $dd
+   142 E2E9 51 58		  eor (scr),y
+   143 E2EB 91 58		  sta (scr),y
+   144 E2ED 88			  dey
+   145 E2EE A5 DC		  lda $dc
+   146 E2F0 51 58		  eor (scr),y
+   147 E2F2 91 58		  sta (scr),y
+   148 E2F4 88			  dey
+   149 E2F5 A5 DB		  lda $db
+   150 E2F7 51 58		  eor (scr),y
+   151 E2F9 91 58		  sta (scr),y
+   152 E2FB 88			  dey
+   153 E2FC A5 DA		  lda $da
+   154 E2FE 51 58		  eor (scr),y
+   155 E300 91 58		  sta (scr),y
+   156 E302 4C 91 E3		  jmp nxt
+   157
+   158 E305			l3:
+   159 E305 C0 02		  cpy #2
+   160 E307 D0 3A		  bne l2
+   161
+   162 E309 B1 88		  lda (adr),y
+   163 E30B 85 DC		  sta $dc
+   164 E30D 88			  dey
+   165 E30E B1 88		  lda (adr),y
+   166 E310 85 DB		  sta $db
+   167 E312 88			  dey
+   168 E313 B1 88		  lda (adr),y
+   169 E315 85 DA		  sta $da
+   170
+   171 E317			lb3:
+   172 E317 18			  clc
+   173 E318 66 DA		  ror $da
+   174 E31A 66 DB		  ror $db
+   175 E31C 66 DC		  ror $dc
+   176 E31E 66 DD		  ror $dd
+   177 E320 CA			  dex
+   178 E321 D0 F4		  bne lb3
+   179
+   180 E323 A0 03		  ldy #3
+   181 E325 A5 DD		  lda $dd
+   182 E327 51 58		  eor (scr),y
+   183 E329 91 58		  sta (scr),y
+   184 E32B 88			  dey
+   185 E32C A5 DC		  lda $dc
+   186 E32E 51 58		  eor (scr),y
+   187 E330 91 58		  sta (scr),y
+   188 E332 88			  dey
+   189 E333 A5 DB		  lda $db
+   190 E335 51 58		  eor (scr),y
+   191 E337 91 58		  sta (scr),y
+   192 E339 88			  dey
+   193 E33A A5 DA		  lda $da
+   194 E33C 51 58		  eor (scr),y
+   195 E33E 91 58		  sta (scr),y
+   196 E340 4C 91 E3		  jmp nxt
+   197
+   198 E343			l2:
+   199 E343 C0 01		  cpy #1
+   200 E345 D0 2C		  bne l1
+   201
+   202 E347 B1 88		  lda (adr),y
+   203 E349 85 DB		  sta $db
+   204 E34B 88			  dey
+   205 E34C B1 88		  lda (adr),y
+   206 E34E 85 DA		  sta $da
+   207
+   208 E350			lb2:
+   209 E350 18			  clc
+   210 E351 66 DA		  ror $da
+   211 E353 66 DB		  ror $db
+   212 E355 66 DC		  ror $dc
+   213 E357 CA			  dex
+   214 E358 D0 F6		  bne lb2
+   215
+   216 E35A A0 02		  ldy #2
+   217 E35C A5 DC		  lda $dc
+   218 E35E 51 58		  eor (scr),y
+   219 E360 91 58		  sta (scr),y
+   220 E362 88			  dey
+   221 E363 A5 DB		  lda $db
+   222 E365 51 58		  eor (scr),y
+   223 E367 91 58		  sta (scr),y
+   224 E369 88			  dey
+   225 E36A A5 DA		  lda $da
+   226 E36C 51 58		  eor (scr),y
+   227 E36E 91 58		  sta (scr),y
+   228 E370 4C 91 E3		  jmp nxt
+   229
+   230 E373			l1:
+   231 E373 B1 88		  lda (adr),y
+   232 E375 85 DA		  sta $da
+   233
+   234 E377			lb1:
+   235 E377 18			  clc
+   236 E378 66 DA		  ror $da
+   237 E37A 66 DB		  ror $db
+   238 E37C CA			  dex
+   239 E37D D0 F8		  bne lb1
+   240
+   241 E37F A0 01		  ldy #1
+   242 E381 A5 DB		  lda $db
+   243 E383 51 58		  eor (scr),y
+   244 E385 91 58		  sta (scr),y
+   245 E387 88			  dey
+   246 E388 A5 DA		  lda $da
+   247 E38A 51 58		  eor (scr),y
+   248 E38C 91 58		  sta (scr),y
+   249 E38E 4C 91 E3		  jmp nxt
+   250
+   251 E391			nxt:
+   252 E391 A5 58		  lda scr
+   253 E393 18 69 10		  add #16
+   254 E396 85 58		  sta scr
+   255 E398 A5 59		  lda scr+1
+   256 E39A 69 00		  adc #0
+   257 E39C 85 59		  sta scr+1
+   258
+   259 E39E A5 88		  lda adr
+   260 E3A0 18 6D 85 E5		  add width
+   261 E3A4 85 88		  sta adr
+   262 E3A6 A5 89		  lda adr+1
+   263 E3A8 69 00		  adc #0
+   264 E3AA 85 89		  sta adr+1
+   265
+   266 E3AC CE 86 E5		  dec height
+   267 E3AF F0 03		  beq exPutImg
+   268 E3B1 4C 54 E2		  jmp lline
+   269
+   270 E3B4			exPutImg:
+   271 E3B4 68 AA		  pla:tax
+   276 				; ------------------------------------------------------------
+   277
+   278 = 0088			ADR	= :EDX
+   279 = 008C			X	= :ECX
+   280 = 0084			Y	= :EAX
+   281 = E585			WIDTH	= DATAORIGIN+$000F
+   282 = E586			HEIGHT	= DATAORIGIN+$0010
+   283
+   284 = E585			@VarData	= WIDTH
+   285 = 0002			@VarDataSize	= 2
+   286
+   287 E3B6			@exit
+   288 					.ifdef @new
+   289 					lda <@VarData
+   290 					sta :ztmp
+   291 					lda >@VarData
+   292 					ldy #@VarDataSize-1
+   293 					jmp @FreeMem
+   294 					els
+   295 E3B6 60				rts						; ret
+   296 					eif
+   297 				.endl
+   298
+   299 E3B7			.local	PUTTEXT						; PROCEDURE | ASSEMBLER | REGISTER
+   300
+   301 				; -------------------  ASM Block 00000066  -------------------
+   302
+   303 E3B7			 icl 'asm/put-text.a65' 
+Source: put-text.a65
+     1 E3B7 8A 48		  txa:pha
+     2
+     3 = 00FA			sptr = $fa
+     4
+     5 E3B9 A5 84		  lda S
+     6 E3BB 85 FA		  sta sptr
+     7 E3BD A5 85		  lda s+1
+     8 E3BF 85 FB		  sta sptr+1
+     9
+    10 				// get text length
+    11 E3C1 18			  clc
+    12 E3C2 A0 00		  ldy #0
+    13 E3C4 84 3E		  sty I
+    14 E3C6 B1 FA		  lda (sptr),y
+    15 E3C8 8D EA E3		  sta tlen
+    16 E3CB E6 FA		  inc sptr
+    17 E3CD 90 02 E6 FB		  scc:inc sptr+1
+    18
+    19 				// putchar
+    20 				//  if activePage=1 then inc(y,56);
+    21 E3D1 A5 8C		  lda y
+    22 E3D3 A4 D4		  ldy activePage
+    23 E3D5 F0 03		  beq skPage
+    24 E3D7 18 69 38		  add #56
+    25 E3DA			skPage:
+    26
+    27 				//  y*2 -> index for YSCR
+    28 E3DA 0A			  asl @
+    29 E3DB A8			  tay
+    30
+    31 				//  scr:=Pointer(YSCR[y]);
+    32 E3DC B9 00 06		  lda adr.YSCR,y
+    33 E3DF 85 58		  sta scr
+    34 E3E1 B9 01 06		  lda adr.YSCR+1,y
+    35 E3E4 85 59		  sta scr+1
+    36
+    37 				//
+    38 				// --
+    39 				//
+    40 E3E6 18			  clc
+    41 E3E7			lputchar:
+    42 E3E7 A5 3E		  lda I
+    43 E3E9 C9 00		  cmp tlen:#00
+    44 E3EB 10 35		  bpl exPutText
+    45 E3ED A8			  tay
+    46 E3EE 65 88		  adc x
+    47 E3F0 6A			  ror @
+    48 E3F1 AA			  tax
+    49 E3F2 E6 3E		  inc I
+    50
+    51 E3F4 B1 FA		  lda (sptr),y      // get string char
+    52 E3F6 A8			  tay
+    53 E3F7 B9 80 04		  lda adr._asc2int,y  // convert ATASCII to INTERNAL
+    54 E3FA 90 02		  bcc skipSh
+    55 E3FC 09 40		  ora #64
+    56 E3FE			skipSh:
+    57 E3FE 0A			  asl @
+    58 E3FF A8			  tay
+    59 E400 B9 00 2C		  lda adr.AFONT,y   // get font address
+    60 E403 8D 11 E4		  sta adr
+    61 E406 B9 01 2C		  lda adr.AFONT+1,y
+    62 E409 8D 12 E4		  sta adr+1
+    63
+    64 E40C			lsimple:
+    65 E40C 8A			  txa
+    66 E40D A8			  tay
+    67 E40E A2 00		  ldx #0
+    68
+    69 E410			lln:
+    70 E410			lbyte:
+    71 E410 BD 00 20		  lda adr:$2000,x
+    72 E413 11 58		  ora (scr),y
+    73 E415 91 58		  sta (scr),y
+    74
+    75 E417 98			  tya
+    76 E418 69 14		  adc #20
+    77 E41A A8			  tay
+    78
+    79 E41B E8			  inx
+    80 E41C E0 05		  cpx #5
+    81 E41E D0 F0		  bne lln
+    82 E420 F0 C5		  beq lputchar  // always jymp
+    83
+    84 E422			exPutText:
+    85 E422 68 AA		  pla:tax
+   304 				; ------------------------------------------------------------
+   305
+   306 = 0088			X	= :EDX
+   307 = 008C			Y	= :ECX
+   308 = 0084			S	= :EAX
+   309 E424			@exit
+   310 					.ifdef @new
+   311 					lda <@VarData
+   312 					sta :ztmp
+   313 					lda >@VarData
+   314 					ldy #@VarDataSize-1
+   315 					jmp @FreeMem
+   316 					els
+   317 E424 60				rts						; ret
+   318 					eif
+   319 				.endl
+   320
+   321 E425			.local	PUTTEXTC					; PROCEDURE | ASSEMBLER | REGISTER
+   322
+   323 				; -------------------  ASM Block 00000067  -------------------
+   324
+   325 E425			 icl 'asm/put-textc.a65' 
+Source: put-textc.a65
+     1 E425 8A 48		  txa:pha
+     2
+     3 = 00FA			sptr = $fa
+     4
+     5 E427 A5 84		  lda S
+     6 E429 85 FA		  sta sptr
+     7 E42B A5 85		  lda s+1
+     8 E42D 85 FB		  sta sptr+1
+     9
+    10 				// get text length
+    11 E42F 18			  clc
+    12 E430 A0 00		  ldy #0
+    13 E432 84 3E		  sty I
+    14 E434 B1 FA		  lda (sptr),y
+    15 E436 8D 57 E4		  sta tlen
+    16 E439 E6 FA		  inc sptr
+    17 E43B 90 02 E6 FB		  scc:inc sptr+1
+    18
+    19 				// putchar
+    20 				//  if activePage=1 then inc(y,56);
+    21 E43F A5 8C		  lda y
+    22 E441 A4 D4		  ldy activePage
+    23 E443 F0 03		  beq skPage
+    24 E445 18 69 38		  add #56
+    25 E448			skPage:
+    26
+    27 				//  y*2 -> index for YSCR
+    28 E448 0A			  asl @
+    29 E449 A8			  tay
+    30
+    31 				//  scr:=Pointer(YSCR[y]+x);
+    32
+    33 E44A			calcSCR:
+    34 E44A B9 00 06		  lda adr.YSCR,y
+    35 E44D 85 58		  sta scr
+    36 E44F B9 01 06		  lda adr.YSCR+1,y
+    37 E452 85 59		  sta scr+1
+    38
+    39 				//
+    40 				// --
+    41 				//
+    42
+    43 E454			lputchar:
+    44 E454 A4 3E		  ldy I
+    45 E456 C0 00		  cpy tlen:#00
+    46 E458 10 32		  bpl exPutImg
+    47 E45A 98			  tya
+    48 E45B 65 88		  adc x
+    49 E45D AA			  tax
+    50 E45E E6 3E		  inc I
+    51
+    52 E460 B1 FA		  lda (sptr),y      // get string char
+    53 E462 29 7F		  and #127          // only char #0…#127
+    54 E464 A8			  tay
+    55 E465 B9 80 04		  lda adr._asc2int,y
+    56
+    57 E468 0A			  asl @
+    58 E469 A8			  tay
+    59 E46A B9 00 30		  lda adr.AFONTC,y   // get font address
+    60 E46D 8D 7B E4		  sta adr
+    61 E470 B9 01 30		  lda adr.AFONTC+1,y
+    62 E473 8D 7C E4		  sta adr+1
+    63
+    64 E476			lsimple:
+    65 E476 8A			  txa
+    66 E477 A8			  tay
+    67 E478 A2 00		  ldx #0
+    68 				  // clc
+    69
+    70 E47A			lln:
+    71 E47A			lbyte:
+    72 E47A BD 00 20		  lda adr:$2000,x
+    73 E47D 11 58		  ora (scr),y
+    74 E47F 91 58		  sta (scr),y
+    75
+    76 E481 98			  tya
+    77 E482 69 28		  adc #40
+    78 E484 A8			  tay
+    79
+    80 E485 E8			  inx
+    81 E486 E0 05		  cpx #5
+    82 E488 D0 F0		  bne lln
+    83 E48A F0 C8		  beq lputchar  // always jymp
+    84
+    85 E48C			exPutImg:
+    86 E48C 68 AA		  pla:tax
+   326 				; ------------------------------------------------------------
+   327
+   328 = 0088			X	= :EDX
+   329 = 008C			Y	= :ECX
+   330 = 0084			S	= :EAX
+   331 E48E			@exit
+   332 					.ifdef @new
+   333 					lda <@VarData
+   334 					sta :ztmp
+   335 					lda >@VarData
+   336 					ldy #@VarDataSize-1
+   337 					jmp @FreeMem
+   338 					els
+   339 E48E 60				rts						; ret
+   340 					eif
+   341 				.endl
+   342
+   343 E48F			.local	INVERT						; PROCEDURE | ASSEMBLER | REGISTER
+   344
+   345 				; -------------------  ASM Block 00000068  -------------------
+   346
+   347 E48F			 icl 'asm/invert.a65' 
+Source: invert.a65
+     1 E48F 8A 48		  txa:pha
+     2
+     3 				// putchar
+     4 				//  if activePage=1 then inc(y,56);
+     5 E491 A5 8C		  lda y
+     6 E493 A4 D4		  ldy activePage
+     7 E495 F0 03		  beq skPage
+     8 E497 18 69 38		  add #56
+     9 E49A			skPage:
+    10
+    11 				//  y*2 -> index for YSCR
+    12 E49A 0A			  asl @
+    13 E49B A8			  tay
+    14
+    15 				//  scr:=Pointer(YSCR[y]+x);
+    16
+    17 E49C			calcSCR:
+    18 E49C B9 00 06		  lda adr.YSCR,y
+    19 E49F 85 58		  sta scr
+    20 E4A1 B9 01 06		  lda adr.YSCR+1,y
+    21 E4A4 85 59		  sta scr+1
+    22
+    23 				//
+    24 				// --
+    25 				//
+    26 E4A6 18			  clc
+    27 E4A7			lputchar:
+    28 E4A7 A5 84		  lda w
+    29 E4A9 30 24		  bmi exPutImg
+    30 E4AB A5 88		  lda x
+    31 E4AD 6A			  ror @
+    32 E4AE A8			  tay
+    33 E4AF C6 84		  dec w
+    34 E4B1 E6 88		  inc x
+    35
+    36 E4B3 A9 F0		  lda #%11110000
+    37 E4B5 90 02		  bcc lsimple
+    38 E4B7 A9 0F		  lda #%00001111
+    39
+    40 E4B9			lsimple:
+    41 E4B9 8D C3 E4		  sta mask
+    42 E4BC AE 87 E5		  ldx h
+    43 E4BF 18			  clc
+    44
+    45 E4C0			lln:
+    46 E4C0			lbyte:
+    47 E4C0 B1 58		  lda (scr),y
+    48 E4C2 49 00		  eor mask:#0
+    49 E4C4 91 58		  sta (scr),y
+    50
+    51 E4C6 98			  tya
+    52 E4C7 69 14		  adc _LNWIDTH1:#20
+    53 E4C9 A8			  tay
+    54
+    55 E4CA CA			  dex
+    56 E4CB 10 F3		  bpl lln
+    57 E4CD 30 D8		  bmi lputchar  // always jymp
+    58
+    59 E4CF			exPutImg:
+    60 E4CF 68 AA		  pla:tax
+   348 				; ------------------------------------------------------------
+   349
+   350 = 0088			X	= :EDX
+   351 = 008C			Y	= :ECX
+   352 = 0084			W	= :EAX
+   353 = E587			H	= DATAORIGIN+$0011
+   354
+   355 = E587			@VarData	= H
+   356 = 0001			@VarDataSize	= 1
+   357
+   358 E4D1			@exit
+   359 					.ifdef @new
+   360 					lda <@VarData
+   361 					sta :ztmp
+   362 					lda >@VarData
+   363 					ldy #@VarDataSize-1
+   364 					jmp @FreeMem
+   365 					els
+   366 E4D1 60				rts						; ret
+   367 					eif
+   368 				.endl
+   369
+   370 E4D2			.local	BLANK						; PROCEDURE | ASSEMBLER | REGISTER
+   371
+   372 				; -------------------  ASM Block 00000069  -------------------
+   373
+   374 E4D2			 icl 'asm/blank.a65' 
+Source: blank.a65
+     1 E4D2 8A 48		  txa:pha
+     2
+     3 				// putchar
+     4 				//  if activePage=1 then inc(y,56);
+     5 E4D4 A5 8C		  lda y
+     6 E4D6 A4 D4		  ldy activePage
+     7 E4D8 F0 03		  beq skPage
+     8 E4DA 18 69 38		  add #56
+     9 E4DD			skPage:
+    10
+    11 				//  y*2 -> index for YSCR
+    12 E4DD 0A			  asl @
+    13 E4DE A8			  tay
+    14
+    15 				//  scr:=Pointer(YSCR[y]);
+    16
+    17 E4DF			calcSCR:
+    18 E4DF B9 00 06		  lda adr.YSCR,y
+    19 E4E2 85 58		  sta scr
+    20 E4E4 B9 01 06		  lda adr.YSCR+1,y
+    21 E4E7 85 59		  sta scr+1
+    22
+    23 				//
+    24 				// --
+    25 				//
+    26 E4E9 18			  clc
+    27 E4EA			lputchar:
+    28 E4EA A5 84		  lda w
+    29 E4EC 30 24		  bmi exPutImg
+    30 E4EE A5 88		  lda x
+    31 E4F0 6A			  ror @
+    32 E4F1 A8			  tay
+    33 E4F2 C6 84		  dec w
+    34 E4F4 E6 88		  inc x
+    35
+    36 E4F6 A9 0F		  lda #%00001111
+    37 E4F8 90 02		  bcc lsimple
+    38 E4FA A9 F0		  lda #%11110000
+    39
+    40 E4FC			lsimple:
+    41 E4FC 8D 06 E5		  sta mask
+    42 E4FF AE 88 E5		  ldx h
+    43 E502 18			  clc
+    44
+    45 E503			lln:
+    46 E503			lbyte:
+    47 E503 B1 58		  lda (scr),y
+    48 E505 29 00		  and mask:#0
+    49 E507 91 58		  sta (scr),y
+    50
+    51 E509 98			  tya
+    52 E50A 69 14		  adc _LNWIDTH1:#20
+    53 E50C A8			  tay
+    54
+    55 E50D CA			  dex
+    56 E50E 10 F3		  bpl lln
+    57 E510 30 D8		  bmi lputchar  // always jymp
+    58
+    59 E512			exPutImg:
+    60 E512 68 AA		  pla:tax
+   375 				; ------------------------------------------------------------
+   376
+   377 = 0088			X	= :EDX
+   378 = 008C			Y	= :ECX
+   379 = 0084			W	= :EAX
+   380 = E588			H	= DATAORIGIN+$0012
+   381
+   382 = E588			@VarData	= H
+   383 = 0001			@VarDataSize	= 1
+   384
+   385 E514			@exit
+   386 					.ifdef @new
+   387 					lda <@VarData
+   388 					sta :ztmp
+   389 					lda >@VarData
+   390 					ldy #@VarDataSize-1
+   391 					jmp @FreeMem
+   392 					els
+   393 E514 60				rts						; ret
+   394 					eif
+   395 				.endl
+   396
+   397 E515			.local	SETSCREENWIDTH					; PROCEDURE | ASSEMBLER | REGISTER | INLINE
+   398
+   399 					.MACRO m@INLINE
+   400 					sta NSW
+   401 				
+   402 				; -------------------  ASM Block 00000070  -------------------
+   403 				
+   404 				  sta MAIN.PUTIMAGE._LNWIDTH
+   405 				  sta MAIN.PUTSPRITE._LNWIDTH1
+   406 				  sta MAIN.PUTSPRITE._LNWIDTH2
+   407 				
+   408 					.ENDM
+   409
+   410 				; ------------------------------------------------------------
+   411
+   412 = 0088			NSW	= :EDX
+   413 E515			@exit
+   414 				.endl
+   415
+   416 E515			.local	CLEARPAGE					; PROCEDURE | ASSEMBLER | REGISTER
+   417 E515 85 88			sta PAGE
+   418
+   419 				; -------------------  ASM Block 00000071  -------------------
+   420
+   421 				  // lda page
+   422 E517 D0 04		  bne setPage1
+   423
+   424 E519			setPage0:
+   425 E519 A0 24		  ldy #>SCREEN_ADDR
+   426 E51B D0 02		  bne clear
+   427
+   428 E51D			setPage1:
+   429 E51D A0 28		  ldy #>(SCREEN_ADDR+$400)
+   430
+   431 E51F			clear:                      ; clear active page
+   432 E51F A9 00		  lda #0
+   433 E521 8D 3E E5		  sta _pp0
+   434 E524 8C 3F E5		  sty _pp0+1
+   435 E527 C8			  iny
+   436 E528 8D 41 E5		  sta _pp1
+   437 E52B 8C 42 E5		  sty _pp1+1
+   438 E52E C8			  iny
+   439 E52F 8D 44 E5		  sta _pp2
+   440 E532 8C 45 E5		  sty _pp2+1
+   441 E535 C8			  iny
+   442 E536 8D 47 E5		  sta _pp3
+   443 E539 8C 48 E5		  sty _pp3+1
+   444
+   445 E53C A8			  tay
+   446 E53D			lclr:
+   447 E53D 99 00 80		  sta _pp0:$8000,y
+   448 E540 99 00 81		  sta _pp1:$8100,y
+   449 E543 99 00 82		  sta _pp2:$8200,y
+   450 E546 99 00 83		  sta _pp3:$8300,y
+   451 E549 88			  dey
+   452 E54A D0 F1		  bne lclr
+   453
+   454
+   455 				; ------------------------------------------------------------
+   456
+   457 = 0088			PAGE	= :EDX
+   458 E54C			@exit
+   459 					.ifdef @new
+   460 					lda <@VarData
+   461 					sta :ztmp
+   462 					lda >@VarData
+   463 					ldy #@VarDataSize-1
+   464 					jmp @FreeMem
+   465 					els
+   466 E54C 60				rts						; ret
+   467 					eif
+   468 				.endl
+   469
+   470 E54D			.local	WAIT						; PROCEDURE | ASSEMBLER | REGISTER
+   471 E54D 85 88			sta F
+   472
+   473 				; -------------------  ASM Block 00000072  -------------------
+   474
+   475 				  // Accu have value od variable 'f'
+   476 				  // lda $14
+   477 				  // add f
+   478 E54F 18 65 14		  add $14
+   479 E552			loop:
+   480 E552 C5 14		  cmp $14
+   481 E554 D0 FC		  bne *-2
+   482
+   483 				; ------------------------------------------------------------
+   484
+   485 = 0088			F	= :EDX
+   486 E556			@exit
+   487 					.ifdef @new
+   488 					lda <@VarData
+   489 					sta :ztmp
+   490 					lda >@VarData
+   491 					ldy #@VarDataSize-1
+   492 					jmp @FreeMem
+   493 					els
+   494 E556 60				rts						; ret
+   495 					eif
+   496 				.endl
+   497 E557			l_0004
+   498
+   499 				; ------------------------------------------------------------
+   500
+   501 = 0600			SCREEN_LINES_ADDR	= $0600
+   502 = 2000			PMG_ADDR	= $2000
+   503 = 2400			SCREEN_ADDR	= $2400
+   504 = 2800			EDITOR_ADDR	= $2800
+   505 = 2C00			AFONT_ADDR	= $2C00
+   506 = 3000			AFONTC_ADDR	= $3000
+   507 = 000F			MAX_SPRITE	= $0F
+   508 = 0007			MAX_GROUP	= $07
+   509 = 0200			DLIV	= $0200
+   510 = D40E			NMIEN	= $D40E
+   511 = 0230			SDLST	= $0230
+   512 = 026F			GTIACS	= $026F
+   513 = 02C4			PFCOL0	= $02C4
+   514 = 02C5			PFCOL1	= $02C5
+   515 = 02C6			PFCOL2	= $02C6
+   516 = 02C7			PFCOL3	= $02C7
+   517 = 02C8			PFCOL4	= $02C8
+   518 = 00D4			ACTIVEPAGE	= $D4
+   519 = 0058			SCR	= $58
+   520 = 0600			adr.YSCR	= $0600
+   521 E557			.var YSCR	= adr.YSCR .word
+   522 = 003E			I	= $3E
+   523 = 2C00			adr.AFONT	= $2C00
+   524 E557			.var AFONT	= adr.AFONT .word
+   525 = 3000			adr.AFONTC	= $3000
+   526 E557			.var AFONTC	= adr.AFONTC .word
+   527 = 0480			adr._ASC2INT	= $0480
+   528 E557			.var _ASC2INT	= adr._ASC2INT .word
+   529 E557			@exit
+   530
+   531 E557 A2 00		@halt	ldx #$00
+   532 E559 9A				txs
+   533
+   534 E55A A0 01			ldy #$01
+   535
+   536 E55C 60				rts
+   537
+   538 				; ------------------------------------------------------------
+   539
+   540 E55D			.local	@DEFINES
+   541 E55D			ATARI
+   542 				.endl
+   543
+   544 E55D			.local	@RESOURCE
+   545 				.endl
+   546
+   547 = E55D 00 06		YSCR
+   547 = E55F 00 2C		AFONT
+   547 = E561 00 30		AFONTC
+   547 = E563 80 04		_ASC2INT
+   547 				.endl							; MAIN
+   548
+   549 				; ------------------------------------------------------------
+   550 				; ------------------------------------------------------------
+   551
+   552 				.macro	UNITINITIALIZATION
+   553 				
+   554 					.ifdef MAIN.SYSTEM.@UnitInit
+   555 					jsr MAIN.SYSTEM.@UnitInit
+   556 					.fi
+   557 				.endm
+   558
+   559 				; ------------------------------------------------------------
+   560
+   561 					ift .SIZEOF(MAIN.SYSTEM) > 0
+   562 					.print 'SYSTEM: ',MAIN.SYSTEM,'..',MAIN.SYSTEM+.SIZEOF(MAIN.SYSTEM)-1
+   562 				SYSTEM: $E00C..$E00F
+   563 					eif
+   564
+   565 				.nowarn	.print 'CODE: ',CODEORIGIN,'..',MAIN.@RESOURCE-1
+   565 				CODE: $E000..$E55C
+   566
+   567 				; ------------------------------------------------------------
+   568
+   569 = E565				?adr = *
+   570 					ift (?adr < ?old_adr) && (?old_adr - ?adr < $120)
+   571 = E576				?adr = ?old_adr
+   572 					eif
+   573
+   574 					org ?adr
+   575 = E576				?old_adr = *
+   576
+   577 E576			DATAORIGIN
+   578 E576-E588> 28 00 18 00 + .by  $28 $00 $18 $00 $2D $0C $00 $00  $00 $00 $00 $00 $00 $00 $00 $00  $00 $00 $00
+   579
+   580 E589			PROGRAMSTACK
+   581
+   582 					.print 'DATA: ',DATAORIGIN,'..',PROGRAMSTACK
+   582 				DATA: $E576..$E589
+   583
+   584 02E0-02E1> 00 E0			run START
+   585
+   586 				; ------------------------------------------------------------
+   587
+   588 				.macro	STATICDATA
+   589 				.endm
+   590
+   591 					end

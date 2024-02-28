@@ -1,0 +1,317 @@
+  txa:pha
+
+//  if activePage=1 then inc(y,56);
+  lda y
+  ldy activePage
+  beq skPage
+  add #56
+skPage:
+
+//  scr:=Pointer(YSCR[y]+x shr 3);
+  asl @
+  tay
+
+  lda x
+  bpl positiveX
+negativeX:
+  ora #%111
+  sec
+  ror @
+  ror @
+  ror @
+  bmi calcScr ; always jump
+
+positiveX:
+  lsr @
+  lsr @
+  lsr @
+
+calcSCR:
+  add adr.YSCR,y
+  sta scr
+  lda adr.YSCR+1,y
+  add #0
+  sta scr+1
+
+  lda x
+  and #7
+  sta sh
+  bne lline
+
+//
+// --
+//
+
+lsimple:
+  ldx height
+
+lln:
+  ldy width
+  dey
+lbyte:
+  lda (adr),y
+  ora (scr),y
+  sta (scr),y
+  dey
+  bpl lbyte
+
+  lda scr
+  add _LNWIDTH1:#16
+  sta scr
+  scc:inc scr+1
+
+  lda adr
+  add width
+  sta adr
+  scc:inc adr+1
+
+  dex
+  bne lln
+
+  jmp exPutImg
+
+//
+// --
+//
+lline:
+  ldx sh:#00
+  ldy width
+  lda #0
+  sta $da,y
+  dey
+
+  cpy #4
+  bne l4
+
+//
+// --
+l5:
+  lda (adr),y
+  sta $de
+  dey
+  lda (adr),y
+  sta $dd
+  dey
+  lda (adr),y
+  sta $dc
+  dey
+  lda (adr),y
+  sta $db
+  dey
+  lda (adr),y
+  sta $da
+
+lb5:
+  clc
+  ror $da
+  ror $db
+  ror $dc
+  ror $dd
+  ror $de
+  ror $df
+  dex
+  bne lb5
+
+  ldy #5
+  lda $df
+  ora (scr),y
+  sta (scr),y
+  dey
+  lda $de
+  ora (scr),y
+  sta (scr),y
+  dey
+  lda $dd
+  ora (scr),y
+  sta (scr),y
+  dey
+  lda $dc
+  ora (scr),y
+  sta (scr),y
+  dey
+  lda $db
+  ora (scr),y
+  sta (scr),y
+  dey
+  lda $da
+  ora (scr),y
+  sta (scr),y
+  jmp nxt
+// --
+//
+
+l4:
+  cpy #3
+  bne l3
+
+//
+// --
+  lda (adr),y
+  sta $dd
+  dey
+  lda (adr),y
+  sta $dc
+  dey
+  lda (adr),y
+  sta $db
+  dey
+  lda (adr),y
+  sta $da
+
+lb4:
+  clc
+  ror $da
+  ror $db
+  ror $dc
+  ror $dd
+  ror $de
+  dex
+  bne lb4
+
+  ldy #4
+  lda $de
+  ora (scr),y
+  sta (scr),y
+  dey
+  lda $dd
+  ora (scr),y
+  sta (scr),y
+  dey
+  lda $dc
+  ora (scr),y
+  sta (scr),y
+  dey
+  lda $db
+  ora (scr),y
+  sta (scr),y
+  dey
+  lda $da
+  ora (scr),y
+  sta (scr),y
+  jmp nxt
+// --
+//
+
+l3:
+  cpy #2
+  bne l2
+
+//
+// --
+  lda (adr),y
+  sta $dc
+  dey
+  lda (adr),y
+  sta $db
+  dey
+  lda (adr),y
+  sta $da
+
+lb3:
+  clc
+  ror $da
+  ror $db
+  ror $dc
+  ror $dd
+  dex
+  bne lb3
+
+  ldy #3
+  lda $dd
+  ora (scr),y
+  sta (scr),y
+  dey
+  lda $dc
+  ora (scr),y
+  sta (scr),y
+  dey
+  lda $db
+  ora (scr),y
+  sta (scr),y
+  dey
+  lda $da
+  ora (scr),y
+  sta (scr),y
+  jmp nxt
+// --
+//
+
+l2:
+  cpy #1
+  bne l1
+
+//
+// --
+  lda (adr),y
+  sta $db
+  dey
+  lda (adr),y
+  sta $da
+
+lb2:
+  clc
+  ror $da
+  ror $db
+  ror $dc
+  dex
+  bne lb2
+
+  ldy #2
+  lda $dc
+  ora (scr),y
+  sta (scr),y
+  dey
+  lda $db
+  ora (scr),y
+  sta (scr),y
+  dey
+  lda $da
+  ora (scr),y
+  sta (scr),y
+  jmp nxt
+// --
+//
+
+l1:
+  lda (adr),y
+  sta $da
+
+//
+// --
+lb1:
+  clc
+  ror $da
+  ror $db
+  dex
+  bne lb1
+
+  ldy #1
+  lda $db
+  ora (scr),y
+  sta (scr),y
+  dey
+  lda $da
+  ora (scr),y
+  sta (scr),y
+
+//
+// --
+//
+
+nxt:
+  lda scr
+  add _LNWIDTH2:#16
+  sta scr
+  scc:inc scr+1
+
+  lda adr
+  add width
+  sta adr
+  scc:inc adr+1
+
+  dec height
+  beq exPutImg
+  jmp lline
+
+exPutImg:
+  pla:tax

@@ -1,0 +1,86 @@
+  txa:pha
+
+sptr = $fa
+
+  lda S
+  sta sptr
+  lda s+1
+  sta sptr+1
+
+// get text length
+  clc
+  ldy #0
+  sty I
+  lda (sptr),y
+  sta tlen
+  inc sptr
+  scc:inc sptr+1
+
+// putchar
+//  if activePage=1 then inc(y,56);
+  lda y
+  ldy activePage
+  beq skPage
+  add #56
+skPage:
+
+//  y*2 -> index for YSCR
+  asl @
+  tay
+
+//  scr:=Pointer(YSCR[y]+x);
+
+calcSCR:
+  lda adr.YSCR,y
+  sta scr
+  lda adr.YSCR+1,y
+  sta scr+1
+
+//
+// --
+//
+
+lputchar:
+  ldy I
+  cpy tlen:#00
+  bpl exPutImg
+  tya
+  adc x
+  tax
+  inc I
+
+  lda (sptr),y      // get string char
+  and #127          // only char #0…#127
+  tay
+  lda adr._asc2int,y
+
+  asl @
+  tay
+  lda adr.AFONTC,y   // get font address
+  sta adr
+  lda adr.AFONTC+1,y
+  sta adr+1
+
+lsimple:
+  txa
+  tay
+  ldx #0
+  // clc
+
+lln:
+lbyte:
+  lda adr:$2000,x
+  ora (scr),y
+  sta (scr),y
+
+  tya
+  adc #40
+  tay
+
+  inx
+  cpx #5
+  bne lln
+  beq lputchar  // always jymp
+
+exPutImg:
+  pla:tax

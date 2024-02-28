@@ -1,0 +1,33 @@
+  opt h-
+  icl '../data-mem.inc'
+  org FONTS_ADDR
+
+AFONT:  // Array[0..127] of Pointer
+// first half
+ dta a(font+309)
+ dta a(font+  0),a(font+  5),a(font+ 10),a(font+ 15),a(font+ 20),a(font+ 25),a(font+ 30),a(font+ 35),a(font+ 40),a(font+ 45),a(font+ 50),a(font+ 55),a(font+ 60),a(font+ 65),a(font+ 70),a(font+ 75),a(font+ 80),a(font+ 85),a(font+ 90),a(font+ 95)
+ dta a(font+100),a(font+105),a(font+110),a(font+115),a(font+120),a(font+125),a(font+130),a(font+135),a(font+140),a(font+145),a(font+150),a(font+155),a(font+160),a(font+165),a(font+170),a(font+175),a(font+180),a(font+185),a(font+190),a(font+195)
+ dta a(font+200),a(font+205),a(font+210),a(font+215),a(font+220),a(font+225),a(font+230),a(font+235),a(font+240),a(font+245),a(font+250),a(font+255),a(font+260),a(font+265),a(font+270),a(font+275),a(font+280),a(font+285),a(font+290),a(font+295)
+ dta a(font+300),a(font+305),a(font+310)
+// second half
+ dta a(font+315+309)
+ dta a(font+315+  0),a(font+315+  5),a(font+315+ 10),a(font+315+ 15),a(font+315+ 20),a(font+315+ 25),a(font+315+ 30),a(font+315+ 35),a(font+315+ 40),a(font+315+ 45),a(font+315+ 50),a(font+315+ 55),a(font+315+ 60),a(font+315+ 65),a(font+315+ 70),a(font+315+ 75),a(font+315+ 80),a(font+315+ 85),a(font+315+ 90),a(font+315+ 95)
+ dta a(font+315+100),a(font+315+105),a(font+315+110),a(font+315+115),a(font+315+120),a(font+315+125),a(font+315+130),a(font+315+135),a(font+315+140),a(font+315+145),a(font+315+150),a(font+315+155),a(font+315+160),a(font+315+165),a(font+315+170),a(font+315+175),a(font+315+180),a(font+315+185),a(font+315+190),a(font+315+195)
+ dta a(font+315+200),a(font+315+205),a(font+315+210),a(font+315+215),a(font+315+220),a(font+315+225),a(font+315+230),a(font+315+235),a(font+315+240),a(font+315+245),a(font+315+250),a(font+315+255),a(font+315+260),a(font+315+265),a(font+315+270),a(font+315+275),a(font+315+280),a(font+315+285),a(font+315+290),a(font+315+295)
+ dta a(font+315+300),a(font+315+305),a(font+315+310)
+
+AFONTC: // Array[0..63] of Pointer
+ dta a(fontc+309)
+ dta a(fontc+  0),a(fontc+  5),a(fontc+ 10),a(fontc+ 15),a(fontc+ 20),a(fontc+ 25),a(fontc+ 30),a(fontc+ 35),a(fontc+ 40),a(fontc+ 45),a(fontc+ 50),a(fontc+ 55),a(fontc+ 60),a(fontc+ 65),a(fontc+ 70),a(fontc+ 75),a(fontc+ 80),a(fontc+ 85),a(fontc+ 90),a(fontc+ 95)
+ dta a(fontc+100),a(fontc+105),a(fontc+110),a(fontc+115),a(fontc+120),a(fontc+125),a(fontc+130),a(fontc+135),a(fontc+140),a(fontc+145),a(fontc+150),a(fontc+155),a(fontc+160),a(fontc+165),a(fontc+170),a(fontc+175),a(fontc+180),a(fontc+185),a(fontc+190),a(fontc+195)
+ dta a(fontc+200),a(fontc+205),a(fontc+210),a(fontc+215),a(fontc+220),a(fontc+225),a(fontc+230),a(fontc+235),a(fontc+240),a(fontc+245),a(fontc+250),a(fontc+255),a(fontc+260),a(fontc+265),a(fontc+270),a(fontc+275),a(fontc+280),a(fontc+285),a(fontc+290),a(fontc+295)
+ dta a(fontc+300),a(fontc+305),a(fontc+310)
+
+//
+
+font: // 1bpp font; two halfs of byte (left & right)
+  ins 'font.bin'
+fontc: // 2bpp font; whole byte size (no halfs)
+  ins 'font-col.bin'
+
+  end

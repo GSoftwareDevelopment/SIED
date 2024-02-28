@@ -1,0 +1,225 @@
+HPOSP0 = $D000
+HPOSP1 = $D001
+stick  = $D300 ; $278
+strig  = $D010
+
+//  if tm and 1=0 then
+  ; lda tm
+  ; and #1
+  ; sne:jmp xitvbv
+
+  lda mRefresh
+  beq checkStick
+  lda #0
+  sta mRefresh
+  jmp clrcrs
+
+checkStick:
+  lda strig
+  eor #$1
+  sta mbutton
+
+//  if (stick<>%1111) then
+  lda stick
+  and #%1111
+  eor #%1111
+  beq checkKeys
+  tax
+
+  and #%1100
+  bne stickHtest
+  lda #0
+  sta mdx
+  beq stickTest2  // always jump
+
+stickHTest:
+  and #%0100    // left
+  beq @+
+  lda #(-16)
+  cmp mdx
+  spl:dec mdx
+
+@:
+  txa
+  and #%1000    // right
+  beq stickTest2
+  lda mdx
+  cmp #16
+  spl:inc mdx
+
+stickTest2:
+  txa
+  and #%0011
+  bne stickVtest
+  lda #0
+  sta mdy
+  beq clrcrs  // always jump
+
+stickVtest:
+  and #%0001    // up
+  beq @+
+  lda #(-16)
+  cmp mdy
+  spl:dec mdy
+
+@:
+  txa
+  and #%0010    // down
+  beq clrcrs
+  lda mdy
+  cmp #16
+  spl:inc mdy
+  jmp clrcrs
+
+checkKeys:
+  lda mAllowKeys
+  beq xit
+
+  lda SKSTAT
+  and #%00001000
+  bne skButton
+  lda #MBUT_LEFT
+  sta mbutton
+
+skButton:
+  lda KEYB
+  and #%0011111
+  cmp #$FF
+  bne testKeys
+
+xit:
+  lda #0
+  sta mdx
+  sta mdy
+  jmp exvbl
+
+testKeys:
+  cmp #K_UP
+  bne @+
+  ldx #(-4)
+  stx mdy
+  bmi clrKey
+
+@:
+  cmp #K_DOWN
+  bne @+
+  ldx #(+4)
+  stx mdy
+  bpl clrKey
+
+@:
+  cmp #K_LEFT
+  bne @+
+  ldx #(-4)
+  stx mdx
+  bmi clrKey
+
+@:
+  cmp #K_RIGHT
+  bne xit
+  ldx #(+4)
+  stx mdx
+
+clrKey:
+  lda #$ff
+  sta KEYB
+
+clrcrs:
+// clear old cursor
+  ldx #6
+  lda _my
+  sub ompivotY:#00
+  tay
+  lda #0
+lclrcrs:
+  sta PMG_ADDR+$200,y
+  sta PMG_ADDR+$281,y
+  iny
+  dex
+  bpl lclrcrs
+
+calccrs:      // calculate new cursor position
+  lda mdx
+  bpl @+
+  lsr @
+  lsr @
+  ora #%11000000
+  bmi adddx
+@:
+  lsr @
+  lsr @
+
+adddx:
+  add _mx
+  sta _mx
+
+  cmp #44     // left edge of screen
+  bcs @+
+  lda #44
+  sta _mx      // stay on left edge
+  bpl checkMY // always jump
+@:
+  sub #210    // right edge of screen
+  bcc checkMY
+  lda #210    // stay on right edge
+  sta _mx
+
+checkMY:
+  lda mdy
+  bpl @+
+  lsr @
+  lsr @
+  ora #%11000000
+  bmi adddy
+@:
+  lsr @
+  lsr @
+
+adddy:
+  add _my
+  sta _my
+
+  cmp #6     // top edge of screen
+  bcs @+
+  lda #6
+  sta _my      // stay on top edge
+  bpl drawcrs // always jump
+@:
+  sub #120    // bottom edge of screen
+  bcc drawcrs
+  lda #120    // stay on bottom edge
+  sta _my
+
+drawcrs:     // draw new cursor
+  ldx #6
+  lda _my
+  sub mpivotY:#00
+  tay
+ldrawcrs:
+  lda CURSORSPR:adr._ARROW,x
+  sta PMG_ADDR+$200,y
+  sta PMG_ADDR+$281,y
+  iny
+  dex
+  bpl ldrawcrs
+
+  lda mpivotY
+  sta ompivotY
+
+  lda _mx
+  sub mpivotX:#0
+  tax
+  stx HPOSP0
+  inx
+  stx HPOSP1
+
+  lda _mx
+  sub #48
+  lsr @
+  lsr @
+  sta mx
+
+  lda _my
+  sub #24
+  sta my
+

@@ -1,0 +1,60 @@
+  txa:pha
+
+// putchar
+//  if activePage=1 then inc(y,56);
+  lda y
+  ldy activePage
+  beq skPage
+  add #56
+skPage:
+
+//  y*2 -> index for YSCR
+  asl @
+  tay
+
+//  scr:=Pointer(YSCR[y]+x);
+
+calcSCR:
+  lda adr.YSCR,y
+  sta scr
+  lda adr.YSCR+1,y
+  sta scr+1
+
+//
+// --
+//
+  clc
+lputchar:
+  lda w
+  bmi exPutImg
+  lda x
+  ror @
+  tay
+  dec w
+  inc x
+
+  lda #%11110000
+  bcc lsimple
+  lda #%00001111
+
+lsimple:
+  sta mask
+  ldx h
+  clc
+
+lln:
+lbyte:
+  lda (scr),y
+  eor mask:#0
+  sta (scr),y
+
+  tya
+  adc _LNWIDTH1:#20
+  tay
+
+  dex
+  bpl lln
+  bmi lputchar  // always jymp
+
+exPutImg:
+  pla:tax
