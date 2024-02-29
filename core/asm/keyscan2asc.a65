@@ -1,0 +1,15 @@
+; internal keyboard code in Accu
+KEYDEFP = $79
+
+    tay
+    lda (KEYDEFP),y     ; use system keyboard mapping
+    bmi ignore          ; no invers & control keys
+    cmp #31
+    bpl ok              ; only alphanumeric keys
+
+ignore:
+    lda #0
+ok:
+    sta Result
+
+    rts

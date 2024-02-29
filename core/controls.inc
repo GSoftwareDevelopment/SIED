@@ -86,7 +86,7 @@ End;
 function addButton(x,y:Byte; cap:PString; prc:TZoneProc):Shortint;
 begin
   putText(x,y,cap);
-  result:=addZone(-1,x-1,y-1,Byte(cap[0])+2,7,prc);
+  result:=addZoneN(-1,x-1,y-1,Byte(cap[0])+2,7,prc);
 End;
 
 //
@@ -94,7 +94,7 @@ End;
 function addInput(x,y,w:Byte; value:PString; prc:TZoneProc):Shortint;
 begin
   putText(x,y,value);
-  result:=addZone(-1,x-1,y-1,w+2,7,prc);
+  result:=addZoneN(-1,x-1,y-1,w+2,7,prc);
 End;
 
 function doInput(value:PString):Shortint;
@@ -164,24 +164,4 @@ begin
   mAllowKeys:=true;
   KEYB:=255;
   _mzoneActive[ozone]:=true;
-End;
-
-//
-const
-  _DIRFILEX:Array of Byte = [  1,  1,  1,  1,  1, 14, 14, 14, 14, 14, 27, 27, 27, 27, 27 ];
-  _DIRFILEY:Array of Byte = [ 13, 20, 27, 34, 41, 13, 20, 27, 34, 41, 13, 20, 27, 34, 41 ];
-
-var
-  dirName:Array[0..14] of string[12];
-  // dirType:Array[0..14] of Byte;
-
-procedure addFileLabel(n:Byte; prc:TZoneProc);
-var
-  x,y:Byte;
-
-begin
-  if n>14 then exit;
-  x:=_DIRFILEX[n]; y:=_DIRFILEY[n];
-  putText(x,y,dirName[n]);
-  addZone(14+n,x-1,y-1,14,7,prc);
 End;

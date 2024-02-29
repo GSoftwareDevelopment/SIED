@@ -1,1 +1,4 @@
-FONTS_ADDR rcdata 'assets//fonts.obx'
+CORE_LIB dosfile 'core/bin/core.lib'
+FONTS_ADDR rcdata 'assets//fonts.bin'
+ASC2INT_ADDR rcdata 'asc2int.bin'
+SCAN2ASC_ADDR rcdata 'scan2asc.bin'

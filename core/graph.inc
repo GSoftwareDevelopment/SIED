@@ -1,23 +1,15 @@
-library graph:$E000;
-
-const
-{$i 'data-mem.inc'}
-
-var
-{$i 'graph-var.inc'}
-  i:shortint absolute $3e;
-
-{$i 'utils.inc'}
+{$I 'graph-var.inc'}
 
 procedure putImage(adr:Pointer; x,y,width,height:Byte); Register; assembler; Asm icl 'asm/put-image.a65' End;
-procedure putSprite(adr:Pointer; x,y:shortint; width,height:shortint); register; assembler; Asm icl 'asm/put-sprite-or.a65' End;
+procedure putSprite(adr:Pointer; x,y:shortint; width,height:shortint); register; keep; assembler; Asm icl 'asm/put-sprite-or.a65' End;
 procedure putSpriteXOR(adr:Pointer; x,y,width,height:Byte); Register; assembler; Asm icl 'asm/put-sprite-xor.a65' End;
 procedure putText(x,y:Shortint; s:PString); Register; assembler; Asm icl 'asm/put-text.a65' End;
 procedure putTextC(x,y:Shortint; s:PString); Register; assembler; Asm icl 'asm/put-textc.a65' End;
+
 procedure invert(x,y,w,h:Shortint); Register; assembler; Asm icl 'asm/invert.a65' End;
 procedure blank(x,y,w,h:Shortint); Register; assembler; Asm icl 'asm/blank.a65' End;
 
-procedure SetScreenWidth(nSW:Byte); Register; inline; assembler;
+procedure SetScreenWidth(nSW:Byte); Register; assembler;
 Asm
   sta MAIN.PUTIMAGE._LNWIDTH
   sta MAIN.PUTSPRITE._LNWIDTH1
@@ -71,17 +63,3 @@ loop:
   cmp $14
   bne *-2
 End;
-
-exports
-  putImage,
-  putSprite,
-  putSpriteXOR,
-  putText,
-  putTextC,
-  invert,
-  blank,
-  SetScreenWidth,
-  clearPage,
-  wait;
-
-end.

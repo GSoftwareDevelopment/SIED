@@ -2,6 +2,7 @@
 {$define ROMOFF}
 {$define NOROMFONT}
 {$UNITPATH './'}
+{$LIBRARYPATH './core/bin/'}
 
 program Editor;
 uses cio,cursor;
@@ -12,25 +13,21 @@ const
 {$I 'display-list.inc'}
 
 {$R 'data.rc'}
-{$I 'assets.inc'}
+{$I 'core/assets.h'}
 
 {$I 'keyboard.inc'}
 {$I 'utils.inc'}
 {$I 'pmg.inc'}
+
+{$I 'core/graph.h'}
+{$I 'core/interface.h'}
+{$I 'core/controls.h'}
 
 var
   i:Shortint absolute $3e;
   tm:Byte absolute $14;
 
   curModule:Byte = -1;
-
-{$I 'graph.inc'}
-
-procedure invertZone(i:Shortint); Forward;
-procedure setIcon(n:Shortint); Forward;
-procedure setControl(n:Shortint); Forward;
-{$I 'interface.inc'}
-{$I 'controls.inc'}
 
 procedure setModule(cm:Shortint); Forward;
 {$I 'about.inc'}
@@ -40,14 +37,11 @@ procedure setModule(cm:Shortint); Forward;
 {$I 'module.inc'}
 
 procedure initEditor();
+var
+  KEYDEFP:Pointer absolute $79;
+
 begin
-  for i:=0 to 31 do
-  begin
-    _asc2int[i]:=0;
-    _asc2int[32+i]:=i;
-    _asc2int[64+i]:=32+i;
-    _asc2int[96+i]:=32+i;
-  End;
+  KEYDEFP:=Pointer(SCAN2ASC_ADDR);
   for i:=0 to 55 do YSCR[i]:=Pointer(SCREEN_ADDR+i*$10);
   for i:=0 to 47 do YSCR[56+i]:=Pointer(EDITOR_ADDR+i*20);
   for i:=0 to 23 do YSCR[56+48+i]:=Pointer(EDITOR_ADDR+(20*48)+i*40);

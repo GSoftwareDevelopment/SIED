@@ -1,22 +1,9 @@
-const
-  MAX_ZONES         = 31;
-  USER_ZONES_BEGIN  = 9;
-
-type
-  TZoneProc = procedure();
+{$i 'interface-var.inc'}
 
 var
-  _mzoneActive:Array[0..MAX_ZONES] of Boolean absolute $500;
-  _mzoneX1:array[0..MAX_ZONES] of Byte absolute $520;
-  _mzoneY1:array[0..MAX_ZONES] of Byte absolute $540;
-  _mzoneX2:array[0..MAX_ZONES] of Byte absolute $560;
-  _mzoneY2:array[0..MAX_ZONES] of Byte absolute $580;
-  _mzonePROC:Array[0..MAX_ZONES] of TZoneProc absolute $5a0;
-
-var
-  szone:Shortint absolute $50;
-  ozone:Shortint absolute $51;
   __x,__y,__w,__h:Byte;
+
+{$i '../cursor-var.inc'}
 
 procedure nullProc(); Begin End;
 
@@ -63,36 +50,36 @@ begin
   End;
 End;
 
-function addZone(n:Shortint; x,y,w,h:Byte; prc:TZoneProc):Shortint; overload;
+function addZoneN(n:Shortint; x,y,w,h:Byte; prc:TZoneProc):Shortint;
 begin
   if n=-1 then n:=getFreeZone();
   if n<>-1 then setZone(n,true,x,y,w,h,prc);
   result:=n;
 End;
 
-function addZone(x,y,w,h:Byte; prc:TZoneProc):Shortint; overload;
+function addZone(x,y,w,h:Byte; prc:TZoneProc):Shortint;
 begin
-  result:=addZone(-1,x,y,w,h,prc);
+  result:=addZoneN(-1,x,y,w,h,prc);
 End;
 
-function addZoneH(prc:TZoneProc):Shortint; overload;
+function addZoneH(prc:TZoneProc):Shortint;
 begin
   result:=addZone(__x+__w,__y,__w,__h,prc);
 End;
 
-function addZoneH(n:Shortint; prc:TZoneProc):Shortint; overload;
+function addZoneHN(n:Shortint; prc:TZoneProc):Shortint;
 begin
-  result:=addZone(n,__x+__w,__y,__w,__h,prc);
+  result:=addZoneN(n,__x+__w,__y,__w,__h,prc);
 End;
 
-function addZoneV(prc:TZoneProc):Shortint; overload;
+function addZoneV(prc:TZoneProc):Shortint;
 begin
   result:=addZone(__x,__y+__h,__w,__h,prc);
 End;
 
-function addZoneV(n:Shortint; prc:TZoneProc):Shortint; overload;
+function addZoneVN(n:Shortint; prc:TZoneProc):Shortint;
 begin
-  result:=addZone(n,__x,__y+__h,__w,__h,prc);
+  result:=addZoneN(n,__x,__y+__h,__w,__h,prc);
 End;
 
 function checkZones:Boolean;

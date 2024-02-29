@@ -8,6 +8,25 @@ var
   filemask:string[16] absolute $42C;
   dirPageBegin:smallint;
 
+const
+  _DIRFILEX:Array of Byte = [  1,  1,  1,  1,  1, 14, 14, 14, 14, 14, 27, 27, 27, 27, 27 ];
+  _DIRFILEY:Array of Byte = [ 13, 20, 27, 34, 41, 13, 20, 27, 34, 41, 13, 20, 27, 34, 41 ];
+
+var
+  dirName:Array[0..14] of string[12];
+  // dirType:Array[0..14] of Byte;
+
+procedure addFileLabel(n:Byte; prc:TZoneProc);
+var
+  x,y:Byte;
+
+begin
+  if n>14 then exit;
+  x:=_DIRFILEX[n]; y:=_DIRFILEY[n];
+  putText(x,y,dirName[n]);
+  addZoneN(14+n,x-1,y-1,14,7,prc);
+End;
+
 procedure doChoiceFile();
 begin
   case szone of

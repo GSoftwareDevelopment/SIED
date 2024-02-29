@@ -111,7 +111,10 @@ FPEXP	.ds 1
 	?EXTDETECT = 0
 	?VBXDETECT = 0
 
-	RCDATA 'assets//fonts.obx' FONTS_ADDR 0 0 0 0 0 0 0 0
+	DOSFILE 'core/bin/core.lib' CORE_LIB 0 0 0 0 0 0 0 0
+	RCDATA 'assets//fonts.bin' FONTS_ADDR 0 0 0 0 0 0 0 0
+	RCDATA 'asc2int.bin' ASC2INT_ADDR 0 0 0 0 0 0 0 0
+	RCDATA 'scan2asc.bin' SCAN2ASC_ADDR 0 0 0 0 0 0 0 0
 .endl
 
 ; ------------------------------------------------------------
@@ -178,14 +181,14 @@ VADR	= DATAORIGIN+VARINITSIZE
 
 .local	MAIN						; PROCEDURE
 
-	jmp l_00EC
+	jmp l_01AF
 
 ; ------------------------------------------------------------
 
 .local	SYSTEM						; UNIT
 
 .local	FILLCHAR					; PROCEDURE | ASSEMBLER | OVERLOAD | REGISTER | INLINE
-.local	@012A
+.local	@01ED
 
 	.MACRO m@INLINE
 
@@ -205,7 +208,7 @@ VALUE	= :EAX
 .endl							; overload
 
 .local	MOVE						; PROCEDURE | ASSEMBLER | OVERLOAD | REGISTER | INLINE
-.local	@012B
+.local	@01EE
 
 	.MACRO m@INLINE
 
@@ -485,34 +488,34 @@ exVBL:
 
 .local	INITCURSOR					; PROCEDURE
 
-; optimize OK (CURSOR), line = 82
+; optimize OK (CURSOR), line = 68
 
 	lda #$20
 	sta PMBASE
 
-; optimize OK (CURSOR), line = 83
+; optimize OK (CURSOR), line = 69
 
 	lda #$03
 	sta PMCTL
 
-; optimize OK (CURSOR), line = 84
+; optimize OK (CURSOR), line = 70
 
 	lda #$02
 	sta GPRIOR
 
-; optimize OK (CURSOR), line = 85
+; optimize OK (CURSOR), line = 71
 
 	lda #$2A
 	sta SDMACTL
 
-; optimize OK (CURSOR), line = 87
+; optimize OK (CURSOR), line = 73
 
 	lda #$0F
 	sta adr.PCOL
 	lda #$00
 	sta adr.PCOL+$01
 
-; optimize OK (CURSOR), line = 88
+; optimize OK (CURSOR), line = 74
 
 	lda <MYVBL
 	ldy #5
@@ -523,31 +526,31 @@ exVBL:
 	lda >MYVBL
 	sta VVBLKD+1
 
-; optimize OK (CURSOR), line = 89
+; optimize OK (CURSOR), line = 75
 
 	lda #$01
 	sta MREFRESH
 
-; optimize OK (CURSOR), line = 90
+; optimize OK (CURSOR), line = 76
 
 	sta MALLOWKEYS
 
-; optimize OK (CURSOR), line = 91
+; optimize OK (CURSOR), line = 77
 
 	lda #$80
 	sta _MX
 	lda #$40
 	sta _MY
 
-; optimize OK (CURSOR), line = 92
+; optimize OK (CURSOR), line = 78
 
-	lda #$E8
+	lda #$AB
 	sta SETCURSOR.SPR
-	lda #$80
+	lda #$81
 	sta SETCURSOR.SPR+1
 	jsr SETCURSOR
 
-; optimize OK (CURSOR), line = 93
+; optimize OK (CURSOR), line = 79
 
 	lda #$00
 	sta SETPIVOT.X
@@ -567,11 +570,11 @@ exVBL:
 
 ; ------------------------------------------------------------
 
-adr._ARROW	= CODEORIGIN+$00E8
+adr._ARROW	= CODEORIGIN+$01AB
 .var _ARROW	= adr._ARROW .word
-adr._WAIT	= CODEORIGIN+$00EF
+adr._WAIT	= CODEORIGIN+$01B2
 .var _WAIT	= adr._WAIT .word
-adr._CROSS	= CODEORIGIN+$00F6
+adr._CROSS	= CODEORIGIN+$01B9
 .var _CROSS	= adr._CROSS .word
 MBUT_NONE	= $00
 MBUT_LEFT	= $01
@@ -593,6 +596,9 @@ EDITOR_ADDR	= $2800
 FONTS_ADDR	= $3000
 MAX_SPRITE	= $0F
 MAX_GROUP	= $07
+CORE_LIB	= $D800
+ASC2INT_ADDR	= $1F00
+SCAN2ASC_ADDR	= $1F80
 GPRIOR	= $026F
 SDMACTL	= $022F
 PMCTL	= $D01D
@@ -730,1934 +736,96 @@ OUTFN	= :ECX
 	eif
 .endl
 
-.local	KEYSCAN2ASC					; FUNCTION | ASSEMBLER
-	sta KEYSCAN
+.local	SHOWABOUT					; PROCEDURE
 
-; -------------------  ASM Block 00000075  -------------------
-
- icl 'asm/keyscan2asc.a65' 
-@exit
-
-; ------------------------------------------------------------
-
-KEYSCAN	= DATAORIGIN+$0011
-RESULT	= DATAORIGIN+$0012
-
-@VarData	= KEYSCAN
-@VarDataSize	= 1
-
-	rts						; ret
-.endl
-
-.local	PUTIMAGE					; PROCEDURE | ASSEMBLER | REGISTER
-
-; -------------------  ASM Block 00000077  -------------------
-
- icl 'asm/put-image.a65' 
-; ------------------------------------------------------------
-
-ADR	= :EDX
-X	= :ECX
-Y	= :EAX
-WIDTH	= DATAORIGIN+$0014
-HEIGHT	= DATAORIGIN+$0015
-
-@VarData	= WIDTH
-@VarDataSize	= 2
-
-@exit
-	.ifdef @new
-	lda <@VarData
-	sta :ztmp
-	lda >@VarData
-	ldy #@VarDataSize-1
-	jmp @FreeMem
-	els
-	rts						; ret
-	eif
-.endl
-
-.local	PUTSPRITE					; PROCEDURE | ASSEMBLER | REGISTER | KEEP
-
-; -------------------  ASM Block 00000078  -------------------
-
- icl 'asm/put-sprite-or.a65' 
-; ------------------------------------------------------------
-
-ADR	= :EDX
-X	= :ECX
-Y	= :EAX
-WIDTH	= DATAORIGIN+$0016
-HEIGHT	= DATAORIGIN+$0017
-
-@VarData	= WIDTH
-@VarDataSize	= 2
-
-@exit
-	.ifdef @new
-	lda <@VarData
-	sta :ztmp
-	lda >@VarData
-	ldy #@VarDataSize-1
-	jmp @FreeMem
-	els
-	rts						; ret
-	eif
-.endl
-
-.local	PUTTEXT						; PROCEDURE | ASSEMBLER | REGISTER
-
-; -------------------  ASM Block 00000080  -------------------
-
- icl 'asm/put-text.a65' 
-; ------------------------------------------------------------
-
-X	= :EDX
-Y	= :ECX
-S	= :EAX
-@exit
-	.ifdef @new
-	lda <@VarData
-	sta :ztmp
-	lda >@VarData
-	ldy #@VarDataSize-1
-	jmp @FreeMem
-	els
-	rts						; ret
-	eif
-.endl
-
-.local	PUTTEXTC					; PROCEDURE | ASSEMBLER | REGISTER
-
-; -------------------  ASM Block 00000081  -------------------
-
- icl 'asm/put-textc.a65' 
-; ------------------------------------------------------------
-
-X	= :EDX
-Y	= :ECX
-S	= :EAX
-@exit
-	.ifdef @new
-	lda <@VarData
-	sta :ztmp
-	lda >@VarData
-	ldy #@VarDataSize-1
-	jmp @FreeMem
-	els
-	rts						; ret
-	eif
-.endl
-
-.local	INVERT						; PROCEDURE | ASSEMBLER | REGISTER
-
-; -------------------  ASM Block 00000082  -------------------
-
- icl 'asm/invert.a65' 
-; ------------------------------------------------------------
-
-X	= :EDX
-Y	= :ECX
-W	= :EAX
-H	= DATAORIGIN+$0018
-
-@VarData	= H
-@VarDataSize	= 1
-
-@exit
-	.ifdef @new
-	lda <@VarData
-	sta :ztmp
-	lda >@VarData
-	ldy #@VarDataSize-1
-	jmp @FreeMem
-	els
-	rts						; ret
-	eif
-.endl
-
-.local	BLANK						; PROCEDURE | ASSEMBLER | REGISTER
-
-; -------------------  ASM Block 00000083  -------------------
-
- icl 'asm/blank.a65' 
-; ------------------------------------------------------------
-
-X	= :EDX
-Y	= :ECX
-W	= :EAX
-H	= DATAORIGIN+$0019
-
-@VarData	= H
-@VarDataSize	= 1
-
-@exit
-	.ifdef @new
-	lda <@VarData
-	sta :ztmp
-	lda >@VarData
-	ldy #@VarDataSize-1
-	jmp @FreeMem
-	els
-	rts						; ret
-	eif
-.endl
-
-.local	SETSCREENWIDTH					; PROCEDURE | ASSEMBLER | REGISTER | INLINE
-
-	.MACRO m@INLINE
-	sta NSW
-
-; -------------------  ASM Block 00000084  -------------------
-
-  sta MAIN.PUTIMAGE._LNWIDTH
-  sta MAIN.PUTSPRITE._LNWIDTH1
-  sta MAIN.PUTSPRITE._LNWIDTH2
-
-	.ENDM
-
-; ------------------------------------------------------------
-
-NSW	= :EDX
-@exit
-.endl
-
-.local	NULLPROC					; PROCEDURE
-
-@exit
-	.ifdef @new
-	lda <@VarData
-	sta :ztmp
-	lda >@VarData
-	ldy #@VarDataSize-1
-	jmp @FreeMem
-	els
-	rts						; ret
-	eif
-.endl
-
-.local	SETZONE						; PROCEDURE
-
-; optimize OK (interface.inc), line = 25
-
-	ldy N
-	lda ACT
-	sta adr._MZONEACTIVE,y
-
-; optimize OK (interface.inc), line = 26
-
-	lda X
-	sta adr._MZONEX1,y
-	sta __X
-
-; optimize OK (interface.inc), line = 27
-
-	lda Y
-	sta adr._MZONEY1,y
-	sta __Y
-
-; optimize OK (interface.inc), line = 28
-
-	lda X
-	add W
-	sub #$01
-	sta adr._MZONEX2,y
-	lda W
-	sta __W
-
-; optimize OK (interface.inc), line = 29
-
-	lda Y
-	add H
-	sub #$01
-	sta adr._MZONEY2,y
-	lda H
-	sta __H
-
-; optimize OK (interface.inc), line = 30
-
-	lda N
-	asl @
-	tay
-	lda PRC
-	sta adr._MZONEPROC,y
-	lda PRC+1
-	sta adr._MZONEPROC+1,y
-
-; ------------------------------------------------------------
-
-N	= DATAORIGIN+$001E
-ACT	= DATAORIGIN+$001F
-X	= DATAORIGIN+$0020
-Y	= DATAORIGIN+$0021
-W	= DATAORIGIN+$0022
-H	= DATAORIGIN+$0023
-PRC	= DATAORIGIN+$0024
-
-@VarData	= N
-@VarDataSize	= 8
-
-@exit
-	.ifdef @new
-	lda <@VarData
-	sta :ztmp
-	lda >@VarData
-	ldy #@VarDataSize-1
-	jmp @FreeMem
-	els
-	rts						; ret
-	eif
-.endl
-
-.local	CLEARZONE					; PROCEDURE
-	sta N
-
-; optimize OK (interface.inc), line = 36
-
-	ldy N
-	lda #$00
-	sta adr._MZONEACTIVE,y
-
-; optimize OK (interface.inc), line = 37
+; optimize OK (about.inc), line = 3
 
 	lda #$FF
-	sta adr._MZONEX1,y
+	jsr SETMODULE
 
-; optimize OK (interface.inc), line = 38
+; optimize OK (about.inc), line = 4
 
-	sta adr._MZONEX2,y
+	lda #$14
+	jsr SETSCREENWIDTH
 
-; optimize OK (interface.inc), line = 39
+; optimize OK (about.inc), line = 5
 
-	sta adr._MZONEY1,y
+	lda #$0A
+	sta PUTTEXT.X
+	lda #$06
+	sta PUTTEXT.Y
+	lda #$C4
+	sta PUTTEXT.S
+	lda #$80
+	sta PUTTEXT.S+1
+	jsr PUTTEXT
 
-; optimize OK (interface.inc), line = 40
+; optimize OK (about.inc), line = 6
 
-	sta adr._MZONEY2,y
-
-; optimize OK (interface.inc), line = 41
-
-	lda N
-	asl @
-	tay
-	lda <NULLPROC
-	sta adr._MZONEPROC,y
-	lda >NULLPROC
-	sta adr._MZONEPROC+1,y
-
-; ------------------------------------------------------------
-
-N	= DATAORIGIN+$0026
-
-@VarData	= N
-@VarDataSize	= 1
-
-@exit
-	.ifdef @new
-	lda <@VarData
-	sta :ztmp
-	lda >@VarData
-	ldy #@VarDataSize-1
-	jmp @FreeMem
-	els
-	rts						; ret
-	eif
-.endl
-
-.local	CLEARWORKZONES					; PROCEDURE
-
-; optimize OK (interface.inc), line = 46
-
-	lda #$09
-	sta I
-
-l_0251
-; --- ForToDoCondition
-	lda I
-	cmp #$20
-	jcs l_025F
-
-; optimize OK (interface.inc), line = 47
-
-	jsr CLEARZONE
-
-; --- ForToDoEpilog
-	inc I
-	jne l_0251
-l_025F
-
-; ------------------------------------------------------------
-
-@exit
-	.ifdef @new
-	lda <@VarData
-	sta :ztmp
-	lda >@VarData
-	ldy #@VarDataSize-1
-	jmp @FreeMem
-	els
-	rts						; ret
-	eif
-.endl
-
-.local	INITINTERFACE					; PROCEDURE
-
-; optimize OK (interface.inc), line = 52
-
-	lda #$FF
-	sta SZONE
-	sta OZONE
-	lda #$00
-	sta CURSOR.OMBUTTON
-
-; optimize OK (interface.inc), line = 53
-
-	sta I
-
-l_0281
-; --- ForToDoCondition
-	lda I
-	cmp #$20
-	jcs l_028F
-
-; optimize OK (interface.inc), line = 54
-
-	jsr CLEARZONE
-
-; --- ForToDoEpilog
-	inc I
-	jne l_0281
-l_028F
-
-; ------------------------------------------------------------
-
-@exit
-	.ifdef @new
-	lda <@VarData
-	sta :ztmp
-	lda >@VarData
-	ldy #@VarDataSize-1
-	jmp @FreeMem
-	els
-	rts						; ret
-	eif
-.endl
-
-.local	GETFREEZONE					; FUNCTION
-
-; optimize OK (interface.inc), line = 59
-
-	lda #$FF
-	sta RESULT
-
-; optimize OK (interface.inc), line = 60
-
-	lda #$09
-	sta I
-
-l_02A9
-; --- ForToDoCondition
-	ldy I
-	cpy #$20
-	jcs l_02B7
-
-; optimize OK (interface.inc), line = 62
-
-	lda adr._MZONEX1,y
-	cmp #$FF
-	jne l_02CC
-	lda I
-	sta RESULT
-	jmp @exit
-l_02CC
-
-; --- ForToDoEpilog
-	inc I
-	jne l_02A9
-l_02B7
-@exit
-
-; ------------------------------------------------------------
-
-RESULT	= DATAORIGIN+$0027
-	rts						; ret
-.endl
-
-.local	ADDZONE						; FUNCTION | OVERLOAD
-.local	@02DB
-
-; optimize OK (interface.inc), line = 68
-
-	lda N
-	cmp #$FF
-	jne l_02F0
-	jsr GETFREEZONE
-	lda GETFREEZONE.RESULT
-	sta N
-l_02F0
-
-; optimize OK (interface.inc), line = 69
-
-	lda N
-	cmp #$FF
-	jeq l_0309
-	lda PRC
-	sta SETZONE.PRC
-	lda PRC+1
-	sta SETZONE.PRC+1
-	lda N
-	sta SETZONE.N
-	lda #$01
-	sta SETZONE.ACT
-	lda X
-	sta SETZONE.X
-	lda Y
-	sta SETZONE.Y
-	lda W
-	sta SETZONE.W
-	lda H
-	sta SETZONE.H
-	jsr SETZONE
-l_0309
-
-; optimize OK (interface.inc), line = 70
-
-	lda N
-	sta RESULT
-@exit
-
-; ------------------------------------------------------------
-
-N	= DATAORIGIN+$0028
-X	= DATAORIGIN+$0029
-Y	= DATAORIGIN+$002A
-W	= DATAORIGIN+$002B
-H	= DATAORIGIN+$002C
-PRC	= DATAORIGIN+$002D
-RESULT	= DATAORIGIN+$002F
-
-@VarData	= N
-@VarDataSize	= 7
-
-	rts						; ret
-.endl
-.endl							; overload
-
-.local	ADDZONE						; FUNCTION | OVERLOAD
-.local	@0324
-
-; optimize OK (interface.inc), line = 75
-
-	lda PRC
-	sta ADDZONE.@02DB.PRC
-	lda PRC+1
-	sta ADDZONE.@02DB.PRC+1
-	lda #$FF
-	sta ADDZONE.@02DB.N
-	lda X
-	sta ADDZONE.@02DB.X
-	lda Y
-	sta ADDZONE.@02DB.Y
-	lda W
-	sta ADDZONE.@02DB.W
-	lda H
-	sta ADDZONE.@02DB.H
-	jsr ADDZONE.@02DB
-	lda ADDZONE.@02DB.RESULT
-	sta RESULT
-@exit
-
-; ------------------------------------------------------------
-
-X	= DATAORIGIN+$0030
-Y	= DATAORIGIN+$0031
-W	= DATAORIGIN+$0032
-H	= DATAORIGIN+$0033
-PRC	= DATAORIGIN+$0034
-RESULT	= DATAORIGIN+$0036
-
-@VarData	= X
-@VarDataSize	= 6
-
-	rts						; ret
-.endl
-.endl							; overload
-
-.local	ADDZONEH					; FUNCTION | OVERLOAD
-.local	@0339
-
-; optimize OK (interface.inc), line = 85
-
-	lda PRC
-	sta ADDZONE.@02DB.PRC
-	lda PRC+1
-	sta ADDZONE.@02DB.PRC+1
-	lda __X
-	add __W
-	sta ADDZONE.@02DB.X
-	lda N
-	sta ADDZONE.@02DB.N
-	lda __Y
-	sta ADDZONE.@02DB.Y
-	lda __W
-	sta ADDZONE.@02DB.W
-	lda __H
-	sta ADDZONE.@02DB.H
-	jsr ADDZONE.@02DB
-	lda ADDZONE.@02DB.RESULT
-	sta RESULT
-@exit
-
-; ------------------------------------------------------------
-
-N	= DATAORIGIN+$0037
-PRC	= DATAORIGIN+$0038
-RESULT	= DATAORIGIN+$003A
-
-@VarData	= N
-@VarDataSize	= 3
-
-	rts						; ret
-.endl
-.endl							; overload
-
-.local	ADDZONEV					; FUNCTION | OVERLOAD
-.local	@0356
-
-; optimize OK (interface.inc), line = 90
-
-	lda PRC
-	sta ADDZONE.@0324.PRC
-	lda PRC+1
-	sta ADDZONE.@0324.PRC+1
-	lda __Y
-	add __H
-	sta ADDZONE.@0324.Y
-	lda __X
-	sta ADDZONE.@0324.X
-	lda __W
-	sta ADDZONE.@0324.W
-	lda __H
-	sta ADDZONE.@0324.H
-	jsr ADDZONE.@0324
-	lda ADDZONE.@0324.RESULT
-	sta RESULT
-@exit
-
-; ------------------------------------------------------------
-
-PRC	= DATAORIGIN+$003B
-RESULT	= DATAORIGIN+$003D
-
-@VarData	= PRC
-@VarDataSize	= 2
-
-	rts						; ret
-.endl
-.endl							; overload
-
-.local	CHECKZONES					; FUNCTION
-
-	jmp l_0373
-
-.local	REFRESHZONE					; PROCEDURE
-
-; optimize OK (interface.inc), line = 104
-
-	lda OZONE
-	sub #$09
-	svc
-	eor #$80
-	jmi l_0388
-
-; optimize OK (interface.inc), line = 106
-
-	lda OZONE
-	jsr INVERTZONE
-
-; optimize OK (interface.inc), line = 107
-
-	lda #$FF
-	sta OZONE
-l_0388
-
-; optimize OK (interface.inc), line = 109
-
-	lda NZONE
-	sub #$09
-	svc
-	eor #$80
-	jmi l_03A5
-
-; optimize OK (interface.inc), line = 111
-
-	lda NZONE
-	jsr INVERTZONE
-
-; optimize OK (interface.inc), line = 112
-
-	lda NZONE
-	sta OZONE
-l_03A5
-@exit
-	.ifdef @new
-	lda <@VarData
-	sta :ztmp
-	lda >@VarData
-	ldy #@VarDataSize-1
-	jmp @FreeMem
-	els
-	rts						; ret
-	eif
-.endl
-
-.local	PRESSED						; FUNCTION
-
-; optimize OK (interface.inc), line = 118
-
-	lda NZONE
-	sta SZONE
-
-; optimize OK (interface.inc), line = 119
-
-	lda #$FF
-	sta NZONE
-
-; optimize OK (interface.inc), line = 120
-
-	lda #$00
-	sta CURSOR.OMBUTTON
-
-; optimize OK (interface.inc), line = 121
-
-	lda #$01
-	sta RESULT
-@exit
-
-; ------------------------------------------------------------
-
-RESULT	= DATAORIGIN+$003F
-	rts						; ret
-.endl
-l_0373
-
-; optimize OK (interface.inc), line = 125
-
-	lda #$00
-	sta RESULT
-
-; optimize OK (interface.inc), line = 126
-
-	lda #$FF
-	sta NZONE
-	sta SZONE
-
-; optimize OK (interface.inc), line = 127
-
-	lda #$00
-	sta I
-
-l_03DE
-; --- ForToDoCondition
-	ldy I
-	cpy #$20
-	jcs l_03EC
-
-; optimize OK (interface.inc), line = 129
-
-	lda adr._MZONEACTIVE,y
-	jeq l_03FB
-
-; optimize OK (interface.inc), line = 130
-
-	lda adr._MZONEX1,y
-	sta :STACKORIGIN+10
-	ldy #$00
-	lda CURSOR.MX
-	spl
-	dey
-	sty :STACKORIGIN+STACKWIDTH+9
-	cmp :STACKORIGIN+10
-	lda :STACKORIGIN+STACKWIDTH+9
-	sbc #$00
-	svc
-	eor #$80
-	jmi l_0446
-	ldy I
-	lda adr._MZONEX2,y
-	sta :STACKORIGIN+11
-	ldy #$00
-	lda CURSOR.MX
-	spl
-	dey
-	sty :STACKORIGIN+STACKWIDTH+10
-	sta :STACKORIGIN+10
-	lda :STACKORIGIN+11
-	cmp :STACKORIGIN+10
-	lda #$00
-	sbc :STACKORIGIN+STACKWIDTH+10
-	svc
-	eor #$80
-	jmi l_0446
-	ldy I
-	lda adr._MZONEY1,y
-	sta :STACKORIGIN+11
-	ldy #$00
-	lda CURSOR.MY
-	spl
-	dey
-	sty :STACKORIGIN+STACKWIDTH+10
-	cmp :STACKORIGIN+11
-	lda :STACKORIGIN+STACKWIDTH+10
-	sbc #$00
-	svc
-	eor #$80
-	jmi l_0446
-	ldy I
-	lda adr._MZONEY2,y
-	sta :STACKORIGIN+11
-	ldy #$00
-	lda CURSOR.MY
-	spl
-	dey
-	sty :STACKORIGIN+STACKWIDTH+10
-	sta :STACKORIGIN+10
-	lda :STACKORIGIN+11
-	cmp :STACKORIGIN+10
-	lda #$00
-	sbc :STACKORIGIN+STACKWIDTH+10
-	svc
-	eor #$80
-	jmi l_0446
-
-; optimize OK (interface.inc), line = 133
-
-	lda I
-	sta NZONE
-	jmp b_03DE					; break
-l_0446
-l_03FB
-
-; --- ForToDoEpilog
-	inc I
-	jne l_03DE
-l_03EC
-b_03DE
-
-; optimize OK (interface.inc), line = 137
-
-	lda NZONE
-	cmp #$FF
-	jeq l_0468
-
-; optimize OK (interface.inc), line = 139
-
-	sub #$09
-	svc
-	eor #$80
-	jpl l_047B
-
-; optimize FAIL ('REFRESHZONE', interface.inc), line = 141
-
-	jsr REFRESHZONE
-
-; optimize OK (interface.inc), line = 142
-
-	lda CURSOR.MBUTTON
-	jne l_048F
-
-; optimize OK (interface.inc), line = 144
-
-	lda CURSOR.OMBUTTON
-	cmp #$01
-	jne l_04B0
-	lda NZONE
-	cmp OZONE
-	jne l_04B0
-
-; optimize FAIL ('PRESSED', interface.inc), line = 145
-
-	jsr PRESSED
-	lda PRESSED.RESULT
-	sta RESULT
-l_04B0
-	jmp l_04C0
-l_048F
-
-; optimize OK (interface.inc), line = 149
-
-	lda NZONE
-	cmp OZONE
-	jeq l_04D4
-
-; optimize OK (interface.inc), line = 151
-
-	sub #$03
-	svc
-	eor #$80
-	jpl l_04E7
-
-; optimize OK (interface.inc), line = 153
-
-	lda #$FF
-	jsr SETICON
-
-; optimize OK (interface.inc), line = 154
-
-	ldy NZONE
-	lda adr._MZONEX1,y
-	sta PUTIMAGE.X
-	ldy #$00
-	lda NZONE
-	spl
-	dey
-	sty :STACKORIGIN+STACKWIDTH+14
-	add #$03
-	sta :STACKORIGIN+13
-	lda #$00
-	adc :STACKORIGIN+STACKWIDTH+14
-	asl :STACKORIGIN+13
-	rol @
-	sta :STACKORIGIN+STACKWIDTH+13
-	lda :STACKORIGIN+13
-	add #$00
-	tay
-	lda :STACKORIGIN+STACKWIDTH+13
-	adc #$00
-	sta :STACKORIGIN+STACKWIDTH+13
-	lda adr.AICONS,y
-	sta PUTIMAGE.ADR
-	lda adr.AICONS+1,y
-	sta PUTIMAGE.ADR+1
-	lda #$32
-	sta PUTIMAGE.Y
-	lda #$03
-	sta PUTIMAGE.WIDTH
+	lda #$0A
+	sta PUTTEXT.X
 	lda #$0C
-	sta PUTIMAGE.HEIGHT
-	jsr PUTIMAGE
-	jmp l_0506
-l_04E7
+	sta PUTTEXT.Y
+	lda #$D8
+	sta PUTTEXT.S
+	lda #$80
+	sta PUTTEXT.S+1
+	jsr PUTTEXT
+
+; optimize OK (about.inc), line = 7
 
-; optimize OK (interface.inc), line = 156
-
-	lda NZONE
-	sub #$03
-	jsr SETCONTROL
-l_0506
-
-; optimize OK (interface.inc), line = 158
-
-	lda NZONE
-	sta OZONE
-
-; optimize OK (interface.inc), line = 159
-
-	lda #$01
-	sta CURSOR.OMBUTTON
-l_04D4
-l_04C0
-	jmp l_0523
-l_047B
-
-; optimize OK (interface.inc), line = 165
-
-	lda CURSOR.MBUTTON
-	jne l_0535
-
-; optimize OK (interface.inc), line = 167
-
-	lda CURSOR.OMBUTTON
-	cmp #$01
-	jne l_0548
-	jsr PRESSED
-	lda PRESSED.RESULT
-	sta RESULT
-l_0548
-
-; optimize OK (interface.inc), line = 168
-
-	lda NZONE
-	cmp OZONE
-	jeq l_0563
-	jsr REFRESHZONE
-l_0563
-	jmp l_0570
-l_0535
-
-; optimize OK (interface.inc), line = 172
-
-	lda #$FF
-	sta NZONE
-
-; optimize FAIL ('REFRESHZONE', interface.inc), line = 173
-
-	jsr REFRESHZONE
-
-; optimize OK (interface.inc), line = 174
-
-	lda #$01
-	sta CURSOR.OMBUTTON
-l_0570
-l_0523
-	jmp l_0582
-l_0468
-
-; optimize FAIL ('REFRESHZONE', interface.inc), line = 180
-
-	jsr REFRESHZONE
-
-; optimize OK (interface.inc), line = 181
-
-	lda CURSOR.OMBUTTON
-	cmp #$01
-	jne l_0595
-
-; optimize OK (interface.inc), line = 183
-
-	lda #$FF
-	jsr SETICON
-	lda #$FF
-	jsr SETCONTROL
-
-; optimize OK (interface.inc), line = 184
-
-	lda #$FF
-	sta OZONE
-
-; optimize OK (interface.inc), line = 185
-
-	lda #$00
-	sta CURSOR.OMBUTTON
-l_0595
-l_0582
-@exit
-
-; ------------------------------------------------------------
-
-RESULT	= DATAORIGIN+$003E
-NZONE	= $57
-	rts						; ret
-.endl
-
-.local	INVERTZONE					; PROCEDURE
-	sta I
-
-; optimize OK (controls.inc), line = 9
-
-	ldy I
-	lda adr._MZONEX2,y
-	sub adr._MZONEX1,y
-	sta _W
-
-; optimize OK (controls.inc), line = 10
-
-	lda adr._MZONEY2,y
-	sub adr._MZONEY1,y
-	sta _H
-
-; optimize OK (controls.inc), line = 11
-
-	lda adr._MZONEY1,y
-	sta INVERT.Y
-	lda adr._MZONEX1,y
-	sta INVERT.X
-	lda _W
-	sta INVERT.W
-	lda _H
-	sta INVERT.H
-	jsr INVERT
-
-; ------------------------------------------------------------
-
-I	= DATAORIGIN+$0040
-_W	= DATAORIGIN+$0041
-_H	= DATAORIGIN+$0042
-
-@VarData	= I
-@VarDataSize	= 3
-
-@exit
-	.ifdef @new
-	lda <@VarData
-	sta :ztmp
-	lda >@VarData
-	ldy #@VarDataSize-1
-	jmp @FreeMem
-	els
-	rts						; ret
-	eif
-.endl
-
-.local	CLEARWORKAREA					; PROCEDURE
-
-; optimize OK (controls.inc), line = 16
-
-	lda #$00
-	sta SYSTEM.FILLCHAR.@012A.A
-	lda #$28
-	sta SYSTEM.FILLCHAR.@012A.A+1
-	lda #$C0
-	sta SYSTEM.FILLCHAR.@012A.COUNT
-	lda #$03
-	sta SYSTEM.FILLCHAR.@012A.COUNT+1
-	lda #$00
-	sta SYSTEM.FILLCHAR.@012A.VALUE
-	.LOCAL +MAIN.SYSTEM.FILLCHAR.@012A
-	m@INLINE
-	.ENDL
-
-; optimize FAIL ('CLEARWORKZONES', controls.inc), line = 17
-
-	jsr CLEARWORKZONES
-@exit
-	.ifdef @new
-	lda <@VarData
-	sta :ztmp
-	lda >@VarData
-	ldy #@VarDataSize-1
-	jmp @FreeMem
-	els
-	rts						; ret
-	eif
-.endl
-
-.local	CLEARSTATUS					; PROCEDURE
-
-; optimize OK (controls.inc), line = 22
-
-	lda adr.YSCR+$F8
-	sta SYSTEM.FILLCHAR.@012A.A
-	lda adr.YSCR+1+$F8
-	sta SYSTEM.FILLCHAR.@012A.A+1
-	lda #$18
-	sta SYSTEM.FILLCHAR.@012A.COUNT
-	lda #$01
-	sta SYSTEM.FILLCHAR.@012A.COUNT+1
-	lda #$00
-	sta SYSTEM.FILLCHAR.@012A.VALUE
-	.LOCAL +MAIN.SYSTEM.FILLCHAR.@012A
-	m@INLINE
-	.ENDL
-@exit
-	.ifdef @new
-	lda <@VarData
-	sta :ztmp
-	lda >@VarData
-	ldy #@VarDataSize-1
-	jmp @FreeMem
-	els
-	rts						; ret
-	eif
-.endl
-
-.local	SETSTATUS					; PROCEDURE
-
-; optimize FAIL ('CLEARSTATUS', controls.inc), line = 27
-
-	jsr CLEARSTATUS
-
-; optimize OK (controls.inc), line = 28
-
-	lda #$28
-	.LOCAL +MAIN.SETSCREENWIDTH
-	m@INLINE
-	.ENDL
-
-; optimize OK (controls.inc), line = 29
-
-	lda #$00
-	sta PUTTEXTC.X
-	lda #$45
-	sta PUTTEXTC.Y
-	lda S
-	sta PUTTEXTC.S
-	lda S+1
-	sta PUTTEXTC.S+1
-	jsr PUTTEXTC
-
-; ------------------------------------------------------------
-
-S	= DATAORIGIN+$0043
-
-@VarData	= S
-@VarDataSize	= 2
-
-@exit
-	.ifdef @new
-	lda <@VarData
-	sta :ztmp
-	lda >@VarData
-	ldy #@VarDataSize-1
-	jmp @FreeMem
-	els
-	rts						; ret
-	eif
-.endl
-
-.local	SETICON						; PROCEDURE
-	sta N
-
-; optimize OK (controls.inc), line = 38
-
-	lda #$28
-	.LOCAL +MAIN.SETSCREENWIDTH
-	m@INLINE
-	.ENDL
-
-; optimize OK (controls.inc), line = 39
-
-	lda #$00
-	sta I
-
-l_060D
-; --- ForToDoCondition
-	ldy I
-	cpy #$03
-	jcs l_061B
-
-; optimize OK (controls.inc), line = 41
-
-	lda adr._MZONEX1,y
-	sta _X
-
-; optimize OK (controls.inc), line = 42
-
-	lda adr._MZONEACTIVE,y
-	jeq l_0633
-
-; optimize OK (controls.inc), line = 44
-
-	lda I
-	cmp N
-	jne l_0648
-
-; optimize OK (controls.inc), line = 46
-
-	lda _X
-	sub #$01
-	sta PUTIMAGE.X
-	lda #$BB
-	sta PUTIMAGE.ADR
-	lda #$83
-	sta PUTIMAGE.ADR+1
-	lda #$30
-	sta PUTIMAGE.Y
-	lda #$05
-	sta PUTIMAGE.WIDTH
 	lda #$0F
-	sta PUTIMAGE.HEIGHT
-	jsr PUTIMAGE
-
-; optimize OK (controls.inc), line = 47
-
-	ldy #$00
-	lda N
-	spl
-	dey
-	sty :STACKORIGIN+STACKWIDTH+10
-	add #$06
-	sta :STACKORIGIN+9
-	lda #$00
-	adc :STACKORIGIN+STACKWIDTH+10
-	asl :STACKORIGIN+9
-	rol @
-	sta :STACKORIGIN+STACKWIDTH+9
-	lda :STACKORIGIN+9
-	add #$00
-	tay
-	lda :STACKORIGIN+STACKWIDTH+9
-	adc #$00
-	sta :STACKORIGIN+STACKWIDTH+9
-	jmp l_066A
-l_0648
-
-; optimize OK (controls.inc), line = 50
-
-	lda I
-	asl @
-	tay
-l_066A
-	lda adr.AICONS,y
-	sta P
-	lda adr.AICONS+1,y
-	sta P+1
-
-; optimize OK (controls.inc), line = 51
-
-	lda P
-	sta PUTIMAGE.ADR
-	lda P+1
-	sta PUTIMAGE.ADR+1
-	lda _X
-	sta PUTIMAGE.X
-	lda #$32
-	sta PUTIMAGE.Y
-	lda #$03
-	sta PUTIMAGE.WIDTH
-	lda #$0C
-	sta PUTIMAGE.HEIGHT
-	jsr PUTIMAGE
-l_0633
-
-; --- ForToDoEpilog
-	inc I
-	jne l_060D
-l_061B
-
-; ------------------------------------------------------------
-
-N	= DATAORIGIN+$0045
-_X	= DATAORIGIN+$0046
-P	= DATAORIGIN+$0047
-
-@VarData	= N
-@VarDataSize	= 4
-
-@exit
-	.ifdef @new
-	lda <@VarData
-	sta :ztmp
-	lda >@VarData
-	ldy #@VarDataSize-1
-	jmp @FreeMem
-	els
-	rts						; ret
-	eif
-.endl
-
-.local	SETCONTROL					; PROCEDURE
-	sta N
-
-; optimize OK (controls.inc), line = 72
-
-	lda #$28
-	.LOCAL +MAIN.SETSCREENWIDTH
-	m@INLINE
-	.ENDL
-
-; optimize OK (controls.inc), line = 73
-
-	lda #$00
-	sta I
-
-l_0691
-; --- ForToDoCondition
-	lda I
-	cmp #$06
-	jcs l_069F
-
-; optimize OK (controls.inc), line = 75
-
-	add #$03
-	tay
-	lda adr._MZONEX1,y
-	sta _X
-
-; optimize OK (controls.inc), line = 76
-
-	lda I
-	cmp N
-	jne l_06C0
-
-; optimize OK (controls.inc), line = 77
-
-	asl @
-	tay
-	lda adr.ACONTROLS+$0C,y
-	sta P
-	lda adr.ACONTROLS+1+$0C,y
-	jmp l_06D6
-l_06C0
-
-; optimize OK (controls.inc), line = 79
-
-	lda I
-	asl @
-	tay
-	lda adr.ACONTROLS,y
-	sta P
-	lda adr.ACONTROLS+1,y
-l_06D6
-	sta P+1
-
-; optimize OK (controls.inc), line = 80
-
-	lda P
-	sta PUTIMAGE.ADR
-	lda P+1
-	sta PUTIMAGE.ADR+1
-	lda _X
-	sta PUTIMAGE.X
-	lda #$37
-	sta PUTIMAGE.Y
-	lda #$03
-	sta PUTIMAGE.WIDTH
-	lda #$08
-	sta PUTIMAGE.HEIGHT
-	jsr PUTIMAGE
-
-; --- ForToDoEpilog
-	inc I
-	jne l_0691
-l_069F
-
-; ------------------------------------------------------------
-
-N	= DATAORIGIN+$0049
-_X	= DATAORIGIN+$004A
-P	= DATAORIGIN+$004B
-
-@VarData	= N
-@VarDataSize	= 4
-
-@exit
-	.ifdef @new
-	lda <@VarData
-	sta :ztmp
-	lda >@VarData
-	ldy #@VarDataSize-1
-	jmp @FreeMem
-	els
-	rts						; ret
-	eif
-.endl
-
-.local	ADDBUTTON					; FUNCTION
-
-; optimize OK (controls.inc), line = 88
-
-	lda X
 	sta PUTTEXT.X
-	lda Y
+	lda #$18
 	sta PUTTEXT.Y
-	lda CAP
+	lda #$EC
 	sta PUTTEXT.S
-	lda CAP+1
+	lda #$80
 	sta PUTTEXT.S+1
 	jsr PUTTEXT
 
-; optimize OK (controls.inc), line = 89
-
-	lda PRC
-	sta ADDZONE.@02DB.PRC
-	lda PRC+1
-	sta ADDZONE.@02DB.PRC+1
-	ldy CAP+1
-	sty :bp+1
-	ldy CAP
-	lda (:bp),y
-	add #$02
-	sta ADDZONE.@02DB.W
-	lda Y
-	sub #$01
-	sta ADDZONE.@02DB.Y
-	lda X
-	sub #$01
-	sta ADDZONE.@02DB.X
-	lda #$FF
-	sta ADDZONE.@02DB.N
-	lda #$07
-	sta ADDZONE.@02DB.H
-	jsr ADDZONE.@02DB
-	lda ADDZONE.@02DB.RESULT
-	sta RESULT
-@exit
-
-; ------------------------------------------------------------
-
-X	= DATAORIGIN+$004D
-Y	= DATAORIGIN+$004E
-CAP	= DATAORIGIN+$004F
-PRC	= DATAORIGIN+$0051
-RESULT	= DATAORIGIN+$0053
-
-@VarData	= X
-@VarDataSize	= 6
-
-	rts						; ret
-.endl
-
-.local	ADDINPUT					; FUNCTION
-
-; optimize OK (controls.inc), line = 96
-
-	lda X
-	sta PUTTEXT.X
-	lda Y
-	sta PUTTEXT.Y
-	lda VALUE
-	sta PUTTEXT.S
-	lda VALUE+1
-	sta PUTTEXT.S+1
-	jsr PUTTEXT
-
-; optimize OK (controls.inc), line = 97
-
-	lda PRC
-	sta ADDZONE.@02DB.PRC
-	lda PRC+1
-	sta ADDZONE.@02DB.PRC+1
-	lda W
-	add #$02
-	sta ADDZONE.@02DB.W
-	lda Y
-	sub #$01
-	sta ADDZONE.@02DB.Y
-	lda X
-	sub #$01
-	sta ADDZONE.@02DB.X
-	lda #$FF
-	sta ADDZONE.@02DB.N
-	lda #$07
-	sta ADDZONE.@02DB.H
-	jsr ADDZONE.@02DB
-	lda ADDZONE.@02DB.RESULT
-	sta RESULT
-@exit
-
-; ------------------------------------------------------------
-
-X	= DATAORIGIN+$0054
-Y	= DATAORIGIN+$0055
-W	= DATAORIGIN+$0056
-VALUE	= DATAORIGIN+$0057
-PRC	= DATAORIGIN+$0059
-RESULT	= DATAORIGIN+$005B
-
-@VarData	= X
-@VarDataSize	= 7
-
-	rts						; ret
-.endl
-
-.local	DOINPUT						; FUNCTION
-
-	jmp l_0741
-
-.local	REFRESHVALUE					; PROCEDURE
-
-; optimize OK (controls.inc), line = 110
-
-	lda X
-	sta BLANK.X
-	lda Y
-	sta BLANK.Y
-	lda W
-	sta BLANK.W
-	lda #$07
-	sta BLANK.H
-	jsr BLANK
-
-; optimize OK (controls.inc), line = 111
-
-	lda Y
-	add #$01
-	sta PUTTEXT.Y
-	lda X
-	sta PUTTEXT.X
-	lda VALUE
-	sta PUTTEXT.S
-	lda VALUE+1
-	sta PUTTEXT.S+1
-	jsr PUTTEXT
-
-; optimize OK (controls.inc), line = 112
-
-	ldy VALUE+1
-	sty :bp+1
-	ldy VALUE
-	lda (:bp),y
-	sta LN
-@exit
-	.ifdef @new
-	lda <@VarData
-	sta :ztmp
-	lda >@VarData
-	ldy #@VarDataSize-1
-	jmp @FreeMem
-	els
-	rts						; ret
-	eif
-.endl
-l_0741
-
-; optimize OK (controls.inc), line = 116
-
-	lda SZONE
-	sta OZONE
-
-; optimize OK (controls.inc), line = 117
-
-	ldy SZONE
-	lda adr._MZONEX1,y
-	sta X
-
-; optimize OK (controls.inc), line = 118
-
-	lda adr._MZONEY1,y
-	sta Y
-
-; optimize OK (controls.inc), line = 119
-
-	lda adr._MZONEX2,y
-	sub X
-	sub #$01
-	sta W
-
-; optimize OK (controls.inc), line = 120
-
-	lda #$00
-	sta adr._MZONEACTIVE,y
-
-; optimize FAIL (0, controls.inc), line = 121
-
-	inc X
-
-; optimize FAIL ('REFRESHVALUE', controls.inc), line = 122
-
-	jsr REFRESHVALUE
-
-; optimize OK (controls.inc), line = 123
-
-	lda LN
-	sta CX
-
-; optimize OK (controls.inc), line = 124
-
-	ldy TM
-	iny
-	sty CTM
-	lda #$00
-	sta ISCRS
-	sta CURSOR.MALLOWKEYS
-	lda #$FF
-	sta KEYB
-
-; --- RepeatUntilProlog
-l_07B8
-
-; optimize OK (controls.inc), line = 126
-
-	lda X
-	add CX
-	sta CH
-
-; optimize OK (controls.inc), line = 127
-
-	lda TM
-	cmp CTM
-	jne l_07D8
-
-; optimize OK (controls.inc), line = 129
-
-	add #$14
-	sta CTM
-
-; optimize OK (controls.inc), line = 130
-
-	lda CH
-	sta INVERT.X
-	lda Y
-	sta INVERT.Y
-	lda #$00
-	sta INVERT.W
-	lda #$06
-	sta INVERT.H
-	jsr INVERT
-	ldy #1
-	lda ISCRS
-	beq @+
-	dey
-@
-	tya
-	sta ISCRS
-l_07D8
-
-; optimize FAIL ('CHECKZONES', controls.inc), line = 132
-
-	jsr CHECKZONES
-
-; optimize OK (controls.inc), line = 133
-
-	lda CURSOR.MBUTTON
-	jeq l_080A
-
-; optimize OK (controls.inc), line = 135
-
-	lda ISCRS
-	jeq l_0817
-	lda CH
-	sta INVERT.X
-	lda Y
-	sta INVERT.Y
-	lda #$00
-	sta INVERT.W
-	lda #$06
-	sta INVERT.H
-	jsr INVERT
-l_0817
-
-; optimize OK (controls.inc), line = 136
-
-	lda #$FE
-	sta RESULT
-	jmp b_07B8					; break
-l_080A
-
-; optimize OK (controls.inc), line = 138
-
-	lda KEYB
-	cmp #$FF
-	jeq l_083B
-
-; optimize OK (controls.inc), line = 140
-
-	lda ISCRS
-	jeq l_0848
-	lda CH
-	sta INVERT.X
-	lda Y
-	sta INVERT.Y
-	lda #$00
-	sta INVERT.W
-	lda #$06
-	sta INVERT.H
-	jsr INVERT
-	lda #$00
-	sta ISCRS
-l_0848
-
-; optimize OK (controls.inc), line = 141
-
-	lda KEYB
-	sta @CASETMP_0004
-	cmp #$1C
-	jne l_0863
-@
-
-; optimize OK (controls.inc), line = 142
-
-	lda #$FF
-	sta RESULT
-	jmp b_07B8					; break
-	jmp a_0004
-l_0863
-	cmp #$0C
-	jne l_086E
-
-; optimize OK (controls.inc), line = 143
-
-	lda OZONE
-	sta RESULT
-	jmp b_07B8					; break
-	jmp a_0004
-l_086E
-	cmp #$86
-	jne l_087B
-
-; optimize OK (controls.inc), line = 144
-
-	lda CX
-	jmi l_088D
-	jeq l_088D
-	dec CX
-l_088D
-	jmp a_0004
-l_087B
-	cmp #$87
-	jne l_089B
-
-; optimize OK (controls.inc), line = 145
-
-	ldy #$00
-	lda CX
-	spl
-	dey
-	sty :STACKORIGIN+STACKWIDTH+9
-	cmp W
-	lda :STACKORIGIN+STACKWIDTH+9
-	sbc #$00
-	svc
-	eor #$80
-	jpl l_08AF
-	inc CX
-l_08AF
-	jmp a_0004
-l_089B
-	cmp #$34
-	jne l_08BD
-
-; optimize OK (controls.inc), line = 148
-
-	ldy #$00
-	lda CX
-	spl
-	dey
-	sty :STACKORIGIN+STACKWIDTH+9
-	sta :STACKORIGIN+9
-	lda :STACKORIGIN+STACKWIDTH+9
-	bne @+
-	lda :STACKORIGIN+9
-	cmp LN
-@
-	jne l_08D1
-	lda LN
-	sub #$01
-	ldy VALUE+1
-	sty :bp+1
-	ldy VALUE
-	sta (:bp),y
-l_08D1
-
-; optimize OK (controls.inc), line = 149
-
-	mwy VALUE :bp2
-	ldy CX
-	lda #$00
-	sta (:bp2),y
-
-; optimize OK (controls.inc), line = 150
-
-	tya
-	jmi l_08F8
-	jeq l_08F8
-	dec CX
-l_08F8
-
-; optimize FAIL ('REFRESHVALUE', controls.inc), line = 151
-
-	jsr REFRESHVALUE
-	jmp a_0004
-l_08BD
-
-; optimize OK (controls.inc), line = 154
-
-	lda KEYB
-	jsr KEYSCAN2ASC
-	lda KEYSCAN2ASC.RESULT
-	sta CH
-
-; optimize OK (controls.inc), line = 155
-
-	cmp #$60
-	jcc l_091B
-	sub #$20
-	sta CH
-l_091B
-
-; optimize OK (controls.inc), line = 156
-
-	ldy #$00
-	lda CX
-	spl
-	dey
-	sty :STACKORIGIN+STACKWIDTH+9
-	cmp W
-	lda :STACKORIGIN+STACKWIDTH+9
-	sbc #$00
-	svc
-	eor #$80
-	jpl l_0933
-	inc CX
-l_0933
-
-; optimize OK (controls.inc), line = 157
-
-	mwy VALUE :bp2
-	ldy CX
-	lda CH
-	sta (:bp2),y
-
-; optimize OK (controls.inc), line = 158
-
-	ldy #$00
-	lda CX
-	spl
-	dey
-	sty :STACKORIGIN+STACKWIDTH+9
-	sta :STACKORIGIN+9
-	lda LN
-	cmp :STACKORIGIN+9
-	lda #$00
-	sbc :STACKORIGIN+STACKWIDTH+9
-	svc
-	eor #$80
-	jpl l_0957
-	ldy VALUE+1
-	sty :bp+1
-	ldy VALUE
-	lda CX
-	sta (:bp),y
-l_0957
-
-; optimize FAIL ('REFRESHVALUE', controls.inc), line = 159
-
-	jsr REFRESHVALUE
-a_0004
-
-; optimize OK (controls.inc), line = 161
-
-	lda TM
-	sta CTM
-	lda #$FF
-	sta KEYB
-l_083B
-
-; optimize OK (controls.inc), line = 163
-
-	jmp l_07B8
-b_07B8
-
-; optimize OK (controls.inc), line = 164
+; optimize OK (about.inc), line = 8
 
 	lda #$01
-	sta CURSOR.MALLOWKEYS
+	sta PUTTEXT.X
+	lda #$24
+	sta PUTTEXT.Y
+	lda #$F5
+	sta PUTTEXT.S
+	lda #$80
+	sta PUTTEXT.S+1
+	jsr PUTTEXT
 
-; optimize OK (controls.inc), line = 165
+; optimize OK (about.inc), line = 9
 
-	lda #$FF
-	sta KEYB
-
-; optimize OK (controls.inc), line = 166
-
-	ldy OZONE
-	lda #$01
-	sta adr._MZONEACTIVE,y
+	lda #$1C
+	sta SETSTATUS.S
+	lda #$81
+	sta SETSTATUS.S+1
+	jsr SETSTATUS
 @exit
-
-; ------------------------------------------------------------
-
-VALUE	= DATAORIGIN+$005C
-RESULT	= DATAORIGIN+$005E
-OZONE	= DATAORIGIN+$005F
-CX	= DATAORIGIN+$0060
-CH	= DATAORIGIN+$0061
-LN	= DATAORIGIN+$0062
-X	= DATAORIGIN+$0063
-Y	= DATAORIGIN+$0064
-W	= DATAORIGIN+$0065
-CTM	= DATAORIGIN+$0066
-ISCRS	= DATAORIGIN+$0067
-@CASETMP_0004	= DATAORIGIN+$0068
-
-@VarData	= VALUE
-@VarDataSize	= 12
-
+	.ifdef @new
+	lda <@VarData
+	sta :ztmp
+	lda >@VarData
+	ldy #@VarDataSize-1
+	jmp @FreeMem
+	els
 	rts						; ret
+	eif
 .endl
 
 .local	ADDFILELABEL					; PROCEDURE
 
-; optimize OK (controls.inc), line = 183
+; optimize OK (module-disk.inc), line = 24
 
 	lda N
 	cmp #$0F
-	jcc l_099D
+	jcc l_029B
 	jmp @exit
-l_099D
+l_029B
 
-; optimize OK (controls.inc), line = 184
+; optimize OK (module-disk.inc), line = 25
 
 	ldy N
 	lda adr._DIRFILEX,y
@@ -2665,7 +833,7 @@ l_099D
 	lda adr._DIRFILEY,y
 	sta Y
 
-; optimize OK (controls.inc), line = 185
+; optimize OK (module-disk.inc), line = 26
 
 	lda N
 	asl @
@@ -2680,33 +848,33 @@ l_099D
 	sta PUTTEXT.Y
 	jsr PUTTEXT
 
-; optimize OK (controls.inc), line = 186
+; optimize OK (module-disk.inc), line = 27
 
 	lda PRC
-	sta ADDZONE.@02DB.PRC
+	sta ADDZONEN.PRC
 	lda PRC+1
-	sta ADDZONE.@02DB.PRC+1
+	sta ADDZONEN.PRC+1
 	lda Y
 	sub #$01
-	sta ADDZONE.@02DB.Y
+	sta ADDZONEN.Y
 	lda X
 	sub #$01
-	sta ADDZONE.@02DB.X
+	sta ADDZONEN.X
 	lda #$0E
 	add N
-	sta ADDZONE.@02DB.N
+	sta ADDZONEN.N
 	lda #$0E
-	sta ADDZONE.@02DB.W
+	sta ADDZONEN.W
 	lda #$07
-	sta ADDZONE.@02DB.H
-	jsr ADDZONE.@02DB
+	sta ADDZONEN.H
+	jsr ADDZONEN
 
 ; ------------------------------------------------------------
 
-N	= DATAORIGIN+$014A
-PRC	= DATAORIGIN+$014B
-X	= DATAORIGIN+$014D
-Y	= DATAORIGIN+$014E
+N	= DATAORIGIN+$00FD
+PRC	= DATAORIGIN+$00FE
+X	= DATAORIGIN+$0100
+Y	= DATAORIGIN+$0101
 
 @VarData	= N
 @VarDataSize	= 5
@@ -2723,93 +891,12 @@ Y	= DATAORIGIN+$014E
 	eif
 .endl
 
-.local	SHOWABOUT					; PROCEDURE
-
-; optimize OK (about.inc), line = 3
-
-	lda #$FF
-	jsr SETMODULE
-
-; optimize OK (about.inc), line = 4
-
-	lda #$14
-	.LOCAL +MAIN.SETSCREENWIDTH
-	m@INLINE
-	.ENDL
-
-; optimize OK (about.inc), line = 5
-
-	lda #$0A
-	sta PUTTEXT.X
-	lda #$06
-	sta PUTTEXT.Y
-	lda #$01
-	sta PUTTEXT.S
-	lda #$80
-	sta PUTTEXT.S+1
-	jsr PUTTEXT
-
-; optimize OK (about.inc), line = 6
-
-	lda #$0A
-	sta PUTTEXT.X
-	lda #$0C
-	sta PUTTEXT.Y
-	lda #$15
-	sta PUTTEXT.S
-	lda #$80
-	sta PUTTEXT.S+1
-	jsr PUTTEXT
-
-; optimize OK (about.inc), line = 7
-
-	lda #$0F
-	sta PUTTEXT.X
-	lda #$18
-	sta PUTTEXT.Y
-	lda #$29
-	sta PUTTEXT.S
-	lda #$80
-	sta PUTTEXT.S+1
-	jsr PUTTEXT
-
-; optimize OK (about.inc), line = 8
-
-	lda #$01
-	sta PUTTEXT.X
-	lda #$24
-	sta PUTTEXT.Y
-	lda #$32
-	sta PUTTEXT.S
-	lda #$80
-	sta PUTTEXT.S+1
-	jsr PUTTEXT
-
-; optimize OK (about.inc), line = 9
-
-	lda #$59
-	sta SETSTATUS.S
-	lda #$80
-	sta SETSTATUS.S+1
-	jsr SETSTATUS
-@exit
-	.ifdef @new
-	lda <@VarData
-	sta :ztmp
-	lda >@VarData
-	ldy #@VarDataSize-1
-	jmp @FreeMem
-	els
-	rts						; ret
-	eif
-.endl
-
 .local	DOCHOICEFILE					; PROCEDURE
 
-; optimize OK (module-disk.inc), line = 13
+; optimize OK (module-disk.inc), line = 32
 
 	lda SZONE
-	sta @CASETMP_0005
+	sta @CASETMP_0004
 	cmp #14
 	bmi @+
 	cmp #29
@@ -2817,10 +904,10 @@ Y	= DATAORIGIN+$014E
 	bpl @+
 	jmp *+6
 @
-	jmp l_0A03
+	jmp l_02E7
 @
 
-; optimize OK (module-disk.inc), line = 15
+; optimize OK (module-disk.inc), line = 34
 
 	lda SZONE
 	asl @
@@ -2831,7 +918,7 @@ Y	= DATAORIGIN+$014E
 	sta @move.src+1
 	@moveSTRING FN #17
 
-; optimize OK (module-disk.inc), line = 17
+; optimize OK (module-disk.inc), line = 36
 
 	lda #$07
 	sta BLANK.X
@@ -2843,7 +930,7 @@ Y	= DATAORIGIN+$014E
 	sta BLANK.H
 	jsr BLANK
 
-; optimize OK (module-disk.inc), line = 18
+; optimize OK (module-disk.inc), line = 37
 
 	lda #$07
 	sta PUTTEXT.X
@@ -2854,14 +941,14 @@ Y	= DATAORIGIN+$014E
 	lda FN+1
 	sta PUTTEXT.S+1
 	jsr PUTTEXT
-l_0A03
-a_0005
+l_02E7
+a_0004
 
 ; ------------------------------------------------------------
 
-@CASETMP_0005	= DATAORIGIN+$0151
+@CASETMP_0004	= DATAORIGIN+$0102
 
-@VarData	= @CASETMP_0005
+@VarData	= @CASETMP_0004
 @VarDataSize	= 1
 
 @exit
@@ -2878,7 +965,7 @@ a_0005
 
 .local	DOPREVPAGEDIR					; PROCEDURE
 
-; optimize OK (module-disk.inc), line = 27
+; optimize OK (module-disk.inc), line = 46
 
 	lda DIRPAGEBEGIN
 	sub #$0E
@@ -2886,7 +973,7 @@ a_0005
 	scs
 	dec DIRPAGEBEGIN+1
 
-; optimize FAIL ('READDIRECTORY', module-disk.inc), line = 28
+; optimize FAIL ('READDIRECTORY', module-disk.inc), line = 47
 
 	jsr READDIRECTORY
 @exit
@@ -2903,7 +990,7 @@ a_0005
 
 .local	DONEXTPAGEDIR					; PROCEDURE
 
-; optimize OK (module-disk.inc), line = 33
+; optimize OK (module-disk.inc), line = 52
 
 	lda DIRPAGEBEGIN
 	add #$0E
@@ -2911,7 +998,7 @@ a_0005
 	scc
 	inc DIRPAGEBEGIN+1
 
-; optimize FAIL ('READDIRECTORY', module-disk.inc), line = 34
+; optimize FAIL ('READDIRECTORY', module-disk.inc), line = 53
 
 	jsr READDIRECTORY
 @exit
@@ -2928,25 +1015,25 @@ a_0005
 
 .local	READDIRECTORY					; PROCEDURE
 
-; optimize OK (module-disk.inc), line = 43
+; optimize OK (module-disk.inc), line = 62
 
 	lda adr.DEV+$01
 	cmp #$44
-	jne l_0A3C
+	jne l_0320
 
-; optimize OK (module-disk.inc), line = 45
+; optimize OK (module-disk.inc), line = 64
 
 	lda #$03
 	sta CURSOR.SETPIVOT.X
 	sta CURSOR.SETPIVOT.Y
 	jsr CURSOR.SETPIVOT
-	lda #$EF
+	lda #$B2
 	sta CURSOR.SETCURSOR.SPR
-	lda #$80
+	lda #$81
 	sta CURSOR.SETCURSOR.SPR+1
 	jsr CURSOR.SETCURSOR
 
-; optimize OK (module-disk.inc), line = 46
+; optimize OK (module-disk.inc), line = 65
 
 	lda DEV
 	sta @move.src
@@ -2954,7 +1041,7 @@ a_0005
 	sta @move.src+1
 	@moveSTRING _FN #21
 	lda adr.FILEMASK
-	sta SYSTEM.MOVE.@012B.COUNT
+	sta SYSTEM.MOVE.@01EE.COUNT
 	lda adr._FN
 	add #$01
 	sta :STACKORIGIN+10
@@ -2963,44 +1050,44 @@ a_0005
 	sta :STACKORIGIN+STACKWIDTH+10
 	lda <adr._FN
 	add :STACKORIGIN+10
-	sta SYSTEM.MOVE.@012B.DEST
+	sta SYSTEM.MOVE.@01EE.DEST
 	lda >adr._FN
 	adc :STACKORIGIN+STACKWIDTH+10
-	sta SYSTEM.MOVE.@012B.DEST+1
+	sta SYSTEM.MOVE.@01EE.DEST+1
 	lda <adr.FILEMASK+$01
-	sta SYSTEM.MOVE.@012B.SOURCE
+	sta SYSTEM.MOVE.@01EE.SOURCE
 	lda >adr.FILEMASK+$01
-	sta SYSTEM.MOVE.@012B.SOURCE+1
+	sta SYSTEM.MOVE.@01EE.SOURCE+1
 	lda #$00
-	sta SYSTEM.MOVE.@012B.COUNT+1
-	.LOCAL +MAIN.SYSTEM.MOVE.@012B
+	sta SYSTEM.MOVE.@01EE.COUNT+1
+	.LOCAL +MAIN.SYSTEM.MOVE.@01EE
 	m@INLINE
 	.ENDL
 
-; optimize OK (module-disk.inc), line = 47
+; optimize OK (module-disk.inc), line = 66
 
 	lda DIRPAGEBEGIN
 	sta DIRSEEK
 	lda DIRPAGEBEGIN+1
 	sta DIRSEEK+1
 
-; optimize OK (module-disk.inc), line = 48
+; optimize OK (module-disk.inc), line = 67
 
 	lda DIRPAGEBEGIN+1
-	jmi l_0A68
+	jmi l_034C
 	ora DIRPAGEBEGIN
-	jeq l_0A68
-	lda #$72
-	jmp l_0A74
-l_0A68
-	lda #$7D
-l_0A74
+	jeq l_034C
+	lda #$35
+	jmp l_0358
+l_034C
+	lda #$40
+l_0358
 	sta SETSTATUS.S
-	lda #$80
+	lda #$81
 	sta SETSTATUS.S+1
 	jsr SETSTATUS
 
-; optimize OK (module-disk.inc), line = 49
+; optimize OK (module-disk.inc), line = 68
 
 	lda #$01
 	sta CIO.OPN.CHN
@@ -3014,16 +1101,16 @@ l_0A74
 	sta CIO.OPN.DEVICE+1
 	jsr CIO.OPN
 
-; optimize OK (module-disk.inc), line = 50
+; optimize OK (module-disk.inc), line = 69
 
 	lda #$FF
 	sta N
 
 ; --- WhileProlog
-	jmp l_0A82
-l_0A83
+	jmp l_0366
+l_0367
 
-; optimize OK (module-disk.inc), line = 53
+; optimize OK (module-disk.inc), line = 72
 
 	lda #$01
 	sta GETLN.CHN
@@ -3033,13 +1120,13 @@ l_0A83
 	sta GETLN.BUF+1
 	jsr GETLN
 
-; optimize OK (module-disk.inc), line = 54
+; optimize OK (module-disk.inc), line = 73
 
 	lda adr._FN+$01
 	cmp #$30
-	jcc l_0A9A
+	jcc l_037E
 
-; optimize OK (module-disk.inc), line = 56
+; optimize OK (module-disk.inc), line = 75
 
 	dec adr._FN
 	lda _FN
@@ -3048,47 +1135,47 @@ l_0A83
 	sta SETSTATUS.S+1
 	jsr SETSTATUS
 
-; optimize OK (module-disk.inc), line = 57
+; optimize OK (module-disk.inc), line = 76
 
 	lda #$03
 	sta SYSTEM.IORESULT
-	jmp b_0A83					; break
-l_0A9A
+	jmp b_0367					; break
+l_037E
 
-; optimize OK (module-disk.inc), line = 60
+; optimize OK (module-disk.inc), line = 79
 
 	lda DIRSEEK+1
-	jmi l_0AC1
+	jmi l_03A5
 	ora DIRSEEK
-	jeq l_0AC1
+	jeq l_03A5
 
-; optimize FAIL (0, module-disk.inc), line = 62
+; optimize FAIL (0, module-disk.inc), line = 81
 
 	lda DIRSEEK
 	bne @+
 	dec DIRSEEK+1
 @
 	dec DIRSEEK
-	jmp c_0A83					; continue
-l_0AC1
+	jmp c_0367					; continue
+l_03A5
 
-; optimize OK (module-disk.inc), line = 65
+; optimize OK (module-disk.inc), line = 84
 
 	lda N
 	cmp #$FF
-	jne l_0ADA
-	lda #$92
+	jne l_03BE
+	lda #$55
 	sta SETSTATUS.S
-	lda #$80
+	lda #$81
 	sta SETSTATUS.S+1
 	jsr SETSTATUS
-l_0ADA
+l_03BE
 
-; optimize FAIL (0, module-disk.inc), line = 68
+; optimize FAIL (0, module-disk.inc), line = 87
 
 	inc N
 
-; optimize OK (module-disk.inc), line = 69
+; optimize OK (module-disk.inc), line = 88
 
 	lda N
 	asl @
@@ -3102,56 +1189,56 @@ l_0ADA
 	lda _FN+1
 	sta REDUCEFILENAME.INFN+1
 	jsr REDUCEFILENAME
-c_0A83
-l_0A82
+c_0367
+l_0366
 
-; optimize OK (module-disk.inc), line = 51
+; optimize OK (module-disk.inc), line = 70
 
 	lda SYSTEM.IORESULT
 	cmp #$01
-	jne l_0A83w
+	jne l_0367w
 	lda N
 	sub #$0F
 	svc
 	eor #$80
-	jpl l_0A83w
-	jmp l_0A83
-l_0A83w
-b_0A83
-	jmp l_0B0C
-l_0A3C
+	jpl l_0367w
+	jmp l_0367
+l_0367w
+b_0367
+	jmp l_03F0
+l_0320
 
-; optimize OK (module-disk.inc), line = 73
+; optimize OK (module-disk.inc), line = 92
 
 	lda #$A0
 	sta SYSTEM.IORESULT
-l_0B0C
+l_03F0
 
-; optimize OK (module-disk.inc), line = 74
+; optimize OK (module-disk.inc), line = 93
 
 	lda adr.YSCR+$84
-	sta SYSTEM.FILLCHAR.@012A.A
+	sta SYSTEM.FILLCHAR.@01ED.A
 	lda adr.YSCR+1+$84
-	sta SYSTEM.FILLCHAR.@012A.A+1
+	sta SYSTEM.FILLCHAR.@01ED.A+1
 	lda #$F8
-	sta SYSTEM.FILLCHAR.@012A.COUNT
+	sta SYSTEM.FILLCHAR.@01ED.COUNT
 	lda #$02
-	sta SYSTEM.FILLCHAR.@012A.COUNT+1
+	sta SYSTEM.FILLCHAR.@01ED.COUNT+1
 	lda #$00
-	sta SYSTEM.FILLCHAR.@012A.VALUE
-	.LOCAL +MAIN.SYSTEM.FILLCHAR.@012A
+	sta SYSTEM.FILLCHAR.@01ED.VALUE
+	.LOCAL +MAIN.SYSTEM.FILLCHAR.@01ED
 	m@INLINE
 	.ENDL
 
-; optimize OK (module-disk.inc), line = 75
+; optimize OK (module-disk.inc), line = 94
 
 	lda SYSTEM.IORESULT
 	cmp #$04
-	jcc l_0B28
+	jcc l_040C
 	ldy #256-14
-	mva:rne CODEORIGIN+$00A7+14-256,y adr._FN+14-256,y+
+	mva:rne CODEORIGIN+$016A+14-256,y adr._FN+14-256,y+
 
-; optimize OK (module-disk.inc), line = 78
+; optimize OK (module-disk.inc), line = 97
 
 	lda SYSTEM.IORESULT
 	lsr @
@@ -3163,7 +1250,7 @@ l_0B0C
 	lda adr._HEX,y
 	sta adr._FN+$0C
 
-; optimize OK (module-disk.inc), line = 79
+; optimize OK (module-disk.inc), line = 98
 
 	lda SYSTEM.IORESULT
 	and #$0F
@@ -3172,43 +1259,43 @@ l_0B0C
 	lda adr._HEX,y
 	sta adr._FN+$0D
 
-; optimize OK (module-disk.inc), line = 80
+; optimize OK (module-disk.inc), line = 99
 
 	lda _FN
 	sta SETSTATUS.S
 	lda _FN+1
 	sta SETSTATUS.S+1
 	jsr SETSTATUS
-	jmp l_0B5D
-l_0B28
+	jmp l_0441
+l_040C
 
-; optimize OK (module-disk.inc), line = 84
+; optimize OK (module-disk.inc), line = 103
 
 	lda #$0E
 	sta J
 
-l_0B66
+l_044A
 ; --- ForToDoCondition
 	lda J
 	cmp #$1F
-	jcs l_0B74
+	jcs l_0458
 	jsr CLEARZONE
 
 ; --- ForToDoEpilog
 	inc J
-	jne l_0B66
-l_0B74
+	jne l_044A
+l_0458
 
-; optimize OK (module-disk.inc), line = 85
+; optimize OK (module-disk.inc), line = 104
 
 	lda #$00
 	sta J
 
 ; --- WhileProlog
-	jmp l_0B83
-l_0B84
+	jmp l_0467
+l_0468
 
-; optimize OK (module-disk.inc), line = 87
+; optimize OK (module-disk.inc), line = 106
 
 	lda J
 	sta ADDFILELABEL.N
@@ -3218,20 +1305,20 @@ l_0B84
 	sta ADDFILELABEL.PRC+1
 	jsr ADDFILELABEL
 
-; optimize FAIL (0, module-disk.inc), line = 88
+; optimize FAIL (0, module-disk.inc), line = 107
 
 	inc J
-l_0B83
+l_0467
 
-; optimize OK (module-disk.inc), line = 85
+; optimize OK (module-disk.inc), line = 104
 
 	lda N
 	sub J
 	svc
 	eor #$80
-	jpl l_0B84
+	jpl l_0468
 
-; optimize OK (module-disk.inc), line = 90
+; optimize OK (module-disk.inc), line = 109
 
 	lda DIRPAGEBEGIN+1
 	bmi @+
@@ -3239,14 +1326,14 @@ l_0B83
 	sne
 @
 	jmp *+6
-@	jmp l_0BB7x
+@	jmp l_049Bx
 	lda SYSTEM.IORESULT
 	cmp #$03
-	jcs l_0BB7
+	jcs l_049B
 @
-l_0BB7x
+l_049Bx
 
-; optimize OK (module-disk.inc), line = 92
+; optimize OK (module-disk.inc), line = 111
 
 	lda #$1B
 	sta BLANK.X
@@ -3260,45 +1347,45 @@ l_0BB7x
 	lda #$1C
 	jsr CLEARZONE
 
-; optimize OK (module-disk.inc), line = 93
+; optimize OK (module-disk.inc), line = 112
 
 	lda DIRPAGEBEGIN+1
-	jmi l_0BD0
+	jmi l_04B4
 	ora DIRPAGEBEGIN
-	jeq l_0BD0
+	jeq l_04B4
 
-; optimize OK (module-disk.inc), line = 94
+; optimize OK (module-disk.inc), line = 113
 
 	lda #$1B
 	sta ADDBUTTON.X
 	lda #$29
 	sta ADDBUTTON.Y
-	lda #$B5
+	lda #$78
 	sta ADDBUTTON.CAP
-	lda #$80
+	lda #$81
 	sta ADDBUTTON.CAP+1
 	lda <DOPREVPAGEDIR
 	sta ADDBUTTON.PRC
 	lda >DOPREVPAGEDIR
 	sta ADDBUTTON.PRC+1
 	jsr ADDBUTTON
-l_0BD0
+l_04B4
 
-; optimize OK (module-disk.inc), line = 95
+; optimize OK (module-disk.inc), line = 114
 
 	lda SYSTEM.IORESULT
 	cmp #$03
-	jcs l_0BE9
+	jcs l_04CD
 
-; optimize OK (module-disk.inc), line = 97
+; optimize OK (module-disk.inc), line = 116
 
 	lda #$23
 	sta ADDBUTTON.X
 	lda #$29
 	sta ADDBUTTON.Y
-	lda #$BA
+	lda #$7D
 	sta ADDBUTTON.CAP
-	lda #$80
+	lda #$81
 	sta ADDBUTTON.CAP+1
 	lda <DONEXTPAGEDIR
 	sta ADDBUTTON.PRC
@@ -3306,35 +1393,35 @@ l_0BD0
 	sta ADDBUTTON.PRC+1
 	jsr ADDBUTTON
 
-; optimize FAIL ('CLEARSTATUS', module-disk.inc), line = 98
+; optimize FAIL ('CLEARSTATUS', module-disk.inc), line = 117
 
 	jsr CLEARSTATUS
-l_0B5D
-l_0BE9
-l_0BB7
+l_0441
+l_04CD
+l_049B
 
-; optimize OK (module-disk.inc), line = 102
+; optimize OK (module-disk.inc), line = 121
 
 	lda #$01
 	jsr CIO.CLS
 
-; optimize OK (module-disk.inc), line = 103
+; optimize OK (module-disk.inc), line = 122
 
 	lda #$00
 	sta CURSOR.SETPIVOT.X
 	sta CURSOR.SETPIVOT.Y
 	jsr CURSOR.SETPIVOT
-	lda #$E8
+	lda #$AB
 	sta CURSOR.SETCURSOR.SPR
-	lda #$80
+	lda #$81
 	sta CURSOR.SETCURSOR.SPR+1
 	jsr CURSOR.SETCURSOR
 
 ; ------------------------------------------------------------
 
-N	= DATAORIGIN+$0152
-J	= DATAORIGIN+$0153
-DIRSEEK	= DATAORIGIN+$0154
+N	= DATAORIGIN+$0103
+J	= DATAORIGIN+$0104
+DIRSEEK	= DATAORIGIN+$0105
 
 @VarData	= N
 @VarDataSize	= 4
@@ -3353,13 +1440,13 @@ DIRSEEK	= DATAORIGIN+$0154
 
 .local	STARTDIRECTORY					; PROCEDURE
 
-; optimize OK (module-disk.inc), line = 108
+; optimize OK (module-disk.inc), line = 127
 
 	lda #$00
 	sta DIRPAGEBEGIN
 	sta DIRPAGEBEGIN+1
 
-; optimize FAIL ('READDIRECTORY', module-disk.inc), line = 109
+; optimize FAIL ('READDIRECTORY', module-disk.inc), line = 128
 
 	jsr READDIRECTORY
 @exit
@@ -3376,7 +1463,7 @@ DIRSEEK	= DATAORIGIN+$0154
 
 .local	DOFILENAME					; PROCEDURE
 
-; optimize OK (module-disk.inc), line = 114
+; optimize OK (module-disk.inc), line = 133
 
 	lda FN
 	sta DOINPUT.VALUE
@@ -3397,7 +1484,7 @@ DIRSEEK	= DATAORIGIN+$0154
 
 .local	DODEVICE					; PROCEDURE
 
-; optimize OK (module-disk.inc), line = 119
+; optimize OK (module-disk.inc), line = 138
 
 	lda DEV
 	sta DOINPUT.VALUE
@@ -3405,9 +1492,9 @@ DIRSEEK	= DATAORIGIN+$0154
 	sta DOINPUT.VALUE+1
 	jsr DOINPUT
 	lda DOINPUT.RESULT
-	jmi l_0C20
+	jmi l_0504
 	jsr STARTDIRECTORY
-l_0C20
+l_0504
 @exit
 	.ifdef @new
 	lda <@VarData
@@ -3422,18 +1509,18 @@ l_0C20
 
 .local	SHOWDISKDIRECTORY				; PROCEDURE
 
-; optimize OK (module-disk.inc), line = 124
+; optimize OK (module-disk.inc), line = 143
 
 	lda CURMODULE
 	jeq @exit
-l_0C3A
+l_051E
 
-; optimize OK (module-disk.inc), line = 125
+; optimize OK (module-disk.inc), line = 144
 
 	lda #$00
 	jsr SETMODULE
 
-; optimize OK (module-disk.inc), line = 126
+; optimize OK (module-disk.inc), line = 145
 
 	lda adr.YSCR+$82
 	sta :bp2
@@ -3443,14 +1530,12 @@ l_0C3A
 	ldy #$13
 	sta:rpl (:bp2),y-
 
-; optimize OK (module-disk.inc), line = 127
+; optimize OK (module-disk.inc), line = 146
 
 	lda #$14
-	.LOCAL +MAIN.SETSCREENWIDTH
-	m@INLINE
-	.ENDL
+	jsr SETSCREENWIDTH
 
-; optimize OK (module-disk.inc), line = 128
+; optimize OK (module-disk.inc), line = 147
 
 	lda #$01
 	sta ADDINPUT.X
@@ -3467,7 +1552,7 @@ l_0C3A
 	sta ADDINPUT.PRC+1
 	jsr ADDINPUT
 
-; optimize OK (module-disk.inc), line = 129
+; optimize OK (module-disk.inc), line = 148
 
 	lda #$07
 	sta ADDINPUT.X
@@ -3485,15 +1570,15 @@ l_0C3A
 	sta ADDINPUT.PRC+1
 	jsr ADDINPUT
 
-; optimize OK (module-disk.inc), line = 130
+; optimize OK (module-disk.inc), line = 149
 
 	lda #$15
 	sta ADDBUTTON.X
 	lda #$01
 	sta ADDBUTTON.Y
-	lda #$BF
+	lda #$82
 	sta ADDBUTTON.CAP
-	lda #$80
+	lda #$81
 	sta ADDBUTTON.CAP+1
 	lda <NULLPROC
 	sta ADDBUTTON.PRC
@@ -3501,15 +1586,15 @@ l_0C3A
 	sta ADDBUTTON.PRC+1
 	jsr ADDBUTTON
 
-; optimize OK (module-disk.inc), line = 131
+; optimize OK (module-disk.inc), line = 150
 
 	lda #$1B
 	sta ADDBUTTON.X
 	lda #$01
 	sta ADDBUTTON.Y
-	lda #$C4
+	lda #$87
 	sta ADDBUTTON.CAP
-	lda #$80
+	lda #$81
 	sta ADDBUTTON.CAP+1
 	lda <NULLPROC
 	sta ADDBUTTON.PRC
@@ -3517,15 +1602,15 @@ l_0C3A
 	sta ADDBUTTON.PRC+1
 	jsr ADDBUTTON
 
-; optimize OK (module-disk.inc), line = 132
+; optimize OK (module-disk.inc), line = 151
 
 	lda #$21
 	sta ADDBUTTON.X
 	lda #$01
 	sta ADDBUTTON.Y
-	lda #$C9
+	lda #$8C
 	sta ADDBUTTON.CAP
-	lda #$80
+	lda #$81
 	sta ADDBUTTON.CAP+1
 	lda <NULLPROC
 	sta ADDBUTTON.PRC
@@ -3533,7 +1618,7 @@ l_0C3A
 	sta ADDBUTTON.PRC+1
 	jsr ADDBUTTON
 
-; optimize FAIL ('STARTDIRECTORY', module-disk.inc), line = 133
+; optimize FAIL ('STARTDIRECTORY', module-disk.inc), line = 152
 
 	jsr STARTDIRECTORY
 @exit
@@ -3555,7 +1640,7 @@ l_0C3A
 	lda CURMODULE
 	cmp #$01
 	jeq @exit
-l_0C76
+l_055A
 
 ; optimize OK (module-path.inc), line = 4
 
@@ -3565,78 +1650,78 @@ l_0C76
 ; optimize OK (module-path.inc), line = 6
 
 	lda #$03
-	sta ADDZONE.@02DB.N
+	sta ADDZONEN.N
 	lda #$01
-	sta ADDZONE.@02DB.X
+	sta ADDZONEN.X
 	lda #$37
-	sta ADDZONE.@02DB.Y
+	sta ADDZONEN.Y
 	lda #$03
-	sta ADDZONE.@02DB.W
+	sta ADDZONEN.W
 	lda #$07
-	sta ADDZONE.@02DB.H
+	sta ADDZONEN.H
 	lda <NULLPROC
-	sta ADDZONE.@02DB.PRC
+	sta ADDZONEN.PRC
 	lda >NULLPROC
-	sta ADDZONE.@02DB.PRC+1
-	jsr ADDZONE.@02DB
+	sta ADDZONEN.PRC+1
+	jsr ADDZONEN
 
 ; optimize OK (module-path.inc), line = 7
 
 	lda #$04
-	sta ADDZONEH.@0339.N
+	sta ADDZONEHN.N
 	lda <NULLPROC
-	sta ADDZONEH.@0339.PRC
+	sta ADDZONEHN.PRC
 	lda >NULLPROC
-	sta ADDZONEH.@0339.PRC+1
-	jsr ADDZONEH.@0339
+	sta ADDZONEHN.PRC+1
+	jsr ADDZONEHN
 
 ; optimize OK (module-path.inc), line = 8
 
 	lda #$05
-	sta ADDZONEH.@0339.N
+	sta ADDZONEHN.N
 	lda <NULLPROC
-	sta ADDZONEH.@0339.PRC
+	sta ADDZONEHN.PRC
 	lda >NULLPROC
-	sta ADDZONEH.@0339.PRC+1
-	jsr ADDZONEH.@0339
+	sta ADDZONEHN.PRC+1
+	jsr ADDZONEHN
 
 ; optimize OK (module-path.inc), line = 9
 
 	lda #$06
-	sta ADDZONEH.@0339.N
+	sta ADDZONEHN.N
 	lda <NULLPROC
-	sta ADDZONEH.@0339.PRC
+	sta ADDZONEHN.PRC
 	lda >NULLPROC
-	sta ADDZONEH.@0339.PRC+1
-	jsr ADDZONEH.@0339
+	sta ADDZONEHN.PRC+1
+	jsr ADDZONEHN
 
 ; optimize OK (module-path.inc), line = 11
 
 	lda #$07
-	sta ADDZONE.@02DB.N
+	sta ADDZONEN.N
 	lda #$0F
-	sta ADDZONE.@02DB.X
+	sta ADDZONEN.X
 	lda #$37
-	sta ADDZONE.@02DB.Y
+	sta ADDZONEN.Y
 	lda #$03
-	sta ADDZONE.@02DB.W
+	sta ADDZONEN.W
 	lda #$07
-	sta ADDZONE.@02DB.H
+	sta ADDZONEN.H
 	lda <NULLPROC
-	sta ADDZONE.@02DB.PRC
+	sta ADDZONEN.PRC
 	lda >NULLPROC
-	sta ADDZONE.@02DB.PRC+1
-	jsr ADDZONE.@02DB
+	sta ADDZONEN.PRC+1
+	jsr ADDZONEN
 
 ; optimize OK (module-path.inc), line = 12
 
 	lda #$08
-	sta ADDZONEH.@0339.N
+	sta ADDZONEHN.N
 	lda <NULLPROC
-	sta ADDZONEH.@0339.PRC
+	sta ADDZONEHN.PRC
 	lda >NULLPROC
-	sta ADDZONEH.@0339.PRC+1
-	jsr ADDZONEH.@0339
+	sta ADDZONEHN.PRC+1
+	jsr ADDZONEHN
 
 ; optimize OK (module-path.inc), line = 14
 
@@ -3655,15 +1740,13 @@ l_0C76
 ; optimize OK (module-path.inc), line = 16
 
 	lda #$14
-	.LOCAL +MAIN.SETSCREENWIDTH
-	m@INLINE
-	.ENDL
+	jsr SETSCREENWIDTH
 
 ; optimize OK (module-path.inc), line = 17
 
-	lda #$06
+	lda _IPATH
 	sta PUTIMAGE.ADR
-	lda #$84
+	lda _IPATH+1
 	sta PUTIMAGE.ADR+1
 	lda #$00
 	sta PUTIMAGE.X
@@ -3677,73 +1760,73 @@ l_0C76
 ; optimize OK (module-path.inc), line = 19
 
 	lda #$00
-	sta ADDZONE.@0324.X
-	sta ADDZONE.@0324.Y
+	sta ADDZONE.X
+	sta ADDZONE.Y
 	lda #$03
-	sta ADDZONE.@0324.W
+	sta ADDZONE.W
 	lda #$0C
-	sta ADDZONE.@0324.H
+	sta ADDZONE.H
 	lda <NULLPROC
-	sta ADDZONE.@0324.PRC
+	sta ADDZONE.PRC
 	lda >NULLPROC
-	sta ADDZONE.@0324.PRC+1
-	jsr ADDZONE.@0324
+	sta ADDZONE.PRC+1
+	jsr ADDZONE
 
 ; optimize OK (module-path.inc), line = 20
 
 	lda <NULLPROC
-	sta ADDZONEV.@0356.PRC
+	sta ADDZONEV.PRC
 	lda >NULLPROC
-	sta ADDZONEV.@0356.PRC+1
-	jsr ADDZONEV.@0356
+	sta ADDZONEV.PRC+1
+	jsr ADDZONEV
 
 ; optimize OK (module-path.inc), line = 21
 
 	lda <NULLPROC
-	sta ADDZONEV.@0356.PRC
+	sta ADDZONEV.PRC
 	lda >NULLPROC
-	sta ADDZONEV.@0356.PRC+1
-	jsr ADDZONEV.@0356
+	sta ADDZONEV.PRC+1
+	jsr ADDZONEV
 
 ; optimize OK (module-path.inc), line = 22
 
 	lda <NULLPROC
-	sta ADDZONEV.@0356.PRC
+	sta ADDZONEV.PRC
 	lda >NULLPROC
-	sta ADDZONEV.@0356.PRC+1
-	jsr ADDZONEV.@0356
+	sta ADDZONEV.PRC+1
+	jsr ADDZONEV
 
 ; optimize OK (module-path.inc), line = 23
 
 	lda #$03
-	sta ADDZONE.@0324.X
+	sta ADDZONE.X
 	lda #$00
-	sta ADDZONE.@0324.Y
+	sta ADDZONE.Y
 	lda #$03
-	sta ADDZONE.@0324.W
+	sta ADDZONE.W
 	lda #$0C
-	sta ADDZONE.@0324.H
+	sta ADDZONE.H
 	lda <NULLPROC
-	sta ADDZONE.@0324.PRC
+	sta ADDZONE.PRC
 	lda >NULLPROC
-	sta ADDZONE.@0324.PRC+1
-	jsr ADDZONE.@0324
+	sta ADDZONE.PRC+1
+	jsr ADDZONE
 
 ; optimize OK (module-path.inc), line = 24
 
 	lda <NULLPROC
-	sta ADDZONEV.@0356.PRC
+	sta ADDZONEV.PRC
 	lda >NULLPROC
-	sta ADDZONEV.@0356.PRC+1
-	jsr ADDZONEV.@0356
+	sta ADDZONEV.PRC+1
+	jsr ADDZONEV
 
 ; optimize OK (module-path.inc), line = 25
 
 	lda <NULLPROC
-	sta ADDZONEV.@0356.PRC
+	sta ADDZONEV.PRC
 	lda >NULLPROC
-	sta ADDZONEV.@0356.PRC+1
-	jsr ADDZONEV.@0356
+	sta ADDZONEV.PRC+1
+	jsr ADDZONEV
 @exit
 	.ifdef @new
 	lda <@VarData
@@ -3763,7 +1846,7 @@ l_0C76
 	lda CURMODULE
 	cmp #$02
 	jeq @exit
-l_0CCD
+l_05B2
 
 ; optimize OK (module-scenario.inc), line = 4
 
@@ -3773,78 +1856,78 @@ l_0CCD
 ; optimize OK (module-scenario.inc), line = 5
 
 	lda #$03
-	sta ADDZONE.@02DB.N
+	sta ADDZONEN.N
 	lda #$01
-	sta ADDZONE.@02DB.X
+	sta ADDZONEN.X
 	lda #$37
-	sta ADDZONE.@02DB.Y
+	sta ADDZONEN.Y
 	lda #$03
-	sta ADDZONE.@02DB.W
+	sta ADDZONEN.W
 	lda #$07
-	sta ADDZONE.@02DB.H
+	sta ADDZONEN.H
 	lda <NULLPROC
-	sta ADDZONE.@02DB.PRC
+	sta ADDZONEN.PRC
 	lda >NULLPROC
-	sta ADDZONE.@02DB.PRC+1
-	jsr ADDZONE.@02DB
+	sta ADDZONEN.PRC+1
+	jsr ADDZONEN
 
 ; optimize OK (module-scenario.inc), line = 6
 
 	lda #$04
-	sta ADDZONEH.@0339.N
+	sta ADDZONEHN.N
 	lda <NULLPROC
-	sta ADDZONEH.@0339.PRC
+	sta ADDZONEHN.PRC
 	lda >NULLPROC
-	sta ADDZONEH.@0339.PRC+1
-	jsr ADDZONEH.@0339
+	sta ADDZONEHN.PRC+1
+	jsr ADDZONEHN
 
 ; optimize OK (module-scenario.inc), line = 7
 
 	lda #$05
-	sta ADDZONEH.@0339.N
+	sta ADDZONEHN.N
 	lda <NULLPROC
-	sta ADDZONEH.@0339.PRC
+	sta ADDZONEHN.PRC
 	lda >NULLPROC
-	sta ADDZONEH.@0339.PRC+1
-	jsr ADDZONEH.@0339
+	sta ADDZONEHN.PRC+1
+	jsr ADDZONEHN
 
 ; optimize OK (module-scenario.inc), line = 8
 
 	lda #$06
-	sta ADDZONEH.@0339.N
+	sta ADDZONEHN.N
 	lda <NULLPROC
-	sta ADDZONEH.@0339.PRC
+	sta ADDZONEHN.PRC
 	lda >NULLPROC
-	sta ADDZONEH.@0339.PRC+1
-	jsr ADDZONEH.@0339
+	sta ADDZONEHN.PRC+1
+	jsr ADDZONEHN
 
 ; optimize OK (module-scenario.inc), line = 10
 
 	lda #$07
-	sta ADDZONE.@02DB.N
+	sta ADDZONEN.N
 	lda #$0F
-	sta ADDZONE.@02DB.X
+	sta ADDZONEN.X
 	lda #$37
-	sta ADDZONE.@02DB.Y
+	sta ADDZONEN.Y
 	lda #$03
-	sta ADDZONE.@02DB.W
+	sta ADDZONEN.W
 	lda #$07
-	sta ADDZONE.@02DB.H
+	sta ADDZONEN.H
 	lda <NULLPROC
-	sta ADDZONE.@02DB.PRC
+	sta ADDZONEN.PRC
 	lda >NULLPROC
-	sta ADDZONE.@02DB.PRC+1
-	jsr ADDZONE.@02DB
+	sta ADDZONEN.PRC+1
+	jsr ADDZONEN
 
 ; optimize OK (module-scenario.inc), line = 11
 
 	lda #$08
-	sta ADDZONEH.@0339.N
+	sta ADDZONEHN.N
 	lda <NULLPROC
-	sta ADDZONEH.@0339.PRC
+	sta ADDZONEHN.PRC
 	lda >NULLPROC
-	sta ADDZONEH.@0339.PRC+1
-	jsr ADDZONEH.@0339
+	sta ADDZONEHN.PRC+1
+	jsr ADDZONEHN
 
 ; optimize OK (module-scenario.inc), line = 12
 
@@ -3874,17 +1957,17 @@ l_0CCD
 	lda #$03
 	sta I
 
-l_0CFB
+l_05E0
 ; --- ForToDoCondition
 	lda I
 	cmp #$0A
-	jcs l_0D09
+	jcs l_05EE
 	jsr CLEARZONE
 
 ; --- ForToDoEpilog
 	inc I
-	jne l_0CFB
-l_0D09
+	jne l_05E0
+l_05EE
 
 ; optimize OK (module.inc), line = 5
 
@@ -3902,16 +1985,16 @@ l_0D09
 ; optimize OK (module.inc), line = 8
 
 	lda adr.YSCR+$D0
-	sta SYSTEM.FILLCHAR.@012A.A
+	sta SYSTEM.FILLCHAR.@01ED.A
 	lda adr.YSCR+1+$D0
-	sta SYSTEM.FILLCHAR.@012A.A+1
+	sta SYSTEM.FILLCHAR.@01ED.A+1
 	lda #$58
-	sta SYSTEM.FILLCHAR.@012A.COUNT
+	sta SYSTEM.FILLCHAR.@01ED.COUNT
 	lda #$02
-	sta SYSTEM.FILLCHAR.@012A.COUNT+1
+	sta SYSTEM.FILLCHAR.@01ED.COUNT+1
 	lda #$00
-	sta SYSTEM.FILLCHAR.@012A.VALUE
-	.LOCAL +MAIN.SYSTEM.FILLCHAR.@012A
+	sta SYSTEM.FILLCHAR.@01ED.VALUE
+	.LOCAL +MAIN.SYSTEM.FILLCHAR.@01ED
 	m@INLINE
 	.ENDL
 
@@ -3967,7 +2050,7 @@ l_0D09
 
 ; ------------------------------------------------------------
 
-CM	= DATAORIGIN+$0156
+CM	= DATAORIGIN+$0107
 
 @VarData	= CM
 @VarDataSize	= 1
@@ -4050,11 +2133,11 @@ CM	= DATAORIGIN+$0156
 	lda #$78
 	sta I
 
-l_0D7B
+l_0660
 ; --- ForToDoCondition
 	lda I
 	cmp #$7B
-	jcs l_0D89
+	jcs l_066E
 	asl @
 	tay
 	lda adr.YSCR,y
@@ -4069,8 +2152,8 @@ l_0D7B
 
 ; --- ForToDoEpilog
 	inc I
-	jne l_0D7B
-l_0D89
+	jne l_0660
+l_066E
 
 ; optimize OK (module.inc), line = 24
 
@@ -4078,17 +2161,17 @@ l_0D89
 	sta PUTTEXTC.X
 	lda #$3F
 	sta PUTTEXTC.Y
-	lda #$D0
+	lda #$93
 	sta PUTTEXTC.S
-	lda #$80
+	lda #$81
 	sta PUTTEXTC.S+1
 	jsr PUTTEXTC
 	ldy #256-5
-	mva:rne CODEORIGIN+$00D9+5-256,y adr.FILEMASK+5-256,y+
+	mva:rne CODEORIGIN+$019C+5-256,y adr.FILEMASK+5-256,y+
 	ldy #256-3
-	mva:rne CODEORIGIN+$00DE+3-256,y adr.DEV+3-256,y+
+	mva:rne CODEORIGIN+$01A1+3-256,y adr.DEV+3-256,y+
 	ldy #256-7
-	mva:rne CODEORIGIN+$00E1+7-256,y adr.FN+7-256,y+
+	mva:rne CODEORIGIN+$01A4+7-256,y adr.FN+7-256,y+
 
 ; ------------------------------------------------------------
 
@@ -4108,53 +2191,21 @@ l_0D89
 
 ; optimize OK (SIED.pas), line = 44
 
-	lda #$00
-	sta I
+	lda #$80
+	sta KEYDEFP
+	lda #$1F
+	sta KEYDEFP+1
 
-l_0DAB
-; --- ForToDoCondition
-	ldy I
-	cpy #$20
-	jcs l_0DB9
-
-; optimize OK (SIED.pas), line = 46
-
-	lda #$00
-	sta adr._ASC2INT,y
-
-; optimize OK (SIED.pas), line = 47
-
-	lda I
-	sta adr._ASC2INT+$20,y
-
-; optimize OK (SIED.pas), line = 48
-
-	lda #$20
-	add I
-	ldy I
-	sta adr._ASC2INT+$40,y
-
-; optimize OK (SIED.pas), line = 49
-
-	lda #$20
-	add I
-	sta adr._ASC2INT+$60,y
-
-; --- ForToDoEpilog
-	inc I
-	jne l_0DAB
-l_0DB9
-
-; optimize OK (SIED.pas), line = 51
+; optimize OK (SIED.pas), line = 45
 
 	lda #$00
 	sta I
 
-l_0DFD
+l_0694
 ; --- ForToDoCondition
 	lda I
 	cmp #$38
-	jcs l_0E0B
+	jcs l_06A2
 	sta :STACKORIGIN+9
 	lda #$10
 	sta :ecx
@@ -4192,19 +2243,19 @@ l_0DFD
 
 ; --- ForToDoEpilog
 	inc I
-	jne l_0DFD
-l_0E0B
+	jne l_0694
+l_06A2
 
-; optimize OK (SIED.pas), line = 52
+; optimize OK (SIED.pas), line = 46
 
 	lda #$00
 	sta I
 
-l_0E2A
+l_06C1
 ; --- ForToDoCondition
 	lda I
 	cmp #$30
-	jcs l_0E38
+	jcs l_06CF
 	ldy #$00
 	lda I
 	spl
@@ -4247,19 +2298,19 @@ l_0E2A
 
 ; --- ForToDoEpilog
 	inc I
-	jne l_0E2A
-l_0E38
+	jne l_06C1
+l_06CF
 
-; optimize OK (SIED.pas), line = 53
+; optimize OK (SIED.pas), line = 47
 
 	lda #$00
 	sta I
 
-l_0E5B
+l_06F2
 ; --- ForToDoCondition
 	lda I
 	cmp #$18
-	jcs l_0E69
+	jcs l_0700
 	lda #$68
 	sta :STACKORIGIN+9
 	ldy #$00
@@ -4305,71 +2356,71 @@ l_0E5B
 
 ; --- ForToDoEpilog
 	inc I
-	jne l_0E5B
-l_0E69
+	jne l_06F2
+l_0700
 
-; optimize OK (SIED.pas), line = 54
+; optimize OK (SIED.pas), line = 48
 
 	lda #$00
-	sta SYSTEM.FILLCHAR.@012A.A
+	sta SYSTEM.FILLCHAR.@01ED.A
 	lda #$20
-	sta SYSTEM.FILLCHAR.@012A.A+1
+	sta SYSTEM.FILLCHAR.@01ED.A+1
 	lda #$00
-	sta SYSTEM.FILLCHAR.@012A.COUNT
+	sta SYSTEM.FILLCHAR.@01ED.COUNT
 	lda #$10
-	sta SYSTEM.FILLCHAR.@012A.COUNT+1
+	sta SYSTEM.FILLCHAR.@01ED.COUNT+1
 	lda #$00
-	sta SYSTEM.FILLCHAR.@012A.VALUE
-	.LOCAL +MAIN.SYSTEM.FILLCHAR.@012A
+	sta SYSTEM.FILLCHAR.@01ED.VALUE
+	.LOCAL +MAIN.SYSTEM.FILLCHAR.@01ED
 	m@INLINE
 	.ENDL
 
-; optimize OK (SIED.pas), line = 55
+; optimize OK (SIED.pas), line = 49
 
 	lda #$FF
 	ldy #$31
 	sta:rpl $2317,y-
 
-; optimize OK (SIED.pas), line = 56
+; optimize OK (SIED.pas), line = 50
 
 	lda #$01
 	sta ACTIVEPAGE
 
-; optimize OK (SIED.pas), line = 57
+; optimize OK (SIED.pas), line = 51
 
 	lda #$00
 	sta SDMACTL
 
-; -------------------  ASM Block 00000089  -------------------
+; -------------------  ASM Block 00000077  -------------------
 
     lda $14
     cmp $14
     beq *-2
   
-; -------------------  ASM Block 00000090  -------------------
+; -------------------  ASM Block 00000078  -------------------
 
  sei; 
-; optimize OK (SIED.pas), line = 65
+; optimize OK (SIED.pas), line = 59
 
 	mva <MYDLI VDSLST
 	mva >MYDLI VDSLST+1
 
-; optimize OK (SIED.pas), line = 66
+; optimize OK (SIED.pas), line = 60
 
 	lda #$C0
 	sta NMIEN
 
-; -------------------  ASM Block 00000091  -------------------
+; -------------------  ASM Block 00000079  -------------------
 
  cli; 
-; optimize OK (SIED.pas), line = 68
+; optimize OK (SIED.pas), line = 62
 
-	lda #$FD
+	lda #$C0
 	sta SDLST
-	lda #$80
+	lda #$81
 	sta SDLST+1
 
-; optimize OK (SIED.pas), line = 69
+; optimize OK (SIED.pas), line = 63
 
 	lda #$EA
 	sta PFCOL0
@@ -4380,31 +2431,32 @@ l_0E69
 	lda #$E0
 	sta PFCOL4
 
-; optimize OK (SIED.pas), line = 70
+; optimize OK (SIED.pas), line = 64
 
 	lda #$0A
 	sta KRPDEL
 	lda #$01
 	sta KEYREP
 
-; optimize FAIL ('CURSOR.INITCURSOR', SIED.pas), line = 72
+; optimize FAIL ('CURSOR.INITCURSOR', SIED.pas), line = 66
 
 	jsr CURSOR.INITCURSOR
 
-; optimize FAIL ('INITINTERFACE', SIED.pas), line = 73
+; optimize FAIL ('INITINTERFACE', SIED.pas), line = 67
 
 	jsr INITINTERFACE
 
-; optimize FAIL ('INITMODULES', SIED.pas), line = 74
+; optimize FAIL ('INITMODULES', SIED.pas), line = 68
 
 	jsr INITMODULES
 
-; optimize FAIL ('SHOWABOUT', SIED.pas), line = 75
+; optimize FAIL ('SHOWABOUT', SIED.pas), line = 69
 
 	jsr SHOWABOUT
 
 ; ------------------------------------------------------------
 
+KEYDEFP	= $79
 @exit
 	.ifdef @new
 	lda <@VarData
@@ -4416,23 +2468,23 @@ l_0E69
 	rts						; ret
 	eif
 .endl
-l_00EC
+l_01AF
 
-; optimize FAIL ('INITEDITOR', SIED.pas), line = 79
+; optimize FAIL ('INITEDITOR', SIED.pas), line = 73
 
 	jsr INITEDITOR
 
 ; --- WhileProlog
-	jmp l_0EC3
-l_0EC4
+	jmp l_075A
+l_075B
 
-; optimize FAIL ('CHECKZONES', SIED.pas), line = 82
+; optimize FAIL ('CHECKZONES', SIED.pas), line = 76
 
 	jsr CHECKZONES
 	lda CHECKZONES.RESULT
-	jeq l_0ECE
+	jeq l_0765
 
-; -------------------  ASM Block 00000092  -------------------
+; -------------------  ASM Block 00000080  -------------------
 
         lda szone
         asl @
@@ -4443,12 +2495,12 @@ l_0EC4
         sta jaddr+1
         jsr jaddr:$ffff
       
-l_0ECE
-l_0EC3
+l_0765
+l_075A
 
-; optimize OK (SIED.pas), line = 80
+; optimize OK (SIED.pas), line = 74
 
-	jmp l_0EC4
+	jmp l_075B
 
 ; ------------------------------------------------------------
 
@@ -4459,6 +2511,9 @@ EDITOR_ADDR	= $2800
 FONTS_ADDR	= $3000
 MAX_SPRITE	= $0F
 MAX_GROUP	= $07
+CORE_LIB	= $D800
+ASC2INT_ADDR	= $1F00
+SCAN2ASC_ADDR	= $1F80
 ZP_TM	= $14
 ZP_NFRMTM	= $12
 ZP_CURGROUP	= $1C
@@ -4536,24 +2591,14 @@ DL_MODE_160X192G4	= $0E
 DL_MODE_320X192G2	= $0F
 DL_JMP	= $01
 DL_JVB	= $41
-adr.DLIST	= CODEORIGIN+$00FD
+adr.DLIST	= CODEORIGIN+$01C0
 .var DLIST	= adr.DLIST .word
-adr._CONTROLS	= CODEORIGIN+$0157
-.var _CONTROLS	= adr._CONTROLS .word
-adr._ICONS	= CODEORIGIN+$0277
-.var _ICONS	= adr._ICONS .word
-adr._ICARD	= CODEORIGIN+$03BB
-.var _ICARD	= adr._ICARD .word
-adr._IPATH	= CODEORIGIN+$0406
-.var _IPATH	= adr._IPATH .word
-adr._FONT	= CODEORIGIN+$04C6
-.var _FONT	= adr._FONT .word
-adr._CFONT	= CODEORIGIN+$073C
-.var _CFONT	= adr._CFONT .word
-adr.ACONTROLS	= CODEORIGIN+$0877
-.var ACONTROLS	= adr.ACONTROLS .word
-adr.AICONS	= CODEORIGIN+$088F
-.var AICONS	= adr.AICONS .word
+_CONTROLS	=	$EA2C
+_ICONS	=	$EA2E
+_ICARD	=	$EA30
+_IPATH	=	$EA32
+ACONTROLS	=	$EA34
+AICONS	=	$EA36
 K_L	= $00
 K_J	= $01
 K_SEMICO	= $02
@@ -4620,7 +2665,7 @@ KRPDEL	= $02D9
 KEYREP	= $02DA
 KEYB	= $02FC
 BRKKEY	= $11
-adr._ASC2INT	= $0480
+adr._ASC2INT	= $1F00
 .var _ASC2INT	= adr._ASC2INT .word
 GPRIOR	= $026F
 SDMACTL	= $022F
@@ -4632,9 +2677,6 @@ adr.SIZEP	= $D008
 .var SIZEP	= adr.SIZEP .word
 adr.PCOL	= $02C0
 .var PCOL	= adr.PCOL .word
-I	= $3E
-TM	= $14
-CURMODULE	= DATAORIGIN+$0013
 DLIV	= $0200
 NMIEN	= $D40E
 SDLST	= $0230
@@ -4645,13 +2687,168 @@ PFCOL2	= $02C6
 PFCOL3	= $02C7
 PFCOL4	= $02C8
 ACTIVEPAGE	= $D4
-SCR	= $2E
+SCR	= $58
 adr.YSCR	= $0600
 .var YSCR	= adr.YSCR .word
 adr.AFONT	= $3000
 .var AFONT	= adr.AFONT .word
 adr.AFONTC	= $3100
 .var AFONTC	= adr.AFONTC .word
+PUTIMAGE.@VARDATASIZE	=	$0002
+PUTIMAGE.@EXIT	=	$DC4F
+PUTIMAGE.@VARDATA	=	$EB59
+PUTIMAGE.HEIGHT	=	$EB5A
+PUTIMAGE.WIDTH	=	$EB59
+PUTIMAGE.Y	=	$0084
+PUTIMAGE.X	=	$008C
+PUTIMAGE.ADR	=	$0088
+PUTIMAGE.EXPUTIMG	=	$DC4D
+PUTIMAGE._LNWIDTH	=	$DC33
+PUTIMAGE.LBYTE	=	$DC28
+PUTIMAGE.LLINE	=	$DC24
+PUTIMAGE.CALCSCR	=	$DC13
+PUTIMAGE.SKPAGE	=	$DC0F
+PUTIMAGE	=	$DC04
+PUTSPRITE.@VARDATASIZE	=	$0002
+PUTSPRITE.@EXIT	=	$DE0B
+PUTSPRITE.@VARDATA	=	$EB5B
+PUTSPRITE.HEIGHT	=	$EB5C
+PUTSPRITE.WIDTH	=	$EB5B
+PUTSPRITE.Y	=	$0084
+PUTSPRITE.X	=	$008C
+PUTSPRITE.ADR	=	$0088
+PUTSPRITE.EXPUTIMG	=	$DE09
+PUTSPRITE._LNWIDTH2	=	$DDEE
+PUTSPRITE.NXT	=	$DDEA
+PUTSPRITE.LB1	=	$DDD3
+PUTSPRITE.L1	=	$DDCF
+PUTSPRITE.LB2	=	$DDAC
+PUTSPRITE.L2	=	$DD9F
+PUTSPRITE.LB3	=	$DD73
+PUTSPRITE.L3	=	$DD61
+PUTSPRITE.LB4	=	$DD2C
+PUTSPRITE.L4	=	$DD15
+PUTSPRITE.LB5	=	$DCD7
+PUTSPRITE.L5	=	$DCBF
+PUTSPRITE.SH	=	$DCB1
+PUTSPRITE.LLINE	=	$DCB0
+PUTSPRITE._LNWIDTH1	=	$DC97
+PUTSPRITE.LBYTE	=	$DC8A
+PUTSPRITE.LLN	=	$DC86
+PUTSPRITE.LSIMPLE	=	$DC83
+PUTSPRITE.CALCSCR	=	$DC6C
+PUTSPRITE.POSITIVEX	=	$DC69
+PUTSPRITE.NEGATIVEX	=	$DC61
+PUTSPRITE.SKPAGE	=	$DC5B
+PUTSPRITE	=	$DC50
+PUTSPRITEXOR.@VARDATASIZE	=	$0002
+PUTSPRITEXOR.@EXIT	=	$DFAA
+PUTSPRITEXOR.@VARDATA	=	$EB5D
+PUTSPRITEXOR.HEIGHT	=	$EB5E
+PUTSPRITEXOR.WIDTH	=	$EB5D
+PUTSPRITEXOR.Y	=	$0084
+PUTSPRITEXOR.X	=	$008C
+PUTSPRITEXOR.ADR	=	$0088
+PUTSPRITEXOR.EXPUTIMG	=	$DFA8
+PUTSPRITEXOR.NXT	=	$DF85
+PUTSPRITEXOR.LB1	=	$DF6B
+PUTSPRITEXOR.L1	=	$DF67
+PUTSPRITEXOR.LB2	=	$DF44
+PUTSPRITEXOR.L2	=	$DF37
+PUTSPRITEXOR.LB3	=	$DF0B
+PUTSPRITEXOR.L3	=	$DEF9
+PUTSPRITEXOR.LB4	=	$DEC4
+PUTSPRITEXOR.L4	=	$DEAD
+PUTSPRITEXOR.LB5	=	$DE6F
+PUTSPRITEXOR.L5	=	$DE57
+PUTSPRITEXOR.SH	=	$DE49
+PUTSPRITEXOR.LLINE	=	$DE48
+PUTSPRITEXOR.LBYTE	=	$DE1E
+PUTSPRITEXOR.LLN	=	$DE1A
+PUTSPRITEXOR.LSIMPLE	=	$DE17
+PUTSPRITEXOR	=	$DE0C
+PUTTEXT.SPTR	=	$00FA
+PUTTEXT.@EXIT	=	$E018
+PUTTEXT.S	=	$0084
+PUTTEXT.Y	=	$008C
+PUTTEXT.X	=	$0088
+PUTTEXT.EXPUTTEXT	=	$E016
+PUTTEXT.ADR	=	$E005
+PUTTEXT.LBYTE	=	$E004
+PUTTEXT.LLN	=	$E004
+PUTTEXT.LSIMPLE	=	$E000
+PUTTEXT.SKIPSH	=	$DFF2
+PUTTEXT.TLEN	=	$DFDE
+PUTTEXT.LPUTCHAR	=	$DFDB
+PUTTEXT.SKPAGE	=	$DFCE
+PUTTEXT	=	$DFAB
+PUTTEXTC.SPTR	=	$00FA
+PUTTEXTC.@EXIT	=	$E082
+PUTTEXTC.S	=	$0084
+PUTTEXTC.Y	=	$008C
+PUTTEXTC.X	=	$0088
+PUTTEXTC.EXPUTIMG	=	$E080
+PUTTEXTC.ADR	=	$E06F
+PUTTEXTC.LBYTE	=	$E06E
+PUTTEXTC.LLN	=	$E06E
+PUTTEXTC.LSIMPLE	=	$E06A
+PUTTEXTC.TLEN	=	$E04B
+PUTTEXTC.LPUTCHAR	=	$E048
+PUTTEXTC.CALCSCR	=	$E03E
+PUTTEXTC.SKPAGE	=	$E03C
+PUTTEXTC	=	$E019
+INVERT.@VARDATASIZE	=	$0001
+INVERT.@EXIT	=	$E0C5
+INVERT.@VARDATA	=	$EB5F
+INVERT.H	=	$EB5F
+INVERT.W	=	$0084
+INVERT.Y	=	$008C
+INVERT.X	=	$0088
+INVERT.EXPUTIMG	=	$E0C3
+INVERT._LNWIDTH1	=	$E0BC
+INVERT.MASK	=	$E0B7
+INVERT.LBYTE	=	$E0B4
+INVERT.LLN	=	$E0B4
+INVERT.LSIMPLE	=	$E0AD
+INVERT.LPUTCHAR	=	$E09B
+INVERT.CALCSCR	=	$E090
+INVERT.SKPAGE	=	$E08E
+INVERT	=	$E083
+BLANK.@VARDATASIZE	=	$0001
+BLANK.@EXIT	=	$E108
+BLANK.@VARDATA	=	$EB60
+BLANK.H	=	$EB60
+BLANK.W	=	$0084
+BLANK.Y	=	$008C
+BLANK.X	=	$0088
+BLANK.EXPUTIMG	=	$E106
+BLANK._LNWIDTH1	=	$E0FF
+BLANK.MASK	=	$E0FA
+BLANK.LBYTE	=	$E0F7
+BLANK.LLN	=	$E0F7
+BLANK.LSIMPLE	=	$E0F0
+BLANK.LPUTCHAR	=	$E0DE
+BLANK.CALCSCR	=	$E0D3
+BLANK.SKPAGE	=	$E0D1
+BLANK	=	$E0C6
+SETSCREENWIDTH.@EXIT	=	$E114
+SETSCREENWIDTH.NSW	=	$0088
+SETSCREENWIDTH	=	$E109
+CLEARPAGE.@EXIT	=	$E14C
+CLEARPAGE.PAGE	=	$0088
+CLEARPAGE._PP3	=	$E147
+CLEARPAGE._PP2	=	$E144
+CLEARPAGE._PP1	=	$E141
+CLEARPAGE._PP0	=	$E13E
+CLEARPAGE.LCLR	=	$E13D
+CLEARPAGE.CLEAR	=	$E11F
+CLEARPAGE.SETPAGE1	=	$E11D
+CLEARPAGE.SETPAGE0	=	$E119
+CLEARPAGE	=	$E115
+WAIT.@EXIT	=	$E156
+WAIT.F	=	$0088
+WAIT.LOOP	=	$E152
+WAIT	=	$E14D
 MAX_ZONES	= $1F
 USER_ZONES_BEGIN	= $09
 adr._MZONEACTIVE	= $0500
@@ -4668,18 +2865,235 @@ adr._MZONEPROC	= $05A0
 .var _MZONEPROC	= adr._MZONEPROC .word
 SZONE	= $50
 OZONE	= $51
-__X	= DATAORIGIN+$001A
-__Y	= DATAORIGIN+$001B
-__W	= DATAORIGIN+$001C
-__H	= DATAORIGIN+$001D
+NULLPROC.@EXIT	=	$E157
+NULLPROC	=	$E157
+SETZONE.@VARDATASIZE	=	$0008
+SETZONE.@EXIT	=	$E1AA
+SETZONE.@VARDATA	=	$EB65
+SETZONE.PRC	=	$EB6B
+SETZONE.H	=	$EB6A
+SETZONE.W	=	$EB69
+SETZONE.Y	=	$EB68
+SETZONE.X	=	$EB67
+SETZONE.ACT	=	$EB66
+SETZONE.N	=	$EB65
+SETZONE	=	$E158
+CLEARZONE.@VARDATASIZE	=	$0001
+CLEARZONE.@EXIT	=	$E1D3
+CLEARZONE.@VARDATA	=	$EB6D
+CLEARZONE.N	=	$EB6D
+CLEARZONE	=	$E1AB
+CLEARWORKZONES.@EXIT	=	$E1E5
+CLEARWORKZONES.L_013B	=	$E1E5
+CLEARWORKZONES.L_012D	=	$E1D8
+CLEARWORKZONES	=	$E1D4
+INITINTERFACE.@EXIT	=	$E1FF
+INITINTERFACE.L_016B	=	$E1FF
+INITINTERFACE.L_015D	=	$E1F2
+INITINTERFACE	=	$E1E6
+GETFREEZONE.RESULT	=	$EB6E
+GETFREEZONE.@EXIT	=	$E222
+GETFREEZONE.L_0193	=	$E222
+GETFREEZONE.L_01A8	=	$E21E
+GETFREEZONE.L_0185	=	$E209
+GETFREEZONE	=	$E200
+ADDZONEN.@VARDATASIZE	=	$0007
+ADDZONEN.@VARDATA	=	$EB6F
+ADDZONEN.RESULT	=	$EB76
+ADDZONEN.PRC	=	$EB74
+ADDZONEN.H	=	$EB73
+ADDZONEN.W	=	$EB72
+ADDZONEN.Y	=	$EB71
+ADDZONEN.X	=	$EB70
+ADDZONEN.N	=	$EB6F
+ADDZONEN.@EXIT	=	$E272
+ADDZONEN.L_01E5	=	$E26C
+ADDZONEN.L_01CC	=	$E233
+ADDZONEN	=	$E223
+ADDZONE.@VARDATASIZE	=	$0006
+ADDZONE.@VARDATA	=	$EB77
+ADDZONE.RESULT	=	$EB7D
+ADDZONE.PRC	=	$EB7B
+ADDZONE.H	=	$EB7A
+ADDZONE.W	=	$EB79
+ADDZONE.Y	=	$EB78
+ADDZONE.X	=	$EB77
+ADDZONE.@EXIT	=	$E2A5
+ADDZONE	=	$E273
+ADDZONEH.@VARDATASIZE	=	$0002
+ADDZONEH.@VARDATA	=	$EB7E
+ADDZONEH.RESULT	=	$EB80
+ADDZONEH.PRC	=	$EB7E
+ADDZONEH.@EXIT	=	$E2D7
+ADDZONEH	=	$E2A6
+ADDZONEHN.@VARDATASIZE	=	$0003
+ADDZONEHN.@VARDATA	=	$EB81
+ADDZONEHN.RESULT	=	$EB84
+ADDZONEHN.PRC	=	$EB82
+ADDZONEHN.N	=	$EB81
+ADDZONEHN.@EXIT	=	$E30F
+ADDZONEHN	=	$E2D8
+ADDZONEV.@VARDATASIZE	=	$0002
+ADDZONEV.@VARDATA	=	$EB85
+ADDZONEV.RESULT	=	$EB87
+ADDZONEV.PRC	=	$EB85
+ADDZONEV.@EXIT	=	$E341
+ADDZONEV	=	$E310
+ADDZONEVN.@VARDATASIZE	=	$0003
+ADDZONEVN.@VARDATA	=	$EB88
+ADDZONEVN.RESULT	=	$EB8B
+ADDZONEVN.PRC	=	$EB89
+ADDZONEVN.N	=	$EB88
+ADDZONEVN.@EXIT	=	$E379
+ADDZONEVN	=	$E342
+CHECKZONES.NZONE	=	$0057
+CHECKZONES.RESULT	=	$EB8C
+CHECKZONES.@EXIT	=	$E553
+CHECKZONES.L_0495	=	$E553
+CHECKZONES.L_04A8	=	$E553
+CHECKZONES.L_037B	=	$E538
+CHECKZONES.L_0436	=	$E535
+CHECKZONES.L_0483	=	$E535
+CHECKZONES.L_0448	=	$E52A
+CHECKZONES.L_0476	=	$E527
+CHECKZONES.L_045B	=	$E51E
+CHECKZONES.L_038E	=	$E50B
+CHECKZONES.L_03D3	=	$E508
+CHECKZONES.L_03E7	=	$E508
+CHECKZONES.L_0419	=	$E500
+CHECKZONES.L_03FA	=	$E4F8
+CHECKZONES.L_03A2	=	$E49C
+CHECKZONES.L_03C3	=	$E499
+CHECKZONES.B_02F1	=	$E468
+CHECKZONES.L_02FF	=	$E468
+CHECKZONES.L_030E	=	$E461
+CHECKZONES.L_0359	=	$E461
+CHECKZONES.L_02F1	=	$E3C7
+CHECKZONES.L_0286	=	$E3B8
+CHECKZONES.PRESSED.RESULT	=	$EB8D
+CHECKZONES.PRESSED.@EXIT	=	$E3B7
+CHECKZONES.PRESSED	=	$E3A6
+CHECKZONES.REFRESHZONE.@EXIT	=	$E3A5
+CHECKZONES.REFRESHZONE.L_02B8	=	$E3A5
+CHECKZONES.REFRESHZONE.L_029B	=	$E391
+CHECKZONES.REFRESHZONE	=	$E37D
+CHECKZONES	=	$E37A
 YCONTROLS	= $37
-adr._DIRFILEX	= CODEORIGIN+$08A1
-.var _DIRFILEX	= adr._DIRFILEX .word
-adr._DIRFILEY	= CODEORIGIN+$08B0
-.var _DIRFILEY	= adr._DIRFILEY .word
-adr.DIRNAME	= [DATAORIGIN+$0069] .array [15] .word
-.var DIRNAME	= adr.DIRNAME .word
-adr._HEX	= CODEORIGIN+$08BF
+INVERTZONE.@VARDATASIZE	=	$0003
+INVERTZONE.@EXIT	=	$E586
+INVERTZONE.@VARDATA	=	$EB8E
+INVERTZONE._H	=	$EB90
+INVERTZONE._W	=	$EB8F
+INVERTZONE.I	=	$EB8E
+INVERTZONE	=	$E554
+CLEARWORKAREA.@EXIT	=	$E5A1
+CLEARWORKAREA	=	$E587
+CLEARSTATUS.@EXIT	=	$E5BB
+CLEARSTATUS	=	$E5A2
+SETSTATUS.@VARDATASIZE	=	$0002
+SETSTATUS.@EXIT	=	$E5D9
+SETSTATUS.@VARDATA	=	$EB91
+SETSTATUS.S	=	$EB91
+SETSTATUS	=	$E5BC
+SETICON.@VARDATASIZE	=	$0004
+SETICON.@EXIT	=	$E680
+SETICON.@VARDATA	=	$EB93
+SETICON.P	=	$EB95
+SETICON._X	=	$EB94
+SETICON.N	=	$EB93
+SETICON.L_052E	=	$E680
+SETICON.L_0546	=	$E679
+SETICON.L_057D	=	$E64D
+SETICON.L_055B	=	$E649
+SETICON.L_0520	=	$E5E6
+SETICON	=	$E5DA
+SETCONTROLS.@VARDATASIZE	=	$0001
+SETCONTROLS.@EXIT	=	$E6D5
+SETCONTROLS.@VARDATA	=	$EB97
+SETCONTROLS.S	=	$EB97
+SETCONTROLS.124@	=	$E6D1
+SETCONTROLS.123@	=	$E6C3
+SETCONTROLS.122@	=	$E6B5
+SETCONTROLS.121@	=	$E6A7
+SETCONTROLS.120@	=	$E699
+SETCONTROLS.119@	=	$E68B
+SETCONTROLS	=	$E681
+SETCONTROL.@VARDATASIZE	=	$0004
+SETCONTROL.@EXIT	=	$E73B
+SETCONTROL.@VARDATA	=	$EB98
+SETCONTROL.P	=	$EB9A
+SETCONTROL._X	=	$EB99
+SETCONTROL.N	=	$EB98
+SETCONTROL.L_061C	=	$E73B
+SETCONTROL.L_0653	=	$E714
+SETCONTROL.L_063D	=	$E707
+SETCONTROL.L_060E	=	$E6E2
+SETCONTROL	=	$E6D6
+ADDBUTTON.@VARDATASIZE	=	$0006
+ADDBUTTON.@VARDATA	=	$EB9C
+ADDBUTTON.RESULT	=	$EBA2
+ADDBUTTON.PRC	=	$EBA0
+ADDBUTTON.CAP	=	$EB9E
+ADDBUTTON.Y	=	$EB9D
+ADDBUTTON.X	=	$EB9C
+ADDBUTTON.@EXIT	=	$E794
+ADDBUTTON	=	$E73C
+ADDINPUT.@VARDATASIZE	=	$0007
+ADDINPUT.@VARDATA	=	$EBA3
+ADDINPUT.RESULT	=	$EBAA
+ADDINPUT.PRC	=	$EBA8
+ADDINPUT.VALUE	=	$EBA6
+ADDINPUT.W	=	$EBA5
+ADDINPUT.Y	=	$EBA4
+ADDINPUT.X	=	$EBA3
+ADDINPUT.@EXIT	=	$E7E6
+ADDINPUT	=	$E795
+DOINPUT.@VARDATASIZE	=	$000C
+DOINPUT.@VARDATA	=	$EBAB
+DOINPUT.@CASETMP_0004	=	$EBB7
+DOINPUT.ISCRS	=	$EBB6
+DOINPUT.CTM	=	$EBB5
+DOINPUT.W	=	$EBB4
+DOINPUT.Y	=	$EBB3
+DOINPUT.X	=	$EBB2
+DOINPUT.LN	=	$EBB1
+DOINPUT.CH	=	$EBB0
+DOINPUT.CX	=	$EBAF
+DOINPUT.OZONE	=	$EBAE
+DOINPUT.RESULT	=	$EBAD
+DOINPUT.VALUE	=	$EBAB
+DOINPUT.@EXIT	=	$EA25
+DOINPUT.B_0735	=	$EA14
+DOINPUT.L_07B8	=	$EA11
+DOINPUT.A_0004	=	$EA07
+DOINPUT.L_08D4	=	$EA04
+DOINPUT.L_08B0	=	$E9CA
+DOINPUT.L_0898	=	$E9B0
+DOINPUT.L_083A	=	$E99A
+DOINPUT.L_0875	=	$E994
+DOINPUT.L_084E	=	$E97B
+DOINPUT.127@	=	$E969
+DOINPUT.L_0818	=	$E950
+DOINPUT.L_082C	=	$E94D
+DOINPUT.L_07F8	=	$E92F
+DOINPUT.L_080A	=	$E92C
+DOINPUT.L_07EB	=	$E91E
+DOINPUT.L_07E0	=	$E90E
+DOINPUT.126@	=	$E903
+DOINPUT.L_07C5	=	$E8F9
+DOINPUT.L_0787	=	$E8CF
+DOINPUT.L_0794	=	$E8C7
+DOINPUT.L_0755	=	$E8A5
+DOINPUT.125@	=	$E8A1
+DOINPUT.L_0735	=	$E86C
+DOINPUT.L_06BE	=	$E829
+DOINPUT.REFRESHVALUE.@EXIT	=	$E828
+DOINPUT.REFRESHVALUE	=	$E7EA
+DOINPUT	=	$E7E7
+I	= $3E
+TM	= $14
+CURMODULE	= DATAORIGIN+$0019
+adr._HEX	= CODEORIGIN+$021A
 .var _HEX	= adr._HEX .word
 adr.DEV	= $0400
 .var DEV	= adr.DEV .word
@@ -4689,7 +3103,13 @@ adr._FN	= $0417
 .var _FN	= adr._FN .word
 adr.FILEMASK	= $042C
 .var FILEMASK	= adr.FILEMASK .word
-DIRPAGEBEGIN	= DATAORIGIN+$014F
+DIRPAGEBEGIN	= DATAORIGIN+$001A
+adr._DIRFILEX	= CODEORIGIN+$022A
+.var _DIRFILEX	= adr._DIRFILEX .word
+adr._DIRFILEY	= CODEORIGIN+$0239
+.var _DIRFILEY	= adr._DIRFILEY .word
+adr.DIRNAME	= [DATAORIGIN+$001C] .array [15] .word
+.var DIRNAME	= adr.DIRNAME .word
 @exit
 
 @halt	ldx #$00
@@ -4767,15 +3187,12 @@ NOROMFONT
 	?old_adr = *
 
 DATAORIGIN
-.by  $28 $00 $18 $00 $2D $0C $00 $00  $00 $00 $00 $00 $00 $00 $00 $00  $00 $00 $00 $FF $00 $00 $00 $00
-.by  $00 $00 $00 $00 $00 $00 $00 $00  $00 $00 $00 $00 $00 $00 $00 $00  $00 $00 $00 $00 $00 $00 $00 $00
-.by  $00 $00 $00 $00 $00 $00 $00 $00  $00 $00 $00 $00 $00 $00 $00 $00  $00 $00 $00 $00 $00 $00 $00 $00
-.by  $00 $00 $00 $00 $00 $00 $00 $00  $00 $00 $00 $00 $00 $00 $00 $00  $00 $00 $00 $00 $00 $00 $00 $00
-.by  $00 $00 $00 $00 $00 $00 $00 $00  $00 <[DATAORIGIN+$0087] >[DATAORIGIN+$0087] <[DATAORIGIN+$0094] >[DATAORIGIN+$0094] <[DATAORIGIN+$00A1] >[DATAORIGIN+$00A1] <[DATAORIGIN+$00AE]  >[DATAORIGIN+$00AE] <[DATAORIGIN+$00BB] >[DATAORIGIN+$00BB] <[DATAORIGIN+$00C8] >[DATAORIGIN+$00C8] <[DATAORIGIN+$00D5] >[DATAORIGIN+$00D5] <[DATAORIGIN+$00E2]
-.by  >[DATAORIGIN+$00E2] <[DATAORIGIN+$00EF] >[DATAORIGIN+$00EF] <[DATAORIGIN+$00FC] >[DATAORIGIN+$00FC] <[DATAORIGIN+$0109] >[DATAORIGIN+$0109] <[DATAORIGIN+$0116]  >[DATAORIGIN+$0116] <[DATAORIGIN+$0123] >[DATAORIGIN+$0123] <[DATAORIGIN+$0130] >[DATAORIGIN+$0130] <[DATAORIGIN+$013D] >[DATAORIGIN+$013D]
+.by  $28 $00 $18 $00 $2D $0C $00 $00  $00 $00 $00 $00 $00 $00 $00 $00  $00 $00 $00 $00 $00 $00 $00 $00
+.by  $00 $FF $00 $00 <[DATAORIGIN+$003A] >[DATAORIGIN+$003A] <[DATAORIGIN+$0047] >[DATAORIGIN+$0047]  <[DATAORIGIN+$0054] >[DATAORIGIN+$0054] <[DATAORIGIN+$0061] >[DATAORIGIN+$0061] <[DATAORIGIN+$006E] >[DATAORIGIN+$006E] <[DATAORIGIN+$007B] >[DATAORIGIN+$007B]  <[DATAORIGIN+$0088] >[DATAORIGIN+$0088] <[DATAORIGIN+$0095] >[DATAORIGIN+$0095] <[DATAORIGIN+$00A2] >[DATAORIGIN+$00A2] <[DATAORIGIN+$00AF] >[DATAORIGIN+$00AF]
+.by  <[DATAORIGIN+$00BC] >[DATAORIGIN+$00BC] <[DATAORIGIN+$00C9] >[DATAORIGIN+$00C9] <[DATAORIGIN+$00D6] >[DATAORIGIN+$00D6] <[DATAORIGIN+$00E3] >[DATAORIGIN+$00E3]  <[DATAORIGIN+$00F0] >[DATAORIGIN+$00F0]
 
 VARINITSIZE	= *-DATAORIGIN
-VARDATASIZE	= 343
+VARDATASIZE	= 264
 
 PROGRAMSTACK	= DATAORIGIN+VARDATASIZE
 
@@ -4786,100 +3203,31 @@ PROGRAMSTACK	= DATAORIGIN+VARDATASIZE
 ; ------------------------------------------------------------
 
 .macro	STATICDATA
-.by  $00 $13 $53 $50 $41 $43 $45 $20  $49 $4D $50 $41 $43 $54 $20 $45  $44 $49 $54 $4F $52 $13 $2D $2D
-.by  $2D $2D $2D $2D $2D $2D $2D $2D  $2D $2D $2D $2D $2D $2D $2D $2D  $2D $08 $47 $53 $44 $20 $32 $30
-.by  $32 $34 $26 $47 $49 $54 $3A $2F  $2F $47 $53 $4F $46 $54 $57 $41  $52 $45 $44 $45 $56 $45 $4C $4F
-.by  $50 $4D $45 $4E $54 $2F $53 $50  $41 $43 $45 $49 $4D $50 $41 $43  $54 $07 $32 $38 $2D $32 $2D $32
-.by  $34 $10 $30 $31 $32 $33 $34 $35  $36 $37 $38 $39 $41 $42 $43 $44  $45 $46 $0A $53 $45 $45 $4B $49
-.by  $4E $47 $2E $2E $2E $14 $52 $45  $41 $44 $49 $4E $47 $20 $44 $49  $52 $45 $43 $54 $4F $52 $59 $2E
-.by  $2E $2E $14 $52 $45 $41 $44 $49  $4E $47 $20 $44 $49 $52 $45 $43  $54 $4F $52 $59 $2E $2E $2E $0D
-.by  $49 $2F $4F $20 $45 $52 $52 $4F  $52 $20 $24 $30 $30 $04 $50 $52  $45 $56 $04 $4E $45 $58 $54 $04
-.by  $4C $4F $41 $44 $04 $53 $41 $56  $45 $06 $45 $58 $50 $4F $52 $54  $08 $30 $30 $3A $30 $30 $2E $30
-.by  $30 $04 $2A $2E $2A $9B $02 $44  $3A $06 $4E $4F $4E $41 $4D $45  $10 $18 $3C $3E $78 $60 $80 $BA
-.by  $7C $F6 $EE $6C $BA $44 $10 $10  $00 $C6 $00 $10 $10 $70 $70 $70  $70 $30 $80 $20 $4B $00 $28 $0B
+.by  $00 $04 $63 $6F $72 $65 $04 $63  $6F $72 $65 $04 $63 $6F $72 $65  $04 $63 $6F $72 $65 $04 $63 $6F
+.by  $72 $65 $04 $63 $6F $72 $65 $04  $63 $6F $72 $65 $04 $63 $6F $72  $65 $04 $63 $6F $72 $65 $04 $63
+.by  $6F $72 $65 $04 $63 $6F $72 $65  $04 $63 $6F $72 $65 $04 $63 $6F  $72 $65 $04 $63 $6F $72 $65 $04
+.by  $63 $6F $72 $65 $04 $63 $6F $72  $65 $04 $63 $6F $72 $65 $04 $63  $6F $72 $65 $04 $63 $6F $72 $65
+.by  $04 $63 $6F $72 $65 $04 $63 $6F  $72 $65 $04 $63 $6F $72 $65 $04  $63 $6F $72 $65 $04 $63 $6F $72
+.by  $65 $04 $63 $6F $72 $65 $04 $63  $6F $72 $65 $04 $63 $6F $72 $65  $04 $63 $6F $72 $65 $04 $63 $6F
+.by  $72 $65 $04 $63 $6F $72 $65 $04  $63 $6F $72 $65 $04 $63 $6F $72  $65 $04 $63 $6F $72 $65 $04 $63
+.by  $6F $72 $65 $04 $63 $6F $72 $65  $04 $63 $6F $72 $65 $04 $63 $6F  $72 $65 $04 $63 $6F $72 $65 $04
+.by  $63 $6F $72 $65 $13 $53 $50 $41  $43 $45 $20 $49 $4D $50 $41 $43  $54 $20 $45 $44 $49 $54 $4F $52
+.by  $13 $2D $2D $2D $2D $2D $2D $2D  $2D $2D $2D $2D $2D $2D $2D $2D  $2D $2D $2D $2D $08 $47 $53 $44
+.by  $20 $32 $30 $32 $34 $26 $47 $49  $54 $3A $2F $2F $47 $53 $4F $46  $54 $57 $41 $52 $45 $44 $45 $56
+.by  $45 $4C $4F $50 $4D $45 $4E $54  $2F $53 $50 $41 $43 $45 $49 $4D  $50 $41 $43 $54 $07 $32 $39 $2D
+.by  $32 $2D $32 $34 $10 $30 $31 $32  $33 $34 $35 $36 $37 $38 $39 $41  $42 $43 $44 $45 $46 $0A $53 $45
+.by  $45 $4B $49 $4E $47 $2E $2E $2E  $14 $52 $45 $41 $44 $49 $4E $47  $20 $44 $49 $52 $45 $43 $54 $4F
+.by  $52 $59 $2E $2E $2E $14 $52 $45  $41 $44 $49 $4E $47 $20 $44 $49  $52 $45 $43 $54 $4F $52 $59 $2E
+.by  $2E $2E $0D $49 $2F $4F $20 $45  $52 $52 $4F $52 $20 $24 $30 $30  $04 $50 $52 $45 $56 $04 $4E $45
+.by  $58 $54 $04 $4C $4F $41 $44 $04  $53 $41 $56 $45 $06 $45 $58 $50  $4F $52 $54 $08 $30 $30 $3A $30
+.by  $30 $2E $30 $30 $04 $2A $2E $2A  $9B $02 $44 $3A $06 $4E $4F $4E  $41 $4D $45 $10 $18 $3C $3E $78
+.by  $60 $80 $BA $7C $F6 $EE $6C $BA  $44 $10 $10 $00 $C6 $00 $10 $10  $70 $70 $70 $70 $30 $80 $20 $4B
+.by  $00 $28 $0B $0B $0B $0B $0B $0B  $0B $0B $0B $0B $0B $0B $0B $0B  $0B $0B $0B $0B $0B $0B $0B $0B
 .by  $0B $0B $0B $0B $0B $0B $0B $0B  $0B $0B $0B $0B $0B $0B $0B $0B  $0B $0B $0B $0B $0B $0B $0B $0B
-.by  $0B $0B $0B $0B $0B $0B $0B $0B  $0B $0B $0B $0B $0B $0B $0B $0B  $0B $0B $0B $0B $0B $0B $90 $0D
-.by  $0D $0D $0D $0D $0D $0D $0D $0D  $0D $0D $0D $0D $0D $0D $30 $0D  $0D $0D $0D $0D $B0 $0D $0D $0D
-.by  $0D $0D $0D $8D $41 $FD $80 $15  $55 $40 $56 $59 $50 $56 $69 $58  $56 $A9 $58 $56 $69 $58 $56 $59
-.by  $58 $15 $55 $68 $0A $AA $A0 $00  $00 $00 $05 $55 $50 $15 $96 $54  $15 $9A $54 $15 $AA $54 $15 $9A
-.by  $54 $15 $96 $54 $05 $55 $50 $15  $55 $40 $56 $95 $50 $56 $A5 $58  $56 $A9 $58 $56 $A5 $58 $56 $95
-.by  $58 $15 $55 $68 $0A $AA $A0 $00  $00 $00 $05 $55 $50 $15 $A5 $54  $15 $A9 $54 $15 $AA $54 $15 $A9
-.by  $54 $15 $A5 $54 $05 $55 $50 $15  $55 $40 $56 $59 $50 $56 $99 $58  $56 $A9 $58 $56 $99 $58 $56 $59
-.by  $58 $15 $55 $68 $0A $AA $A0 $00  $00 $00 $05 $55 $50 $15 $96 $54  $15 $A6 $54 $15 $AA $54 $15 $A6
-.by  $54 $15 $96 $54 $05 $55 $50 $15  $55 $40 $55 $55 $50 $56 $A9 $58  $56 $A9 $58 $56 $A9 $58 $55 $55
-.by  $58 $15 $55 $68 $0A $AA $A0 $00  $00 $00 $05 $55 $50 $15 $55 $54  $15 $AA $54 $15 $AA $54 $15 $AA
-.by  $54 $15 $55 $54 $05 $55 $50 $15  $55 $40 $56 $A9 $50 $55 $55 $58  $5A $AA $58 $56 $A9 $58 $55 $A5
-.by  $58 $15 $55 $68 $0A $AA $A0 $00  $00 $00 $05 $55 $50 $15 $AA $54  $15 $55 $54 $16 $AA $94 $15 $AA
-.by  $54 $15 $69 $54 $05 $55 $50 $15  $55 $40 $55 $A5 $50 $56 $A9 $58  $5A $AA $58 $55 $55 $58 $56 $A9
-.by  $58 $15 $55 $68 $0A $AA $A0 $00  $00 $00 $05 $55 $50 $15 $69 $54  $15 $AA $54 $16 $AA $94 $15 $55
-.by  $54 $15 $AA $54 $05 $55 $50 $55  $55 $54 $6A $A9 $56 $6A $A9 $56  $55 $55 $5A $55 $65 $54 $55 $89
-.by  $56 $55 $65 $56 $55 $55 $56 $55  $65 $56 $55 $65 $56 $55 $55 $56  $2A $AA $AA $00 $00 $14 $00 $01
-.by  $46 $00 $04 $5A $00 $01 $18 $00  $04 $68 $00 $32 $20 $00 $48 $00  $00 $E0 $00 $0D $20 $00 $D2 $80
-.by  $00 $28 $00 $00 $00 $00 $00 $15  $55 $00 $56 $6A $40 $25 $55 $60  $06 $69 $60 $05 $55 $60 $06 $99
-.by  $60 $05 $55 $60 $06 $6A $60 $05  $55 $60 $05 $9A $94 $01 $55 $5A  $00 $AA $A8 $00 $00 $00 $15 $55
-.by  $55 $1A $AA $55 $1A $AA $55 $15  $55 $54 $15 $59 $55 $15 $62 $55  $15 $59 $55 $15 $55 $55 $15 $59
-.by  $55 $15 $59 $55 $15 $55 $55 $00  $00 $00 $00 $00 $05 $00 $00 $51  $00 $01 $14 $00 $00 $44 $00 $01
-.by  $10 $00 $0C $00 $00 $10 $00 $00  $30 $00 $03 $40 $00 $34 $00 $00  $00 $00 $00 $00 $00 $00 $05 $55
-.by  $40 $15 $9A $90 $01 $55 $50 $01  $9A $50 $01 $55 $50 $01 $A6 $50  $01 $55 $50 $01 $9A $90 $01 $55
-.by  $50 $01 $66 $A5 $00 $55 $54 $AA  $AA $AA $95 $55 $55 $9A $AA $55  $9A $AA $55 $95 $55 $56 $95 $59
-.by  $55 $95 $62 $55 $95 $59 $55 $95  $55 $55 $95 $59 $55 $95 $59 $55  $95 $55 $55 $AA $AA $AA $AA $AA
-.by  $A5 $AA $AA $51 $AA $A9 $16 $AA  $AA $46 $AA $A9 $9A $AA $AE $AA  $AA $9A $AA $AA $BA $AA $AB $6A
-.by  $AA $B6 $AA $AA $AA $AA $AA $AA  $AA $AA $A5 $55 $6A $95 $9A $9A  $A9 $55 $5A $A9 $9A $5A $A9 $55
-.by  $5A $A9 $A6 $5A $A9 $55 $5A $A9  $9A $9A $A9 $55 $5A $A9 $66 $A5  $AA $55 $56 $2A $AA $AA $AA $AA
-.by  $0A $AA $AA $AA $A8 $0A $AA $AA  $AA $A8 $02 $AA $AA $AA $A0 $02  $AA $AA $AA $A0 $02 $AA $AA $AA
-.by  $A0 $02 $AA $AA $AA $A0 $02 $AA  $AA $AA $A0 $02 $AA $AA $AA $A0  $02 $AA $AA $AA $A0 $02 $AA $AA
-.by  $AA $A0 $02 $AA $AA $AA $A0 $02  $AA $AA $AA $A0 $02 $AA $AA $AA  $A0 $00 $AA $AA $AA $80 $00 $10
-.by  $01 $1F $D0 $01 $54 $52 $01 $6F  $D1 $81 $74 $51 $E1 $6F $D0 $F9  $54 $50 $F1 $1F $D0 $61 $14 $90
-.by  $41 $1F $10 $01 $00 $10 $01 $FF  $FF $FF $00 $10 $01 $40 $10 $0D  $38 $10 $31 $2C $10 $C1 $32 $13
-.by  $01 $11 $14 $01 $08 $93 $01 $05  $D3 $C1 $03 $D1 $A1 $01 $91 $11  $00 $10 $01 $FF $FF $FF $00 $10
-.by  $01 $00 $10 $01 $54 $17 $C1 $01  $10 $31 $00 $10 $09 $00 $90 $09  $00 $10 $09 $01 $10 $31 $54 $17
-.by  $C1 $00 $10 $01 $00 $10 $01 $FF  $FF $FF $00 $10 $01 $00 $10 $01  $07 $D0 $01 $1F $90 $01 $23 $10
-.by  $01 $47 $10 $01 $3F $10 $01 $1F  $90 $01 $07 $D0 $01 $00 $10 $01  $00 $10 $01 $FF $FF $FF $00 $00
-.by  $00 $00 $3E $00 $01 $80 $00 $40  $00 $40 $00 $40 $00 $80 $00 $80  $1F $00 $00 $00 $00 $00 $00 $00
-.by  $00 $00 $00 $00 $03 $80 $0E $00  $1B $80 $0E $00 $03 $80 $00 $00  $00 $00 $00 $00 $00 $00 $40 $40
-.by  $40 $00 $40 $A0 $A0 $00 $00 $00  $A0 $E0 $A0 $E0 $A0 $40 $60 $80  $20 $C0 $A0 $20 $40 $80 $A0 $40
-.by  $A0 $40 $A0 $60 $40 $40 $00 $00  $00 $40 $80 $80 $80 $40 $80 $40  $40 $40 $80 $00 $A0 $40 $A0 $00
-.by  $00 $40 $E0 $40 $00 $00 $00 $00  $40 $80 $00 $00 $E0 $00 $00 $00  $00 $00 $00 $40 $20 $20 $40 $80
-.by  $80 $40 $A0 $A0 $A0 $40 $40 $C0  $40 $40 $40 $C0 $20 $40 $80 $E0  $C0 $20 $40 $20 $C0 $80 $A0 $60
-.by  $20 $20 $E0 $80 $C0 $20 $C0 $40  $80 $C0 $A0 $40 $E0 $20 $40 $80  $80 $40 $A0 $40 $A0 $40 $40 $A0
-.by  $60 $20 $40 $00 $40 $00 $40 $00  $00 $40 $00 $40 $80 $20 $40 $80  $40 $20 $00 $E0 $00 $E0 $00 $80
-.by  $40 $20 $40 $80 $E0 $20 $40 $00  $40 $E0 $A0 $A0 $80 $E0 $E0 $A0  $A0 $E0 $A0 $E0 $A0 $C0 $A0 $E0
-.by  $E0 $80 $80 $80 $E0 $C0 $A0 $A0  $A0 $C0 $E0 $80 $C0 $80 $E0 $E0  $80 $C0 $80 $80 $E0 $80 $A0 $A0
-.by  $E0 $A0 $A0 $E0 $A0 $A0 $E0 $40  $40 $40 $E0 $20 $20 $20 $A0 $E0  $A0 $A0 $C0 $A0 $A0 $80 $80 $80
-.by  $80 $E0 $C0 $E0 $E0 $A0 $A0 $C0  $A0 $A0 $A0 $A0 $E0 $A0 $A0 $A0  $E0 $E0 $A0 $E0 $80 $80 $E0 $A0
-.by  $A0 $A0 $C0 $E0 $A0 $C0 $A0 $A0  $60 $80 $40 $20 $C0 $E0 $40 $40  $40 $40 $A0 $A0 $A0 $A0 $C0 $A0
-.by  $A0 $A0 $C0 $80 $A0 $A0 $E0 $E0  $C0 $A0 $A0 $40 $A0 $A0 $A0 $A0  $60 $20 $C0 $E0 $20 $40 $80 $E0
-.by  $60 $40 $40 $40 $60 $80 $80 $40  $20 $20 $C0 $40 $40 $40 $C0 $40  $A0 $00 $00 $00 $00 $00 $00 $00
-.by  $E0 $04 $04 $04 $00 $04 $0A $0A  $00 $00 $00 $0A $0E $0A $0E $0A  $04 $06 $08 $02 $0C $0A $02 $04
-.by  $08 $0A $04 $0A $04 $0A $06 $04  $04 $00 $00 $00 $04 $08 $08 $08  $04 $08 $04 $04 $04 $08 $00 $0A
-.by  $04 $0A $00 $00 $04 $0E $04 $00  $00 $00 $00 $04 $08 $00 $00 $0E  $00 $00 $00 $00 $00 $00 $04 $02
-.by  $02 $04 $08 $08 $04 $0A $0A $0A  $04 $04 $0C $04 $04 $04 $0C $02  $04 $08 $0E $0C $02 $04 $02 $0C
-.by  $08 $0A $06 $02 $02 $0E $08 $0C  $02 $0C $04 $08 $0C $0A $04 $0E  $02 $04 $08 $08 $04 $0A $04 $0A
-.by  $04 $04 $0A $06 $02 $04 $00 $04  $00 $04 $00 $00 $04 $00 $04 $08  $02 $04 $08 $04 $02 $00 $0E $00
-.by  $0E $00 $08 $04 $02 $04 $08 $0E  $02 $04 $00 $04 $0E $0A $0A $08  $0E $0E $0A $0A $0E $0A $0E $0A
-.by  $0C $0A $0E $0E $08 $08 $08 $0E  $0C $0A $0A $0A $0C $0E $08 $0C  $08 $0E $0E $08 $0C $08 $08 $0E
-.by  $08 $0A $0A $0E $0A $0A $0E $0A  $0A $0E $04 $04 $04 $0E $02 $02  $02 $0A $0E $0A $0A $0C $0A $0A
-.by  $08 $08 $08 $08 $0E $0C $0E $0E  $0A $0A $0C $0A $0A $0A $0A $0E  $0A $0A $0A $0E $0E $0A $0E $08
-.by  $08 $0E $0A $0A $0A $0C $0E $0A  $0C $0A $0A $06 $08 $04 $02 $0C  $0E $04 $04 $04 $04 $0A $0A $0A
-.by  $0A $0C $0A $0A $0A $0C $08 $0A  $0A $0E $0E $0C $0A $0A $04 $0A  $0A $0A $0A $06 $02 $0C $0E $02
-.by  $04 $08 $0E $06 $04 $04 $04 $06  $08 $08 $04 $02 $02 $0C $04 $04  $04 $0C $04 $0A $00 $00 $00 $00
-.by  $00 $00 $00 $0E $30 $30 $30 $00  $30 $CC $CC $00 $00 $00 $CC $FC  $CC $FC $CC $3C $F0 $30 $3C $F0
-.by  $CC $0C $30 $C0 $CC $30 $CC $30  $CC $3C $30 $30 $00 $00 $00 $30  $C0 $C0 $C0 $30 $30 $0C $0C $0C
-.by  $30 $00 $00 $30 $00 $00 $00 $30  $FC $30 $00 $00 $00 $00 $30 $C0  $00 $00 $FC $00 $00 $00 $00 $00
-.by  $00 $30 $0C $0C $30 $C0 $C0 $FC  $CC $CC $CC $FC $30 $F0 $30 $30  $30 $F0 $0C $30 $C0 $FC $FC $0C
-.by  $30 $0C $F0 $CC $CC $3C $0C $0C  $FC $C0 $F0 $0C $F0 $30 $C0 $F0  $CC $30 $FC $0C $30 $C0 $C0 $30
-.by  $CC $30 $CC $30 $30 $CC $3C $0C  $30 $00 $30 $00 $30 $00 $00 $30  $00 $30 $C0 $0C $30 $C0 $30 $0C
-.by  $00 $FC $00 $FC $00 $C0 $30 $0C  $30 $C0 $F0 $0C $30 $00 $30 $30  $CC $CC $C0 $3C $FC $CC $CC $FC
-.by  $CC $FC $CC $F0 $CC $FC $FC $C0  $C0 $C0 $FC $F0 $CC $CC $CC $F0  $FC $C0 $F0 $C0 $FC $FC $C0 $F0
-.by  $C0 $C0 $FC $C0 $CC $CC $FC $CC  $CC $FC $CC $CC $FC $30 $30 $30  $FC $0C $0C $0C $0C $F0 $CC $CC
-.by  $F0 $CC $CC $C0 $C0 $C0 $C0 $FC  $F0 $FC $FC $CC $CC $F0 $CC $CC  $CC $CC $30 $CC $CC $CC $30 $FC
-.by  $CC $FC $C0 $C0 $30 $CC $CC $CC  $3C $FC $CC $F0 $CC $CC $3C $C0  $30 $0C $F0 $FC $30 $30 $30 $30
-.by  $CC $CC $CC $CC $F0 $CC $CC $CC  $F0 $C0 $CC $CC $FC $FC $F0 $CC  $CC $30 $CC $CC $CC $CC $3C $0C
-.by  $F0 $FC $0C $30 $C0 $FC $3C $30  $30 $30 $3C $C0 $C0 $30 $0C $0C  $F0 $30 $30 $30 $F0 $30 $CC $00
-.by  $00 $00 $00 $00 $00 $00 $FC $57  $81 $87 $81 $E7 $81 $B7 $81 $17  $82 $47 $82 $6F $81 $9F $81 $FF
-.by  $81 $CF $81 $2F $82 $5F $82 $77  $82 $9B $82 $BF $82 $E3 $82 $07  $83 $2B $83 $4F $83 $73 $83 $97
-.by  $83 $01 $01 $01 $01 $01 $0E $0E  $0E $0E $0E $1B $1B $1B $1B $1B  $0D $14 $1B $22 $29 $0D $14 $1B
-.by  $22 $29 $0D $14 $1B $22 $29 $30  $31 $32 $33 $34 $35 $36 $37 $38  $39 $41 $42 $43 $44 $45 $46
+.by  $0B $90 $0D $0D $0D $0D $0D $0D  $0D $0D $0D $0D $0D $0D $0D $0D  $0D $30 $0D $0D $0D $0D $0D $B0
+.by  $0D $0D $0D $0D $0D $0D $8D $41  $C0 $81 $30 $31 $32 $33 $34 $35  $36 $37 $38 $39 $41 $42 $43 $44
+.by  $45 $46 $01 $01 $01 $01 $01 $0E  $0E $0E $0E $0E $1B $1B $1B $1B  $1B $0D $14 $1B $22 $29 $0D $14
+.by  $1B $22 $29 $0D $14 $1B $22 $29
 .endm
 
 	end

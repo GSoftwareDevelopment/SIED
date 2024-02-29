@@ -2,12 +2,12 @@ procedure showScenarioEditor();
 begin
   if curModule=2 then exit;
   setModule(2);
-   addZone(3,1,YCONTROLS,3,7,@nullProc);  // previous
-  addZoneH(4,@nullProc);  // play
-  addZoneH(5,@nullProc);  // stop
-  addZoneH(6,@nullProc);  // next
+   addZoneN(3,1,YCONTROLS,3,7,@nullProc);  // previous
+  addZoneHN(4,@nullProc);  // play
+  addZoneHN(5,@nullProc);  // stop
+  addZoneHN(6,@nullProc);  // next
 
-  addZone(7,15,YCONTROLS,3,7,@nullProc);  // insert
-  addZoneH(8,@nullProc);  // delete
+   addZoneN(7,15,YCONTROLS,3,7,@nullProc);  // insert
+  addZoneHN(8,@nullProc);  // delete
   setControl(-1);
 End;

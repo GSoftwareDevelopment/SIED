@@ -1,3 +1,4 @@
+var
   DLIV:Pointer absolute $200;
   [volatile] NMIEN:Byte absolute $D40E;
   // SDMACTL:Byte absolute $22F;
