@@ -5,10 +5,9 @@ library core:$d800;
 
 const
 {$I '../data/data-mem.inc'}
-
 {$I '../assets/assets.inc'}
 {$I 'keyboard.var.inc'}
-{$I '../utils.inc'}
+{$I 'utils.inc'}
 
 var
   tm:Byte absolute $14;
@@ -53,8 +52,6 @@ exports
   _ICONS,
   _ICARD,
   _IPATH,
-  ACONTROLS,
-  AICONS,
 
 // controls
   invertZone,
@@ -66,6 +63,12 @@ exports
   setControl,
   addButton,
   addInput,
-  doInput;
+  doInput,
+
+// utils
+  _asc2int,
+  reduceFileName,
+  keyscan2asc,
+  convASC2INT;
 
 end.

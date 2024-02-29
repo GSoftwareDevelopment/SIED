@@ -1,0 +1,32 @@
+  opt h-
+  icl '../data/data-mem.inc'
+  org ASSETS_ADDR
+
+_CONTROLS:
+  dta a(CONTROLS_DATA+  0), a(CONTROLS_DATA+ 48), a(CONTROLS_DATA+144), a(CONTROLS_DATA+ 96), a(CONTROLS_DATA+192), a(CONTROLS_DATA+240)
+  dta a(CONTROLS_DATA+ 24), a(CONTROLS_DATA+ 72), a(CONTROLS_DATA+168), a(CONTROLS_DATA+120), a(CONTROLS_DATA+216), a(CONTROLS_DATA+264)
+
+_ICONS:
+  dta a(ICONS_DATA+  0), a(ICONS_DATA+ 36), a(ICONS_DATA+ 72)
+  dta a(ICONS_DATA+108), a(ICONS_DATA+144), a(ICONS_DATA+180)
+  dta a(ICONS_DATA+216), a(ICONS_DATA+252), a(ICONS_DATA+288)
+
+_ICARD:
+  dta a(ICARD_DATA)
+
+_IPATH:
+  dta a(IPATH_DATA)
+
+// data
+CONTROLS_DATA:
+  ins '../assets/bin/controls.bin'
+
+ICONS_DATA:
+  ins '../assets/bin/icons.bin'
+
+ICARD_DATA:
+  ins '../assets/bin/icon-card.bin'
+
+IPATH_DATA:
+  ins '../assets/bin/icon-path.bin'
+

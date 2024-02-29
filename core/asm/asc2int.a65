@@ -1,0 +1,12 @@
+  stx _xreg
+  ldy #0
+  lda (s),y
+  tay
+lp:
+  lda (s),y
+  tax
+  lda adr._asc2int,x
+  sta (s),y
+  dey
+  bne lp
+  ldx _xreg:#00

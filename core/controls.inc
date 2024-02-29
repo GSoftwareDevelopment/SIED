@@ -42,11 +42,11 @@ begin
     begin
       if i=n then
       begin
-        putImage(@_ICARD,_x-1,48,5,15);
-        p:=AICONS[6+n];
+        putImage(_ICARD,_x-1,48,5,15);
+        p:=_ICONS[6+n];
       End
       else
-        p:=AICONS[i];
+        p:=_ICONS[i];
       putImage(p,_x,50,3,12);
     End;
   End;
@@ -73,9 +73,9 @@ begin
   begin
     _x:=_mzoneX1[i+3];
     if i=n then
-      p:=ACONTROLS[i+6]
+      p:=_CONTROLS[i+6]
     else
-      p:=ACONTROLS[i];
+      p:=_CONTROLS[i];
     putImage(p,_x,YCONTROLS,3,8);
   End;
 End;

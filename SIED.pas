@@ -9,19 +9,20 @@ uses cio,cursor;
 
 const
 {$I 'data/data-mem.inc'}
-// {$I 'scripts-mem.inc'}
-{$I 'display-list.inc'}
-{$I 'utils.inc'}
-
 {$R 'data/data.rc'}
-{$I 'core/assets.h.inc'}
+{$R 'libs.rc'}
 
 {$I 'core/keyboard.var.inc'}
 {$I 'core/pmg.var.inc'}
 
+{$I 'core/assets.h.inc'}
 {$I 'core/graph.h.inc'}
 {$I 'core/interface.h.inc'}
 {$I 'core/controls.h.inc'}
+
+{$I 'core/dlist-interrupt.inc'}
+{$I 'core/utils.h.inc'}
+
 
 var
   i:Shortint absolute $3e;
@@ -58,7 +59,7 @@ begin
   setIntVec(iDLI,@myDLI);
   NMIEN:=$C0;
   Asm cli; End;
-  SDLST:=@DLIST;
+  SDLST:=pointer(DLIST_ADDR);
   PFCOL0:=$EA; PFCOL1:=$00; PFCOL2:=$0F; PFCOL4:=$e0;
   KRPDEL:=10; KEYREP:=1;// SDMACTL:=%00100010;
 //

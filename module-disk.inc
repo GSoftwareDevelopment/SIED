@@ -53,6 +53,8 @@ begin
   readDirectory();
 End;
 
+procedure getLn(chn:Byte; buf:PString); Register; Assembler; Asm icl 'asm/get_line.a65' End;
+
 procedure readDirectory;
 var
   n,j:Shortint;

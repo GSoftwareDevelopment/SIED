@@ -1,14 +1,20 @@
-SCREEN_LINES_ADDR   = $0600; // $8B20;
+MAX_SPRITE          = 15;                   // max 16 enemys on screen
+MAX_GROUP           = 7;                    // max 8 groups
 
-PMG_ADDR      = $2000;
-SCREEN_ADDR   = $2400;
-EDITOR_ADDR   = $2800;
-FONTS_ADDR    = $3000;
+SCREEN_LINES_ADDR   = $0600;                // table of screen lines addresses
+DLIST_ADDR          = $1E80;                // Display List definition
+ASC2INT_ADDR        = $1F00;                // ATASCII to INTERNAL convertion table
+SCAN2ASC_ADDR       = $1F80;                // Keyboard SCANCODES to ATASCII convertion table
+PMG_ADDR            = $2000;                // PMG Base address
+SCREEN_ADDR         = $2400;                // Game screen base address
+EDITOR_ADDR         = $2800;                // Editor screen base address
 
-MAX_SPRITE    = 15;     // max 16 enemys on screen
-MAX_GROUP     = 7;      // max 8 groups
+FONTS_ADDR          = $3000;                // (1329) font tables, font 4x5 1bpp two half, font 4x5 2bpp
 
-CORE_LIB      = $d800;
+ASSETS_ADDR         = FONTS_ADDR    +1329;  // assets base address
+CONTROLS_ADDR       = ASSETS_ADDR   +   0;  // time controls
+ICONS_ADDR          = ASSETS_ADDR   +  24;  // module icons
+ICARD_ADDR          = ASSETS_ADDR   +  42;  // selected module background
+IPATH_ADDR          = ASSETS_ADDR   +  44;  // tray icons for path module
 
-ASC2INT_ADDR  = $1F00;
-SCAN2ASC_ADDR = $1F80;
+CORE_LIB            = $D800;                // core library base address

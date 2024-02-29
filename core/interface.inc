@@ -138,7 +138,7 @@ begin
           if nzone<3 then  // for module
           begin
             setIcon(-1);
-            putImage(AICONS[3+nzone],_mzoneX1[nzone],50,3,12);
+            putImage(_ICONS[3+nzone],_mzoneX1[nzone],50,3,12);
           End
           else setControl(nzone-3); // for controls
 

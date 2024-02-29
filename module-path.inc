@@ -14,7 +14,7 @@ begin
   setControl(-1);
   HPOSP[2]:=44; PCOL[2]:=$E6; SIZEP[2]:=%11;
   SetScreenWidth(20);
-  putImage(@_IPATH,0,0,3,48);
+  putImage(_IPATH,0,0,3,48);
 
    addZone(0,0,3,12,@nullProc); // list
   addZoneV(@nullProc); // pen
