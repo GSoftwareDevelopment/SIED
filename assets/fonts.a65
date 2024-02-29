@@ -1,5 +1,5 @@
   opt h-
-  icl '../data-mem.inc'
+  icl '../data/data-mem.inc'
   org FONTS_ADDR
 
 AFONT:  // Array[0..127] of Pointer
@@ -26,8 +26,8 @@ AFONTC: // Array[0..63] of Pointer
 //
 
 font: // 1bpp font; two halfs of byte (left & right)
-  ins 'font.bin'
+  ins 'bin/font.bin'
 fontc: // 2bpp font; whole byte size (no halfs)
-  ins 'font-col.bin'
+  ins 'bin/font-col.bin'
 
   end

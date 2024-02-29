@@ -4,10 +4,10 @@
 library core:$d800;
 
 const
-{$I '../data-mem.inc'}
+{$I '../data/data-mem.inc'}
 
 {$I '../assets/assets.inc'}
-{$I '../keyboard.inc'}
+{$I 'keyboard.var.inc'}
 {$I '../utils.inc'}
 
 var

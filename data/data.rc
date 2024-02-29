@@ -1,0 +1,4 @@
+CORE_LIB dosfile 'core/bin/core.lib'
+FONTS_ADDR rcdata 'assets/bin/fonts.bin'
+ASC2INT_ADDR rcdata 'data/bin/asc2int.bin'
+SCAN2ASC_ADDR rcdata 'data/bin/scan2asc.bin'

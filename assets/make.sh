@@ -3,11 +3,11 @@
 # rm bin/*.bin
 
 # prepare editor assets
-xxd -r -p controls.hex controls.bin
-xxd -r -p icons.hex icons.bin
-xxd -r -p icon-card.hex icon-card.bin
-xxd -r -p icon-path.hex icon-path.bin
+xxd -r -p hex/controls.hex bin/controls.bin
+xxd -r -p hex/icons.hex bin/icons.bin
+xxd -r -p hex/icon-card.hex bin/icon-card.bin
+xxd -r -p hex/icon-path.hex bin/icon-path.bin
 
-xxd -r -p font.hex font.bin
-xxd -r -p font-col.hex font-col.bin
-mads fonts.a65 -o:fonts.bin
+xxd -r -p hex/font.hex bin/font.bin
+xxd -r -p hex/font-col.hex bin/font-col.bin
+mads fonts.a65 -o:bin/fonts.bin

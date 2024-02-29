@@ -1,4 +1,4 @@
-{$i 'core/graph-var.inc'}
+{$i 'core/graph.var.inc'}
 
 procedure putImage(adr:Pointer; x,y,width,height:Byte); Register; external 'core';
 procedure putSprite(adr:Pointer; x,y:shortint; width,height:shortint); Register; external 'core';

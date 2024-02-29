@@ -1,5 +1,4 @@
-const
-  YCONTROLS         = 55;
+{$I 'core/controls.var.inc'}
 
 procedure invertZone(i:Shortint); external 'core';
 procedure clearWorkarea(); external 'core';

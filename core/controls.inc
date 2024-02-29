@@ -1,5 +1,4 @@
-const
-  YCONTROLS         = 55;
+{$I 'controls.var.inc'}
 
 procedure invertZone(i:Shortint);
 var

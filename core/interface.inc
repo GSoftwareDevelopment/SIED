@@ -1,9 +1,9 @@
-{$i 'interface-var.inc'}
+{$i 'interface.var.inc'}
 
 var
   __x,__y,__w,__h:Byte;
 
-{$i '../cursor-var.inc'}
+{$i '../cursor.var.inc'}
 
 procedure nullProc(); Begin End;
 

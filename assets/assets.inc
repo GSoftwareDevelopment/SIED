@@ -1,8 +1,8 @@
 const
-_CONTROLS : Array of Byte = [{$BIN2CSV '../assets//controls.bin'}];
-   _ICONS : Array of Byte = [{$BIN2CSV '../assets//icons.bin'}];
-   _ICARD : Array of Byte = [{$BIN2CSV '../assets//icon-card.bin'}];
-   _IPATH : Array of Byte = [{$BIN2CSV '../assets//icon-path.bin'}];
+_CONTROLS : Array of Byte = [{$BIN2CSV '../assets/bin/controls.bin'}];
+   _ICONS : Array of Byte = [{$BIN2CSV '../assets/bin/icons.bin'}];
+   _ICARD : Array of Byte = [{$BIN2CSV '../assets/bin/icon-card.bin'}];
+   _IPATH : Array of Byte = [{$BIN2CSV '../assets/bin/icon-path.bin'}];
 
 ACONTROLS : Array of Pointer = [
   @_CONTROLS[0],  @_CONTROLS[48], @_CONTROLS[144], @_CONTROLS[96], @_CONTROLS[192], @_CONTROLS[240],

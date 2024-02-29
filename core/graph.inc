@@ -1,4 +1,4 @@
-{$I 'graph-var.inc'}
+{$I 'graph.var.inc'}
 
 procedure putImage(adr:Pointer; x,y,width,height:Byte); Register; assembler; Asm icl 'asm/put-image.a65' End;
 procedure putSprite(adr:Pointer; x,y:shortint; width,height:shortint); register; keep; assembler; Asm icl 'asm/put-sprite-or.a65' End;

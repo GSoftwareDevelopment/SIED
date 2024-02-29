@@ -13,7 +13,7 @@ const
     $10, $10, $00, $c6, $00, $10, $10
   ];
 
-{$i 'cursor-var.inc'}
+{$i 'cursor.var.inc'}
 
 procedure setCursor(spr:Pointer); Register; assembler;
 procedure setPivot(x,y:Shortint); Register; assembler;
@@ -21,8 +21,8 @@ procedure initCursor();
 
 implementation
 const
-{$I 'data-mem.inc'}
-{$I 'pmg.inc'}
+{$I 'data/data-mem.inc'}
+{$I 'core/pmg.var.inc'}
 
 procedure setCursor(spr:Pointer); Register; assembler;
 Asm

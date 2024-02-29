@@ -8,20 +8,20 @@ program Editor;
 uses cio,cursor;
 
 const
-{$I 'data-mem.inc'}
-{$I 'scripts-mem.inc'}
+{$I 'data/data-mem.inc'}
+// {$I 'scripts-mem.inc'}
 {$I 'display-list.inc'}
-
-{$R 'data.rc'}
-{$I 'core/assets.h'}
-
-{$I 'keyboard.inc'}
 {$I 'utils.inc'}
-{$I 'pmg.inc'}
 
-{$I 'core/graph.h'}
-{$I 'core/interface.h'}
-{$I 'core/controls.h'}
+{$R 'data/data.rc'}
+{$I 'core/assets.h.inc'}
+
+{$I 'core/keyboard.var.inc'}
+{$I 'core/pmg.var.inc'}
+
+{$I 'core/graph.h.inc'}
+{$I 'core/interface.h.inc'}
+{$I 'core/controls.h.inc'}
 
 var
   i:Shortint absolute $3e;
@@ -45,7 +45,7 @@ begin
   for i:=0 to 55 do YSCR[i]:=Pointer(SCREEN_ADDR+i*$10);
   for i:=0 to 47 do YSCR[56+i]:=Pointer(EDITOR_ADDR+i*20);
   for i:=0 to 23 do YSCR[56+48+i]:=Pointer(EDITOR_ADDR+(20*48)+i*40);
-  fillchar(Pointer(PMG_ADDR),$1000,0);
+  fillchar(Pointer(PMG_ADDR),$1000,0); // clear PMG, SCREEN & EDITOR area at once
   fillchar(Pointer(PMG_ADDR+$300+23),50,$FF);
   ActivePage:=1;
   SDMACTL:=0; // turn off screen

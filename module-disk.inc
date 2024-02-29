@@ -2,10 +2,10 @@ const
   _HEX:array of char = '0123456789ABCDEF';
 
 var
-  dev:string[4] absolute $400;
-  fn:string[16] absolute $405;
-  _fn:string[20] absolute $417;
-  filemask:string[16] absolute $42C;
+  dev:string[4] absolute $3f00;
+  fn:string[16] absolute $3f05;
+  _fn:string[20] absolute $3f17;
+  filemask:string[16] absolute $3f2C;
   dirPageBegin:smallint;
 
 const
