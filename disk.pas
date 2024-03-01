@@ -51,7 +51,7 @@ End;
 procedure doChoiceFile();
 begin
   case szone of
-    14..29: begin
+    14..28: begin
       fn:=dirName[szone-14];
       // set filename in field
       blank(7,1,12,5);
@@ -129,7 +129,8 @@ begin
     End;
     if (dirPageBegin>0) or (IOResult<3) then
     begin
-      blank(27,41,12,5); clearZone(28);
+      blank(27,41,12,5); // clear last entry
+      clearZone(28); // clear last entry zone
       if dirPageBegin>0 then
         addButton(27,41,'PREV',@doPrevPageDir);
       if IOResult<3 then
