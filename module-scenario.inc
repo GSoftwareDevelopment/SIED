@@ -1,7 +1,5 @@
 procedure showScenarioEditor();
 begin
-  if curModule=2 then exit;
-  setModule(2);
    addZoneN(3,1,YCONTROLS,3,7,@nullProc);  // previous
   addZoneHN(4,@nullProc);  // play
   addZoneHN(5,@nullProc);  // stop

@@ -142,8 +142,6 @@ End;
 
 procedure showDiskDirectory();
 begin
-  if curModule=0 then exit;
-  setModule(0);
   fillchar(YSCR[56+9],20,$FF);
   setScreenWidth(20);
   addInput(1,1,4,dev,@doDevice);
