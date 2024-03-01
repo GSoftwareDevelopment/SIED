@@ -1,7 +1,11 @@
-HPOSP0 = $D000
-HPOSP1 = $D001
-stick  = $D300 ; $278
-strig  = $D010
+HPOSP0    = $D000
+HPOSP1    = $D001
+stick     = $D300 ; $278
+strig     = $D010
+
+CURSORSPR = $5e
+mpivotX   = $60
+mpivotY   = $61
 
 //  if tm and 1=0 then
   ; lda tm
@@ -191,23 +195,23 @@ adddy:
   sta _my
 
 drawcrs:     // draw new cursor
-  ldx #6
+  ldy #6
   lda _my
-  sub mpivotY:#00
-  tay
+  sub mpivotY
+  tax
 ldrawcrs:
-  lda CURSORSPR:adr._ARROW,x
-  sta PMG_ADDR+$200,y
-  sta PMG_ADDR+$281,y
-  iny
-  dex
+  lda (CURSORSPR),y
+  sta PMG_ADDR+$200,x
+  sta PMG_ADDR+$281,x
+  inx
+  dey
   bpl ldrawcrs
 
   lda mpivotY
   sta ompivotY
 
   lda _mx
-  sub mpivotX:#0
+  sub mpivotX
   tax
   stx HPOSP0
   inx

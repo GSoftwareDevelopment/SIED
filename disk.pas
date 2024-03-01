@@ -1,5 +1,29 @@
+{$define BASICOFF}
+{$define ROMOFF}
+{$define NOROMFONT}
+{$LIBRARYPATH 'core/bin/'}
+
+library disk:$4000;
+uses cio;
+
 const
+{$I 'data/data-mem.inc'}
+
+{$I 'core/keyboard.var.inc'}
+
+{$I 'core/cursor.h.inc'}
+{$I 'core/graph.h.inc'}
+{$I 'core/interface.h.inc'}
+{$I 'core/controls.h.inc'}
+{$I 'core/utils.h.inc'}
+
+const
+  MSG_READING = 'READING DIRECTORY...';
+  MSG_SEEKING = 'SEEKING...';
+  MSG_IOERR   = 'I/O ERROR $00';
   _HEX:array of char = '0123456789ABCDEF';
+  _DIRFILEX:Array of Byte = [  1,  1,  1,  1,  1, 14, 14, 14, 14, 14, 27, 27, 27, 27, 27 ];
+  _DIRFILEY:Array of Byte = [ 13, 20, 27, 34, 41, 13, 20, 27, 34, 41, 13, 20, 27, 34, 41 ];
 
 var
   dev:string[4] absolute $3f00;
@@ -7,14 +31,11 @@ var
   _fn:string[20] absolute $3f17;
   filemask:string[16] absolute $3f2C;
   dirPageBegin:smallint;
-
-const
-  _DIRFILEX:Array of Byte = [  1,  1,  1,  1,  1, 14, 14, 14, 14, 14, 27, 27, 27, 27, 27 ];
-  _DIRFILEY:Array of Byte = [ 13, 20, 27, 34, 41, 13, 20, 27, 34, 41, 13, 20, 27, 34, 41 ];
-
-var
   dirName:Array[0..14] of string[12];
   // dirType:Array[0..14] of Byte;
+
+//
+procedure readDirectory(); Forward;
 
 procedure addFileLabel(n:Byte; prc:TZoneProc);
 var
@@ -39,8 +60,6 @@ begin
   End;
 End;
 
-procedure readDirectory(); Forward;
-
 procedure doPrevPageDir();
 begin
   dec(dirPageBegin,14);
@@ -63,10 +82,10 @@ var
 begin
   if dev[1]='D' then
   begin
-    setPivot(3,3); setCursor(@_WAIT);
+    setPivot(3,3); setCursor(_WAIT);
     _fn:=dev; move(filemask[1],_fn[Byte(_fn[0])+1],Byte(filemask[0]));
     dirSeek:=dirPageBegin;
-    if dirPageBegin>0 then setStatus('SEEKING...') else setStatus('READING DIRECTORY...');
+    if dirPageBegin>0 then setStatus(MSG_SEEKING) else setStatus(MSG_READING);
     opn(1,6,0,_fn);
     n:=-1;
     while (IOResult=1) and (n<15) do
@@ -83,7 +102,7 @@ begin
         dec(dirSeek);
         continue;
       End;
-      if (n=-1) then setStatus('READING DIRECTORY...');
+      if (n=-1) then setStatus(MSG_READING);
 
       // isDir:=((_fn[2]=':') or (_fn[18]='>'));
       inc(n);
@@ -95,7 +114,7 @@ begin
   fillchar(YSCR[56+10],38*20,0);
   if IOResult>3 then
   begin
-    _fn:='I/O ERROR $00';
+    _fn:=MSG_IOERR;
     n:=IOResult shr 4; _fn[12]:=_HEX[n];
     n:=IOResult and 15; _fn[13]:=_HEX[n];
     setStatus(_fn);
@@ -121,7 +140,7 @@ begin
     End;
   End;
   cls(1);
-  setPivot(0,0); setCursor(@_ARROW);
+  setPivot(0,0); setCursor(_ARROW);
 End;
 
 procedure startDirectory;
@@ -152,3 +171,17 @@ begin
   startDirectory();
 End;
 
+exports showDiskDirectory;
+
+var
+  moduleInitialized:Byte absolute $62;
+
+begin
+  if (moduleInitialized and $1=0) then
+  begin
+    filemask:='*.*'#$9B;
+    dev:='D:';
+    fn:='NONAME';
+    moduleInitialized:=moduleInitialized or $1;
+  end;
+end.

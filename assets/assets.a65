@@ -17,6 +17,12 @@ _ICARD:
 _IPATH:
   dta a(IPATH_DATA)
 
+_CARROW:
+  dta a(CARROW_DATA)
+
+_CWAIT:
+  dta a(CWAIT_DATA)
+
 // data
 CONTROLS_DATA:
   ins '../assets/bin/controls.bin'
@@ -30,3 +36,12 @@ ICARD_DATA:
 IPATH_DATA:
   ins '../assets/bin/icon-path.bin'
 
+CARROW_DATA:
+  ; dta $80, $e0, $f8, $f0, $e0, $c0, $80
+  dta $10, $18, $3c, $3e, $78, $60, $80
+
+CWAIT_DATA:
+  dta $ba, $7c, $f6, $ee, $6c, $ba, $44
+
+CCROSS_DATA:
+  ; dta $10, $10, $00, $c6, $00, $10, $10

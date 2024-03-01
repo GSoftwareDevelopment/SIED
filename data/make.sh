@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Preparing data..."
+echo "- Preparing data..."
 
 rm bin/*.bin
 xxd -r -p hex/asc2int.hex bin/asc2int.bin

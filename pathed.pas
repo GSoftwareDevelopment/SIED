@@ -1,3 +1,22 @@
+{$define BASICOFF}
+{$define ROMOFF}
+{$define NOROMFONT}
+{$LIBRARYPATH 'core/bin/'}
+
+library pathed:$4000;
+
+const
+{$I 'data/data-mem.inc'}
+
+{$I 'core/keyboard.var.inc'}
+{$I 'core/pmg.var.inc'}
+
+{$I 'core/assets.h.inc'}
+// {$I 'core/cursor.h.inc'}
+{$I 'core/graph.h.inc'}
+{$I 'core/interface.h.inc'}
+{$I 'core/controls.h.inc'}
+
 procedure showPathEditor();
 begin
    addZoneN(3,1,YCONTROLS,3,7,@nullProc);  // previous
@@ -21,3 +40,8 @@ begin
   addZoneV(@nullProc); // line
   addZoneV(@nullProc); // path 2
 End;
+
+exports
+  showPathEditor;
+
+end.

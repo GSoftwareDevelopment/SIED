@@ -3,8 +3,6 @@
 var
   __x,__y,__w,__h:Byte;
 
-{$i '../cursor.var.inc'}
-
 procedure nullProc(); Begin End;
 
 procedure setZone(n:Shortint; act:Boolean; x,y,w,h:Byte; prc:TZoneProc);

@@ -13,6 +13,7 @@ var
   tm:Byte absolute $14;
   i:shortint absolute $3e;
 
+{$I 'cursor.inc'}
 {$I 'graph.inc'}
 procedure invertZone(i:Shortint); Forward;
 procedure setIcon(n:Shortint); Forward;
@@ -22,6 +23,14 @@ procedure setControl(n:Shortint); Forward;
 {$I 'controls.inc'}
 
 exports
+// assets
+  _CONTROLS,
+  _ICONS,
+  _ICARD,
+  _IPATH,
+  _ARROW,
+  _WAIT,
+
 // graph
   putImage,
   putSprite,
@@ -33,6 +42,12 @@ exports
   SetScreenWidth,
   clearPage,
   wait,
+
+// cursor
+  setCursor,
+  setPivot,
+  initCursor,
+
 // interface
   nullProc,
   setZone,
@@ -47,11 +62,6 @@ exports
   addZoneV,
   addZoneVN,
   checkZones,
-// controls assets
-  _CONTROLS,
-  _ICONS,
-  _ICARD,
-  _IPATH,
 
 // controls
   invertZone,

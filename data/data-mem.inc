@@ -11,10 +11,14 @@ EDITOR_ADDR         = $2800;                // Editor screen base address
 
 FONTS_ADDR          = $3000;                // (1329) font tables, font 4x5 1bpp two half, font 4x5 2bpp
 
+MODULE_ADDR         = $4000;                // module base address
+
 ASSETS_ADDR         = FONTS_ADDR    +1329;  // assets base address
 CONTROLS_ADDR       = ASSETS_ADDR   +   0;  // time controls
 ICONS_ADDR          = ASSETS_ADDR   +  24;  // module icons
 ICARD_ADDR          = ASSETS_ADDR   +  42;  // selected module background
 IPATH_ADDR          = ASSETS_ADDR   +  44;  // tray icons for path module
+CARROW_ADDR         = ASSETS_ADDR   +  46;
+CWAIT_ADDR          = ASSETS_ADDR   +  48;
 
 CORE_LIB            = $D800;                // core library base address

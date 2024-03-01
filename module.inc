@@ -1,10 +1,21 @@
-procedure setModule();
-var
-  ncm:Shortint absolute $50; // alias to `szone` from interface
+{$I 'about.h.inc'}
+{$I 'disk.h.inc'}
+{$I 'pathed.h.inc'}
+// {$I 'modules/module-scenario.pas'}
 
+procedure loadModule(FN:PString);
 begin
-  if ncm=curModule then exit;
-  curModule:=ncm;
+  setPivot(3,3); setCursor(_WAIT);
+  setStatus('LOADING MODULE...');
+  XIO($28, 2, 4, $00, FN);
+  clearStatus();
+  setPivot(0,0); setCursor(_ARROW);
+end;
+
+procedure setModule();
+begin
+  if szone=curModule then exit;
+  curModule:=szone;
 
   for i:=3 to 9 do clearZone(i);
   _mzoneActive[0]:=true;
@@ -12,16 +23,17 @@ begin
   _mzoneActive[2]:=true;
   fillchar(YSCR[56+48],600,0);
   HPOSP[2]:=0;
-  setIcon(ncm);
+  setIcon(szone);
   clearStatus();
   clearWorkarea();
-  _mzoneActive[0]:=(ncm<>0);
-  _mzoneActive[1]:=(ncm<>1);
-  _mzoneActive[2]:=(ncm<>2);
-  case ncm of
-    0:showDiskDirectory();
-    1:showPathEditor();
-    2:showScenarioEditor();
+  _mzoneActive[0]:=(szone<>0);
+  _mzoneActive[1]:=(szone<>1);
+  _mzoneActive[2]:=(szone<>2);
+  case szone of
+    0:begin loadModule('D:DISK.LIB'); showDiskDirectory(); end;
+    1:begin loadModule('D:PATHED.LIB'); showPathEditor(); end;
+  //   2:begin loadModule('D:SCENED.LIB'); showScenarioEditor(); end;
+   -1:begin loadModule('D:ABOUT.LIB'); showAbout(); end;
   end;
 End;
 
@@ -30,9 +42,7 @@ begin
   setZone(0,false,28,49,3,15,@setModule);
   setZone(1,false,32,49,3,15,@setModule);
   setZone(2,false,36,49,3,15,@setModule);
+  szone:=-1; setModule();
   for i:=56+48+16 to 56+48+18 do fillchar(Pointer(word(YSCR[i])+8),32,%01010101);
   putTextC(0,63,'00:00.00');
-  filemask:='*.*'#$9B;
-  dev:='D:';
-  fn:='NONAME';
 End;

@@ -3,9 +3,10 @@
 {$define NOROMFONT}
 {$UNITPATH './'}
 {$LIBRARYPATH './core/bin/'}
+{$LIBRARYPATH './bin/'}
 
 program Editor;
-uses cio,cursor;
+uses cio;
 
 const
 {$I 'data/data-mem.inc'}
@@ -22,26 +23,39 @@ const
 
 {$I 'core/dlist-interrupt.inc'}
 {$I 'core/utils.h.inc'}
+{$I 'core/cursor.h.inc'}
 
 
 var
   i:Shortint absolute $3e;
   tm:Byte absolute $14;
 
-  curModule:Byte = -1;
+  curModule:Byte = -128;
+  moduleInitialized:Byte absolute $62;
 
-procedure setModule(cm:Shortint); Forward;
-{$I 'about.inc'}
-{$I 'module-disk.inc'}
-{$I 'module-path.inc'}
-{$I 'module-scenario.inc'}
 {$I 'module.inc'}
+
+procedure myVBL(); interrupt; keep; assembler;
+Asm
+  lda #0
+  sta 77
+
+    // lda #<MAIN.cursor.myDLI
+    // sta DLIV
+    // lda #>MAIN.cursor.myDLI
+    // sta DLIV+1
+
+  icl 'core/asm/cursor.a65'
+exVBL:
+  jmp xitvbv
+End;
 
 procedure initEditor();
 var
   KEYDEFP:Pointer absolute $79;
 
 begin
+  moduleInitialized:=0;
   KEYDEFP:=Pointer(SCAN2ASC_ADDR);
   for i:=0 to 55 do YSCR[i]:=Pointer(SCREEN_ADDR+i*$10);
   for i:=0 to 47 do YSCR[56+i]:=Pointer(EDITOR_ADDR+i*20);
@@ -63,10 +77,9 @@ begin
   PFCOL0:=$EA; PFCOL1:=$00; PFCOL2:=$0F; PFCOL4:=$e0;
   KRPDEL:=10; KEYREP:=1;// SDMACTL:=%00100010;
 //
-  initCursor();
+  initCursor(@myVBL);
   initInterface();
   initModules();
-  showAbout();
 End;
 
 begin

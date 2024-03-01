@@ -14,3 +14,7 @@ var
        stick:Byte     absolute $278;
      mbutton:Byte     absolute $4a;
     ombutton:Byte     absolute $4b;
+
+  CURSORSPR :Pointer  absolute $5e;
+  mpivotX   :shortint absolute $60;
+  mpivotY   :shortint absolute $61;

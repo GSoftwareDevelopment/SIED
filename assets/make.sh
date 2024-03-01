@@ -1,5 +1,5 @@
 #!/bin/bash
-
+echo "- Preparing assets..."
 rm bin/*.bin
 
 # prepare editor assets
