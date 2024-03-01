@@ -88,7 +88,7 @@ begin
     if dirPageBegin>0 then setStatus(MSG_SEEKING) else setStatus(MSG_READING);
     opn(1,6,0,_fn);
     n:=-1;
-    while (IOResult=1) and (n<15) do
+    while (IOResult=1) and (n<14) do
     begin
       getLn(1,_fn);
       if (_fn[1]>='0') then

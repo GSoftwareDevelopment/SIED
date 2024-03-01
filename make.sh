@@ -18,5 +18,6 @@ cp core/bin/core.lib bin/core.lib
 mpc buildlib about.pas -define:DISABLEIOCBCOPY
 mpc buildlib disk.pas -define:DISABLEIOCBCOPY
 mpc buildlib pathed.pas -define:DISABLEIOCBCOPY
+mpc buildlib scened.pas -define:DISABLEIOCBCOPY
 
 mpc buildcom SIED.pas -code:8000 -define:DISABLEIOCBCOPY

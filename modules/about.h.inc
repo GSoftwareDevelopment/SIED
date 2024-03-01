@@ -1,1 +1,0 @@
-procedure showAbout(); external 'about';

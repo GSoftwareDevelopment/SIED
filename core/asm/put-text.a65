@@ -13,8 +13,7 @@ sptr = $fa
   sty I
   lda (sptr),y
   sta tlen
-  inc sptr
-  scc:inc sptr+1
+  inw sptr
 
 // putchar
 //  if activePage=1 then inc(y,56);

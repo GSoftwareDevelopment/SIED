@@ -1,7 +1,7 @@
 {$I 'about.h.inc'}
 {$I 'disk.h.inc'}
 {$I 'pathed.h.inc'}
-// {$I 'modules/module-scenario.pas'}
+{$I 'scened.h.inc'}
 
 procedure loadModule(FN:PString);
 begin
@@ -32,7 +32,7 @@ begin
   case szone of
     0:begin loadModule('D:DISK.LIB'); showDiskDirectory(); end;
     1:begin loadModule('D:PATHED.LIB'); showPathEditor(); end;
-  //   2:begin loadModule('D:SCENED.LIB'); showScenarioEditor(); end;
+    2:begin loadModule('D:SCENED.LIB'); showScenarioEditor(); end;
    -1:begin loadModule('D:ABOUT.LIB'); showAbout(); end;
   end;
 End;
