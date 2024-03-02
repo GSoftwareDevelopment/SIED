@@ -2,9 +2,8 @@ MAX_SPRITE          = 15;                   // max 16 enemys on screen
 MAX_GROUP           = 7;                    // max 8 groups
 
 SCREEN_LINES_ADDR   = $0600;                // table of screen lines addresses
-DLIST_ADDR          = $1F00;                // Display List definition
-ASC2INT_ADDR        = $2000; // $1F00;                // ATASCII to INTERNAL convertion table
-SCAN2ASC_ADDR       = $2080; // $1F80;                // Keyboard SCANCODES to ATASCII convertion table
+ASC2INT_ADDR        = $2000;                // ATASCII to INTERNAL convertion table
+SCAN2ASC_ADDR       = $2080;                // Keyboard SCANCODES to ATASCII convertion table
 PMG_ADDR            = $2000;                // PMG Base address
 SCREEN_ADDR         = $2400;                // Game screen base address
 EDITOR_ADDR         = $2780;                // Editor screen base address
@@ -20,5 +19,7 @@ CARROW_ADDR         = ASSETS_ADDR   +  46;
 CWAIT_ADDR          = ASSETS_ADDR   +  48;
 
 MODULE_ADDR         = $4000;                // module base address
+
+DLIST_ADDR          = $9F00;                // Display List definition
 
 CORE_LIB            = $D800;                // core library base address

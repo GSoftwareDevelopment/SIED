@@ -54,12 +54,12 @@ End;
 
 procedure setControls(s:Byte);
 begin
-  _mzoneActive[3]:=(s and 1<>0);
-  _mzoneActive[4]:=(s and 2<>0);
-  _mzoneActive[5]:=(s and 4<>0);
-  _mzoneActive[6]:=(s and 8<>0);
-  _mzoneActive[7]:=(s and 16<>0);
-  _mzoneActive[8]:=(s and 32<>0);
+  _mzoneActive[3]:=(s and 1<>0);  // prev
+  _mzoneActive[4]:=(s and 2<>0);  // play
+  _mzoneActive[5]:=(s and 4<>0);  // stop
+  _mzoneActive[6]:=(s and 8<>0);  // next
+  _mzoneActive[7]:=(s and 16<>0); // insert
+  _mzoneActive[8]:=(s and 32<>0); // delete
 End;
 
 procedure setControl(n:Shortint);
@@ -71,12 +71,15 @@ begin
   setScreenWidth(40);
   for i:=0 to 5 do
   begin
-    _x:=_mzoneX1[i+3];
-    if i=n then
-      p:=_CONTROLS[i+6]
-    else
-      p:=_CONTROLS[i];
-    putImage(p,_x,YCONTROLS,3,8);
+    if _mzoneActive[i+3] then
+    begin
+      _x:=_mzoneX1[i+3];
+      if i=n then
+        p:=_CONTROLS[i+6]
+      else
+        p:=_CONTROLS[i];
+      putImage(p,_x,YCONTROLS,3,8);
+    end;
   End;
 End;
 

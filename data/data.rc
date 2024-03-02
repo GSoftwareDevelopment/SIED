@@ -1,5 +1,5 @@
-FONTS_ADDR    rcdata 'assets/bin/fonts.bin'
-ASSETS_ADDR   rcdata 'assets/bin/assets.bin'
-DLIST_ADDR    rcdata 'data/display-list.bin'
 ASC2INT_ADDR  rcdata 'data/bin/asc2int.bin'
 SCAN2ASC_ADDR rcdata 'data/bin/scan2asc.bin'
+FONTS_ADDR    rcdata 'assets/bin/fonts.bin'
+ASSETS_ADDR   rcdata 'assets/bin/assets.bin'
+DLIST_ADDR    rcdata 'data/bin/display-list.bin'
