@@ -3,6 +3,10 @@
 {$I 'pathed.h.inc'}
 {$I 'scened.h.inc'}
 
+var
+  curModule:Byte = -128;
+  moduleInitialized:Byte absolute $62;
+
 procedure loadModule(FN:PString);
 begin
   setPivot(3,3); setCursor(_WAIT);
@@ -39,6 +43,7 @@ End;
 
 procedure initModules();
 begin
+  moduleInitialized:=0;
   setZone(0,false,28,49,3,15,@setModule);
   setZone(1,false,32,49,3,15,@setModule);
   setZone(2,false,36,49,3,15,@setModule);

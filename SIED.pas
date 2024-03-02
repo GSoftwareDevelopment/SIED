@@ -30,9 +30,6 @@ var
   i:Shortint absolute $3e;
   tm:Byte absolute $14;
 
-  curModule:Byte = -128;
-  moduleInitialized:Byte absolute $62;
-
 {$I 'module.inc'}
 
 procedure myVBL(); interrupt; keep; assembler;
@@ -55,12 +52,11 @@ var
   KEYDEFP:Pointer absolute $79;
 
 begin
-  moduleInitialized:=0;
   KEYDEFP:=Pointer(SCAN2ASC_ADDR);
   for i:=0 to 55 do YSCR[i]:=Pointer(SCREEN_ADDR+i*$10);
   for i:=0 to 47 do YSCR[56+i]:=Pointer(EDITOR_ADDR+i*20);
   for i:=0 to 23 do YSCR[56+48+i]:=Pointer(EDITOR_ADDR+(20*48)+i*40);
-  fillchar(Pointer(PMG_ADDR),$1000,0); // clear PMG, SCREEN & EDITOR area at once
+  fillchar(Pointer(PMG_ADDR+$180),$E00,0); // clear PMG, SCREEN & EDITOR area at once
   fillchar(Pointer(PMG_ADDR+$300+23),50,$FF);
   ActivePage:=1;
   SDMACTL:=0; // turn off screen

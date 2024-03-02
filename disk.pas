@@ -26,10 +26,10 @@ const
   _DIRFILEY:Array of Byte = [ 13, 20, 27, 34, 41, 13, 20, 27, 34, 41, 13, 20, 27, 34, 41 ];
 
 var
-  dev:string[4] absolute $3f00;
-  fn:string[16] absolute $3f05;
-  _fn:string[20] absolute $3f17;
-  filemask:string[16] absolute $3f2C;
+  dev:string[4] absolute $04C0; //3f00;
+  fn:string[16] absolute $04C5; //3f05;
+  _fn:string[20] absolute $04D7; //3f17;
+  filemask:string[16] absolute $04EC; //3f2C;
   dirPageBegin:smallint;
   dirName:Array[0..14] of string[12];
   // dirType:Array[0..14] of Byte;
