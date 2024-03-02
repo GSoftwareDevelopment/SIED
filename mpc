@@ -1,0 +1,77 @@
+#!/bin/bash
+
+# Do prawidłowej pracy skryptu wymagane jest określenie zmienne globalnej $MPBASE
+# Zmienna ta ma wskazywać na miejsce, gdzie znajduje się kompilator MAD-Pascal
+# W przypadku kompilatora MADS Assembler, dostęp do niego winien być zapewniony
+# przez użytkownika, najlepiej dodając ścieżkę do zmiennej środowiskowej $PATH
+
+PATH=$MPBASE:$PATH
+DESTINATION="bin/"
+LIBPATH="${MPBASE}/base"
+MPGREP="grep \"Error:\""
+MADSGREP="grep \"ERROR:\""
+
+help() {
+	echo "mpc {build|buildcom|buildlib|run} filename.pas"
+	exit -1
+}
+
+checkfile() {
+	if [ ! -f "$FULLNAME" ]; then
+		echo "! Source file '$FULLNAME' does not exists"
+		exit -1
+	fi
+}
+
+build() {
+	checkfile
+	echo "- Build program '${BASENAME}'..."
+	mkdir -p bin
+	mp ${FULLNAME} -o:${DESTINATION}${BASENAME}.a65 $P1 $P2 $P3 $P4 | $MPGREP
+	mads ${DESTINATION}${BASENAME}.a65 -x -l -t -s -i:${LIBPATH} -o:${DESTINATION}${BASENAME}.$1 | $MADSGREP
+}
+
+buildlib() {
+	checkfile
+	echo "- Build library '${BASENAME}'..."
+	mkdir -p bin
+	mp ${FULLNAME} -o:${DESTINATION}${BASENAME}.a65 $P1 $P2 $P3 $P4 | $MPGREP
+	mads ${DESTINATION}${BASENAME}.a65 -hm -xi:${LIBPATH} -o:${DESTINATION}${BASENAME}.lib | $MADSGREP
+
+}
+
+if [ $# = 0 ]; then
+	help
+	exit -1
+elif [ $# = 1 ]; then
+	FULLNAME="main.pas"
+else
+	FULLNAME=$2
+	P1=$3
+	P2=$4
+	P3=$5
+	P4=$6
+fi
+
+#
+
+PATHNAME='${dirname "$FULLNAME"}'
+BASENAME="${FULLNAME%.*}"
+
+# final execute
+
+if [ $1 = "build" ]; then
+	build "xex"
+elif [ $1 = "buildcom" ]; then
+	build "com"
+elif [ $1 = "buildlib" ]; then
+	buildlib
+elif [ $1 = "run" ]; then
+	build "xex"
+	$FULL="${DESTINATION}${BASENAME}.xex"
+	echo $FULL
+	wine c:/Altirra/Altirra "{$FULL}"
+else
+	echo "! Bad parameter '$1'"
+	help
+fi
