@@ -22,4 +22,8 @@ MODULE_ADDR         = $4000;                // module base address
 
 DLIST_ADDR          = $9F00;                // Display List definition
 
+PATHLISTV_ADDR      = $C000;                // Table of path vectors
+PATHNAMEV_ADDR      = $C100;                // Table of path names vectors
+PATHNAMES_ADDR      = $C200;                // Address of path names table
+
 CORE_LIB            = $D800;                // core library base address

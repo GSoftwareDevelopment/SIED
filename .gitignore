@@ -1,3 +1,4 @@
+**/*.log
 bin
 core/bin
 data/bin

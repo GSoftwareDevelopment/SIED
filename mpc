@@ -8,8 +8,8 @@
 PATH=$MPBASE:$PATH
 DESTINATION="bin/"
 LIBPATH="${MPBASE}/base"
-MPGREP="grep \"Error:\""
-MADSGREP="grep \"ERROR:\""
+MPLOG="log-mp.log"
+MADSLOG="log-mads.log"
 
 help() {
 	echo "mpc {build|buildcom|buildlib|run} filename.pas"
@@ -27,17 +27,22 @@ build() {
 	checkfile
 	echo "- Build program '${BASENAME}'..."
 	mkdir -p bin
-	mp ${FULLNAME} -o:${DESTINATION}${BASENAME}.a65 $P1 $P2 $P3 $P4 | $MPGREP
-	mads ${DESTINATION}${BASENAME}.a65 -x -l -t -s -i:${LIBPATH} -o:${DESTINATION}${BASENAME}.$1 | $MADSGREP
+	mp ${FULLNAME} -o:${DESTINATION}${BASENAME}.a65 $P1 $P2 $P3 $P4 > $MPLOG
+	cat ${MPLOG} | grep "Error:"
+	mads ${DESTINATION}${BASENAME}.a65 -x -l -t -s -i:${LIBPATH} -o:${DESTINATION}${BASENAME}.$1 > $MADSLOG
+	cat ${MADSLOG} | grep "ERROR:"
+	rm *.log
 }
 
 buildlib() {
 	checkfile
 	echo "- Build library '${BASENAME}'..."
 	mkdir -p bin
-	mp ${FULLNAME} -o:${DESTINATION}${BASENAME}.a65 $P1 $P2 $P3 $P4 | $MPGREP
-	mads ${DESTINATION}${BASENAME}.a65 -hm -xi:${LIBPATH} -o:${DESTINATION}${BASENAME}.lib | $MADSGREP
-
+	mp ${FULLNAME} -o:${DESTINATION}${BASENAME}.a65 $P1 $P2 $P3 $P4 > $MPLOG
+	cat ${MPLOG} | grep "Error:"
+	mads ${DESTINATION}${BASENAME}.a65 -hm -xi:${LIBPATH} -o:${DESTINATION}${BASENAME}.lib > $MADSLOG
+	cat ${MADSLOG} | grep "ERROR:"
+	rm *.log
 }
 
 if [ $# = 0 ]; then

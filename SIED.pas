@@ -57,7 +57,6 @@ begin
   for i:=0 to 47 do YSCR[56+i]:=Pointer(EDITOR_ADDR+i*20);
   for i:=0 to 23 do YSCR[56+48+i]:=Pointer(EDITOR_ADDR+(20*48)+i*40);
   fillchar(Pointer(PMG_ADDR+$180),$E00,0); // clear PMG, SCREEN & EDITOR area at once
-  fillchar(Pointer(PMG_ADDR+$300+23),50,$FF);
   ActivePage:=1;
   SDMACTL:=0; // turn off screen
   Asm
