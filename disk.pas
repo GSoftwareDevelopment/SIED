@@ -30,9 +30,9 @@ var
   fn:string[16] absolute $04C5; //3f05;
   _fn:string[20] absolute $04D7; //3f17;
   filemask:string[16] absolute $04EC; //3f2C;
-  dirPageBegin:smallint;
   dirName:Array[0..14] of string[12];
   // dirType:Array[0..14] of Byte;
+  dirPageBegin:smallint;
 
 //
 procedure readDirectory(); Forward;
@@ -82,7 +82,7 @@ var
 begin
   if dev[1]='D' then
   begin
-    setPivot(3,3); setCursor(_WAIT);
+    setCursorShapeAnchor(3,3); setCursorShape(_WAIT);
     _fn:=dev; move(filemask[1],_fn[Byte(_fn[0])+1],Byte(filemask[0]));
     dirSeek:=dirPageBegin;
     if dirPageBegin>0 then setStatus(MSG_SEEKING) else setStatus(MSG_READING);
@@ -141,7 +141,7 @@ begin
     End;
   End;
   cls(1);
-  setPivot(0,0); setCursor(_ARROW);
+  setCursorShapeAnchor(0,0); setCursorShape(_ARROW);
 End;
 
 procedure startDirectory;

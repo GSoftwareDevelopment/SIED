@@ -12,7 +12,15 @@ var
 
 ### reduceFileName(var inFN; outFN:PString);
 
+Pozwala zredukować wskazany ciąg `inFN` nazwy pliku do nie zbędnych dla systemu, znaków - usuwa białe znaki, łączy nazwę z rozszerzeniem dając kropkę pomiędzy.
+Wynik funkcji umieszczany jest w `outFN`.
+
 ### convASC2INT(var s:PString);
+
+Konwertuje ciąg znaków ATASCII do kodów ekranowych (INTERNAL)
+Korzysta przy tym z tablicy konwersji `asc2int`
 
 ### keyscan2asc(keyscan:Byte):Byte;
 
+Konwertuje kod skaningowy klawiartry do kodu ATASCI.
+Korzysta przy tym z tablicy konwersji, której adres wskazywany jest przez wektor pod adresem $79 (KEYDEFP)

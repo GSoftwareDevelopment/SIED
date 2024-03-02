@@ -1,7 +1,7 @@
 {$i 'cursor.var.inc'}
 {$I 'pmg.var.inc'}
 
-procedure setCursor(spr:Pointer); Register; assembler;
+procedure setCursorShape(spr:Pointer); Register; assembler;
 Asm
   lda spr
   sta main.CURSORSPR
@@ -14,7 +14,7 @@ Asm
   beq *-2
 End;
 
-procedure setPivot(x,y:Shortint); Register; assembler;
+procedure setCursorShapeAnchor(x,y:Shortint); Register; assembler;
 Asm
   lda x
   sta main.mpivotX
@@ -34,6 +34,6 @@ begin
   mRefresh:=true;
   mAllowKeys:=true;
   _mx:=128; _my:=64;
-  setCursor(_ARROW);
-  setPivot(0,0);
+  setCursorShape(_ARROW);
+  setCursorShapeAnchor(0,0);
 End;

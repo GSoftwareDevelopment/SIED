@@ -33,9 +33,16 @@ _WAIT
 
 ## Methods
 
-### setCursor(spr:Pointer);
+### setCursorShape(spr:Pointer);
 
-### setPivot(x,y:Shortint);
+Ustawia kształt kursora na podany przez wskaźnik `spr`.
+Dane wyglądu kursora opisuje 7 bajtów.
+
+### setCursorShapeAnchor(x,y:Shortint);
+
+Ustawia aktywny punkt kursora.
 
 ### initCursor(VBLPtr:Pointer);
+
+Inicjuje obsługę kursora. Parametr `VBLPtr` musi wskazywać na właściwą procedurę obsługi wskaźnika. Jest ona podłączana do przerwania VBlank.
 

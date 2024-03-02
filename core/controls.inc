@@ -10,6 +10,16 @@ begin
   invert(_mzoneX1[i],_mzoneY1[i],_w,_h);
 End;
 
+procedure blankZone(i:Shortint);
+var
+  _w,_h:Byte;
+
+begin
+  _w:=_mzoneX2[i]-_mzoneX1[i];
+  _h:=_mzoneY2[i]-_mzoneY1[i];
+  blank(_mzoneX1[i],_mzoneY1[i],_w,_h);
+end;
+
 procedure clearWorkarea();
 begin
   fillchar(Pointer(EDITOR_ADDR),48*20,0);

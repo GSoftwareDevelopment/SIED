@@ -18,40 +18,44 @@ const
 {$I 'core/controls.h.inc'}
 
 const
+  MAXPATHDEFINITIONS  = 64;
+  PATHNAMESIZE  = 28;
+  LISTZONE = 20;
   MSG_SEARCH ='ENTER PATH NAME HERE...';
+  MSG_NOTFOUND = 'NO ENTRIES FOUND :(';
 
 var
-  pathListPtr:Array[0..127] of pointer absolute PATHLISTV_ADDR;
-  pathNamePtr:Array[0..127] of pointer absolute PATHNAMEV_ADDR;
+  pathListPtr:Array[0..MAXPATHDEFINITIONS] of pointer absolute PATHLISTV_ADDR;
+  pathNamePtr:Array[0..MAXPATHDEFINITIONS] of pointer absolute PATHNAMEV_ADDR;
   pathNames:Array[0..0] of char absolute PATHNAMES_ADDR;
-  pathNameSearch:String[30];
+  pathNameSearch:String[PATHNAMESIZE];
 
-procedure doSearchPath();
-begin
-  doInput(pathNameSearch);
-  if pathNameSearch[0]=#0 then
-  begin
-    blank(1,1,30,5);
-    putText(1,1,MSG_SEARCH);
-  end;
-end;
+procedure updateSearch(); forward;
+{$I 'pathed-actions.inc'}
+{$I 'pathed-controls.inc'}
 
-procedure showPathList();
+procedure showPathChoice();
 begin
   setStatus('CHOICE PATH TO EDIT OR CREATE NEW...');
   setScreenWidth(20);
-  pathNameSearch:=MSG_SEARCH;
-  fillchar(YSCR[56+8],20,$FF);
-  addInput(1,1,30,pathNameSearch,@doSearchPath); pathNameSearch:='';
-  addButton(33,1,'SEARCH',@nullProc);
-  addButton(33,12,'CREATE',@nullProc);
-  addButton(35,20,'EDIT',@nullProc);
-  addButton(33,28,'CHANGE',@nullProc);
+  fillchar(YSCR[56+9],20,$FF);
+  pathNameSearch:='';
+  addInput(9,1,PATHNAMESIZE,pathNameSearch,@doSearchPath);
+  updateSearch();
+  putText(1,1,'SEARCH:');
+  addButton(1,13,'CREATE',@doCreatePath);
+  addButton(1,20,'EDIT',@nullProc);
+  addButton(1,27,'NAME',@nullProc);
+  addButton(1,41,'DELETE',@nullProc);
+  putImage(_VSCROLL,19,11,1,36);
+  addZone(39,11,1,4,@nullProc);
+  addZone(39,43,1,4,@nullProc);
+  showPathList();
 end;
 
 procedure showPathEditor();
 begin
-  showPathList();
+  showPathChoice();
   //  addZoneN(3,1,YCONTROLS,3,7,@nullProc);   // previous
   // addZoneHN(4,@nullProc);                   // play
   // addZoneHN(5,@nullProc);                   // stop

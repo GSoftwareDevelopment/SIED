@@ -3,3 +3,4 @@ var
   _ICONS:Array[0..8] of Pointer external 'core';
   _ICARD:Pointer external 'core';
   _IPATH:Pointer external 'core';
+  _VSCROLL:Pointer external 'core';

@@ -26,20 +26,53 @@ var
 
 ### `putImage(adr:Pointer; x,y,width,height:Byte);`
 
+Wyświetla obraz podany jako `adr` w pozycji `x` (bajt) i `y` (linia). Szerokość i wysokość obrazu definiują odpowiednio `width` oraz `height`.
+
 ### `putSprite(adr:Pointer; x,y:shortint; width,height:shortint);`
+
+Wyświetla sprite podany jako `adr` w pozycji `x` (piksel) i `y` (linia).
+Poza dokładnością pozycjonowania, różnica jest taka, że sprite jest nakładany na obszar operacją OR.
 
 ### `putSpriteXOR(adr:Pointer; x,y,width,height:Byte);`
 
+Wyświetla sprite podany jako `adr` w pozycji `x` (piksel) i `y` (linia).
+Sprite jest nakładany na obszar operacją XOR.
+
 ### `putText(x,y:Shortint; s:PString);`
+
+Pozwala wyświetlić tekst `s` we wskazanej pozycji `x` (znak) i `y` (linia).
+Ilość znaków w wierszu to 40. Nie istnieje zmiana wiersza, a tekst który wyjdzie poza ekran, zostanie zawinięty i obniżony o jedną linię.
+Akceptowane znaki są z przedziału #32…#127 (nie występują małe litery!)
+Wyświetlany tekst jest monochromatyczny i jest nakładany na obszar operacją OR.
 
 ### `putTextC(x,y:Shortint; s:PString);`
 
+Podobnie jak `putText` z tą różnicą, że wyświetlany tekst jest kolorowy (4bpp) i jest nakładany na obszar operacją OR. Nie ma możliwości ustalenia koloru! (jeszcze?)
+
 ### `invert(x,y,w,h:Shortint);`
 
-### `lank(x,y,w,h:Shortint);`
+Wykonuje operację odwracania bitów w wyznaczonym obszarze o początku `x` i `y` oraz wymiarach `w` (znak) `h` (linia)
+
+### `blank(x,y,w,h:Shortint);`
+
+Czyści wyznaczony obszar o początku `x` i `y` oraz wymiarach `w` (znak) `h` (linia)
 
 ### `SetScreenWidth(nSW:Byte);`
 
+Ustawia szerokość linii przy operacjach rysowania.
+Ma wpływ na wszystkie powyższe procedury.
+Standardowe wartości `nSW` to:
+- 20, dla trybu monochromatycznego (1bpp)
+- 40, dla trybu kolorowego (4bpp)
+- 16, dla okna gry (monochromatyczne 1bpp)
 ### `clearPage(page:Byte);`
 
+Czyści obszar strony `page` obrazu.
+Zmienna `page` wskazuje na:
+0 - obszar okna gry (monochromatyczny o szerokości linii 16 bajtów)
+1 - obszar interfejsu programu (mieszany o zmiennej długości linii)
+
 ### `wait(f:Byte);`
+
+Pauza o długości `f` ramek (1/50 dla PAL, 1/60 dla NTSC)
+

@@ -1,6 +1,7 @@
 {$I 'core/controls.var.inc'}
 
 procedure invertZone(i:Shortint); external 'core';
+procedure blankZone(i:Shortint); external 'core';
 procedure clearWorkarea(); external 'core';
 procedure clearStatus(); external 'core';
 procedure setStatus(s:PString); external 'core';

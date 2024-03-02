@@ -17,6 +17,9 @@ _ICARD:
 _IPATH:
   dta a(IPATH_DATA)
 
+_VSCROLL:
+  dta a(VSCROLL_DATA)
+
 _CARROW:
   dta a(CARROW_DATA)
 
@@ -35,6 +38,9 @@ ICARD_DATA:
 
 IPATH_DATA:
   ins '../assets/bin/icon-path.bin'
+
+VSCROLL_DATA:
+  dta $08,$0C,$0E,$0F,$00,$0F,$0F,$0F,$0F,$0F,$0F,$0F,$0F,$0F,$0F,$0F,$0F,$0F,$0F,$0F,$0F,$0F,$0F,$0F,$0F,$0F,$0F,$0F,$0F,$0F,$0F,$00,$0F,$0E,$0C,$08
 
 CARROW_DATA:
   ; dta $80, $e0, $f8, $f0, $e0, $c0, $80

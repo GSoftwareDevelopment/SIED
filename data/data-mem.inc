@@ -15,8 +15,9 @@ CONTROLS_ADDR       = ASSETS_ADDR   +   0;  // time controls
 ICONS_ADDR          = ASSETS_ADDR   +  24;  // module icons
 ICARD_ADDR          = ASSETS_ADDR   +  42;  // selected module background
 IPATH_ADDR          = ASSETS_ADDR   +  44;  // tray icons for path module
-CARROW_ADDR         = ASSETS_ADDR   +  46;
-CWAIT_ADDR          = ASSETS_ADDR   +  48;
+VSCROLL_ADDR        = ASSETS_ADDR   +  46;
+CARROW_ADDR         = ASSETS_ADDR   +  48;
+CWAIT_ADDR          = ASSETS_ADDR   +  50;
 
 MODULE_ADDR         = $4000;                // module base address
 

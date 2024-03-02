@@ -44,8 +44,8 @@ exports
   wait,
 
 // cursor
-  setCursor,
-  setPivot,
+  setCursorShape,
+  setCursorShapeAnchor,
   initCursor,
 
 // interface
@@ -65,6 +65,7 @@ exports
 
 // controls
   invertZone,
+  blankZone,
   clearWorkarea,
   clearStatus,
   setStatus,

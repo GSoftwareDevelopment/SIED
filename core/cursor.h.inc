@@ -4,6 +4,6 @@ var
   _ARROW:Pointer external 'core';
   _WAIT:Pointer external 'core';
 
-procedure setCursor(spr:Pointer); Register; assembler; external 'core';
-procedure setPivot(x,y:Shortint); Register; assembler; external 'core';
+procedure setCursorShape(spr:Pointer); Register; assembler; external 'core';
+procedure setCursorShapeAnchor(x,y:Shortint); Register; assembler; external 'core';
 procedure initCursor(VBLPtr:Pointer); external 'core';

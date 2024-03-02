@@ -9,11 +9,11 @@ var
 
 procedure loadModule(FN:PString);
 begin
-  setPivot(3,3); setCursor(_WAIT);
+  setCursorShapeAnchor(3,3); setCursorShape(_WAIT);
   setStatus('LOADING MODULE...');
   XIO($28, 2, 4, $00, FN);
   clearStatus();
-  setPivot(0,0); setCursor(_ARROW);
+  setCursorShapeAnchor(0,0); setCursorShape(_ARROW);
 end;
 
 procedure setModule();
