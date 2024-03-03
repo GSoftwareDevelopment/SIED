@@ -25,7 +25,7 @@ checkfile() {
 
 build() {
 	checkfile
-	echo "- Build program '${BASENAME}'..."
+	echo "- Build ${BASENAME}..."
 	mkdir -p bin
 	mp ${FULLNAME} -o:${DESTINATION}${BASENAME}.a65 $P1 $P2 $P3 $P4 > $MPLOG
 	cat ${MPLOG} | grep "Error:"
@@ -36,8 +36,9 @@ build() {
 
 buildlib() {
 	checkfile
-	echo "- Build library '${BASENAME}'..."
+	echo "- Build ${BASENAME}..."
 	mkdir -p bin
+	FN=$FULLNAME
 	mp ${FULLNAME} -o:${DESTINATION}${BASENAME}.a65 $P1 $P2 $P3 $P4 > $MPLOG
 	cat ${MPLOG} | grep "Error:"
 	mads ${DESTINATION}${BASENAME}.a65 -hm -xi:${LIBPATH} -o:${DESTINATION}${BASENAME}.lib > $MADSLOG

@@ -52,13 +52,13 @@ var
   KEYDEFP:Pointer absolute $79;
 
 begin
+  SDMACTL:=0; // turn off screen
   KEYDEFP:=Pointer(SCAN2ASC_ADDR);
   for i:=0 to 55 do YSCR[i]:=Pointer(SCREEN_ADDR+i*$10);
   for i:=0 to 47 do YSCR[56+i]:=Pointer(EDITOR_ADDR+i*20);
   for i:=0 to 23 do YSCR[56+48+i]:=Pointer(EDITOR_ADDR+(20*48)+i*40);
   fillchar(Pointer(PMG_ADDR+$180),$E00,0); // clear PMG, SCREEN & EDITOR area at once
   ActivePage:=1;
-  SDMACTL:=0; // turn off screen
   Asm
     lda $14
     cmp $14

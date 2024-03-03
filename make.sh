@@ -14,6 +14,7 @@ validChanges() {
     fi
     if [ -f "$HASHFN" ]; then
       OLDHASH=`cat $HASHFN`
+      rm $HASHFN
     else
       OLDHASH=''
     fi
@@ -21,8 +22,13 @@ validChanges() {
     if [ "$FN" == "" ]; then
       FN="*.*"
     fi
-    sha256sum <(sha256sum $FN) > $HASHFN
-    NEWHASH=`cat $HASHFN`
+    COUNT=$(ls | wc -l)
+    if [ $COUNT != 0 ]; then
+      sha256sum <(sha256sum $FN) > $HASHFN
+      NEWHASH=`cat $HASHFN`
+    else
+      NWEHASH=''
+    fi
     if [ "$NEWHASH" = "$OLDHASH" ]; then
       return 0
     else
