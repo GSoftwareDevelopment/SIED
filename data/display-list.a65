@@ -1,6 +1,6 @@
   opt h-
   icl './data-mem.inc'
-  icl '../asm/dlist-const.inc'
+  icl 'dlist-const.inc'
   org DLIST_ADDR
 
 dl_start:
