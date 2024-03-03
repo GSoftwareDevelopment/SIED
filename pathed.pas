@@ -23,12 +23,18 @@ const
   LISTZONE = 20;
   MSG_SEARCH ='ENTER PATH NAME HERE...';
   MSG_NOTFOUND = 'NO ENTRIES FOUND :(';
+  HELP_BEFOREACTION = 'ENTER PATH NAME AND/OR SELECT FROM LIST';
+  ACTION : Array of String = ['CREATE','EDIT','NAME','SEARCH','DELETE'];
+  ACTIONY: Array[0..4] of Shortint = ( 13,20,27,34,41 );
 
 var
   pathListPtr:Array[0..MAXPATHDEFINITIONS] of pointer absolute PATHLISTV_ADDR;
   pathNamePtr:Array[0..MAXPATHDEFINITIONS] of pointer absolute PATHNAMEV_ADDR;
   pathNames:Array[0..0] of char absolute PATHNAMES_ADDR;
   pathNameSearch:String[PATHNAMESIZE];
+  i:shortint;
+
+//
 
 procedure updateSearch(); forward;
 {$I 'pathed-actions.inc'}
@@ -36,20 +42,18 @@ procedure updateSearch(); forward;
 
 procedure showPathChoice();
 begin
-  setStatus('CHOICE PATH TO EDIT OR CREATE NEW...');
+  setStatus(HELP_BEFOREACTION);
   setScreenWidth(20);
   fillchar(YSCR[56+9],20,$FF);
-  pathNameSearch:='';
-  addInput(9,1,PATHNAMESIZE,pathNameSearch,@doSearchPath);
-  updateSearch();
-  putText(1,1,'SEARCH:');
-  addButton(1,13,'CREATE',@doCreatePath);
-  addButton(1,20,'EDIT',@nullProc);
-  addButton(1,27,'NAME',@nullProc);
-  addButton(1,41,'DELETE',@nullProc);
+  for i:=0 to 4 do
+    addButton(1,ACTIONY[i],ACTION[i],@doSetAction);
   putImage(_VSCROLL,19,11,1,36);
   addZone(39,11,1,4,@nullProc);
   addZone(39,43,1,4,@nullProc);
+  szone:=12; doSetAction();
+  pathNameSearch:='';
+  addInput(9,1,PATHNAMESIZE,pathNameSearch,@doSearchPath);
+  updateSearch();
   showPathList();
 end;
 
@@ -92,4 +96,5 @@ begin
     fillchar(@pathListPtr,$1000,$00); // clear pathListPtr, pathNamePtr, pathNames
     moduleInitialized:=moduleInitialized or $2;
   end;
+  listShift:=0;
 end.

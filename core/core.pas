@@ -13,6 +13,10 @@ var
   tm:Byte absolute $14;
   i:shortint absolute $3e;
 
+//
+//
+//
+
 {$I 'cursor.inc'}
 {$I 'graph.inc'}
 procedure invertZone(i:Shortint); Forward;

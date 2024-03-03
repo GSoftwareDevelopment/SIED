@@ -6,7 +6,7 @@ var
 
 procedure updateSearch();
 begin
-  blankZone(9); // (9,1,PATHNAMESIZE,5);
+  blank(9,1,PATHNAMESIZE,5);
   if pathNameSearch[0]=#0 then
     putText(9,1,MSG_SEARCH)
   else
@@ -38,14 +38,14 @@ begin
     begin
       name:=pathNamePtr[n];
       addPathLabel(i,name);
+      inc(n); if (n=MAXPATHDEFINITIONS) then break;
     end
     else
     begin
       clearZone(LISTZONE+i);
       blank(9,_LISTY[i],PATHNAMESIZE,5);
     end;
-    inc(i); inc(n);
-  until (i=5) or (n=PATHNAMESIZE);
-  if i=0 then
-    putText(14,27,MSG_NOTFOUND);
+    inc(i);
+  until (i=5);
+  if n=listShift then putText(14,27,MSG_NOTFOUND);
 end;
