@@ -19,7 +19,7 @@ end;
 
 procedure doPageChange();
 begin
-  if szone-15>=0 then
+  if szone-LISTZONE>=0 then
   begin
     if listShift<(MAXPATHDEFINITIONS-10) then inc(listShift,5) else listShift:=MAXPATHDEFINITIONS-5;
   end
@@ -106,32 +106,37 @@ begin
   end;
 end;
 
+procedure toZone(n:byte);
+begin
+  szone:=n; setCursorInZone(n);
+end;
+
 procedure keyName();
 begin
-  szone:=16; setCursorInZone(szone); keyb:=$FF; doSearchPath();
+  toZone(14); keyb:=$FF; doSearchPath();
 end;
 
 procedure keyCreate();
 begin
-  szone:=9; setCursorInZone(szone); doSetAction();
+  toZone(9); doSetAction();
 end;
 
 procedure keyEdit();
 begin
-  szone:=10; setCursorInZone(szone); doSetAction();
+  toZone(10); doSetAction();
 end;
 
 procedure keyRename();
 begin
-  szone:=11; setCursorInZone(szone); doSetAction();
+  toZone(11); doSetAction();
 end;
 
 procedure keySearch();
 begin
-  szone:=12; setCursorInZone(szone); setCursorInZone(szone); doSetAction();
+  toZone(12); doSetAction();
 end;
 
 procedure keyDelete();
 begin
-  szone:=13; setCursorInZone(szone); doSetAction();
+  toZone(13); doSetAction();
 end;

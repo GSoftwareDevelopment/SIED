@@ -29,8 +29,8 @@ end;
 
 procedure updateListScroll();
 begin
-  _mzoneActive[14]:=(listShift>0);
-  _mzoneActive[15]:=(foundItems>5);
+  _mzoneActive[LISTZONE-1]:=(listShift>0);
+  _mzoneActive[LISTZONE+5]:=(listShift+5<foundItems);
 end;
 
 procedure showPathList(n:byte);

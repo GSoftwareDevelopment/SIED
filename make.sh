@@ -2,33 +2,33 @@
 BUILD=$1
 
 validChanges() {
+  FN="${1}"
+
+  if [ "$FN" != "" ]; then
+    HASHFN=".hash-${FN::-3}"
+  else
+    HASHFN=".hash"
+  fi
+  if [ -f "$HASHFN" ]; then
+    OLDHASH=`cat $HASHFN`
+    rm $HASHFN
+  else
+    OLDHASH=''
+  fi
+# generate new hash
+  if [ "$FN" == "" ]; then
+    FN="*.*"
+  fi
+  COUNT=$(ls | wc -l)
+  if [ $COUNT != 0 ]; then
+    sha256sum <(sha256sum $FN) > $HASHFN
+    NEWHASH=`cat $HASHFN`
+  else
+    NWEHASH=''
+  fi
   if [ "$BUILD" = "all" ]; then
     return 1
   else
-    FN="${1}"
-
-    if [ "$FN" != "" ]; then
-      HASHFN=".hash-${FN::-3}"
-    else
-      HASHFN=".hash"
-    fi
-    if [ -f "$HASHFN" ]; then
-      OLDHASH=`cat $HASHFN`
-      rm $HASHFN
-    else
-      OLDHASH=''
-    fi
-  # generate new hash
-    if [ "$FN" == "" ]; then
-      FN="*.*"
-    fi
-    COUNT=$(ls | wc -l)
-    if [ $COUNT != 0 ]; then
-      sha256sum <(sha256sum $FN) > $HASHFN
-      NEWHASH=`cat $HASHFN`
-    else
-      NWEHASH=''
-    fi
     if [ "$NEWHASH" = "$OLDHASH" ]; then
       return 0
     else
@@ -57,10 +57,11 @@ DATA=$?
 cd ..
 
 cd core
-if [[ $ASSETS = 1 || $DATA = 1 ]]; then
+validChanges
+if [ $ASSETS = 1 || $DATA = 1 ]; then
+  # wymuszenie budowy 'core'
   CORE=1
 else
-  validChanges
   CORE=$?
 fi
 [[ $CORE = 1 ]] && ../mpc buildlib core.pas -data:0400 -define:DISABLEIOCBCOPY

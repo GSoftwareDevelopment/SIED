@@ -33,6 +33,7 @@ exports
   _CONTROLS,
   _ICONS,
   _ICARD,
+  _IDISK,
   _IPATH,
   _ARROW,
   _WAIT,

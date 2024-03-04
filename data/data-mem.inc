@@ -14,10 +14,11 @@ ASSETS_ADDR         = FONTS_ADDR    +1329;  // assets base address
 CONTROLS_ADDR       = ASSETS_ADDR   +   0;  // time controls
 ICONS_ADDR          = ASSETS_ADDR   +  24;  // module icons
 ICARD_ADDR          = ASSETS_ADDR   +  42;  // selected module background
-IPATH_ADDR          = ASSETS_ADDR   +  44;  // tray icons for path module
-VSCROLL_ADDR        = ASSETS_ADDR   +  46;
-CARROW_ADDR         = ASSETS_ADDR   +  48;
-CWAIT_ADDR          = ASSETS_ADDR   +  50;
+IDISK_ADDR          = ASSETS_ADDR   +  44;  // tray icons for disk module
+IPATH_ADDR          = ASSETS_ADDR   +  46;  // tray icons for path module
+VSCROLL_ADDR        = ASSETS_ADDR   +  48;
+CARROW_ADDR         = ASSETS_ADDR   +  50;
+CWAIT_ADDR          = ASSETS_ADDR   +  52;
 
 MODULE_ADDR         = $4000;                // module base address
 
