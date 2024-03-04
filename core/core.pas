@@ -12,6 +12,7 @@ const
 var
   tm:Byte absolute $14;
   i:shortint absolute $3e;
+  moduleInitialized:Byte absolute $62;
 
 //
 //
@@ -25,6 +26,7 @@ procedure setControl(n:Shortint); Forward;
 
 {$I 'interface.inc'}
 {$I 'controls.inc'}
+{$I 'keyboard.inc'}
 
 exports
 // assets
@@ -51,7 +53,7 @@ exports
   setCursorShape,
   setCursorShapeAnchor,
   initCursor,
-
+  setCursorPos,
 // interface
   nullProc,
   setZone,
@@ -65,6 +67,7 @@ exports
   addZoneHN,
   addZoneV,
   addZoneVN,
+  setCursorInZone,
   checkZones,
 
 // controls
@@ -84,6 +87,18 @@ exports
   _asc2int,
   reduceFileName,
   keyscan2asc,
-  convASC2INT;
+  convASC2INT,
+  findText,
 
+// keyboard
+  __SCKeyVec,
+  clearAllShortcutsKey,
+  clearShortcutKey,
+  addShortcutKey,
+  initShortcutKeyboard,
+  checkShortcutKeyboard;
+
+begin
+  moduleInitialized:=0;
+  AllowShortcutKeys:=false;
 end.

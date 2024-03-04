@@ -1,3 +1,9 @@
+[Back to CORE](core.md)
+# INTERFACE Library
+
+## Constants & Varialbles
+
+```
 const
   k_L     = 0;
   k_J     = 1;
@@ -79,4 +85,16 @@ var
   BRKKEY:Byte absolute $11;
 
   allowShortcutKeys:Boolean absolute $56;
-  __SCKeyVec:Array[0..63] of TKeyProc absolute SCKEYVEC_ADDR;
+```
+
+## Methods
+
+### procedure initShortcutKeyboard();
+
+### procedure addShortcutKey(key:byte; prc:TKeyProc); register;
+
+### procedure checkShortcutKeyboard();
+
+### procedure clearAllShortcutsKey();
+
+### procedure clearShortcutKey(key:byte); register;

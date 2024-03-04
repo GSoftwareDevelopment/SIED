@@ -1,5 +1,38 @@
   txa:pha
 
+//  if activePage=1 then inc(y,56);
+  lda y
+  ldy activePage
+  beq skPage
+  add #56
+skPage:
+
+//  scr:=Pointer(YSCR[y]+x shr 3);
+  asl @
+  tay
+
+  lda x
+  bpl positiveX
+negativeX:
+  ora #%111
+  sec
+  ror @
+  ror @
+  ror @
+  bmi calcScr ; always jump
+
+positiveX:
+  lsr @
+  lsr @
+  lsr @
+
+calcSCR:
+  add adr.YSCR,y
+  sta scr
+  lda adr.YSCR+1,y
+  adc #0
+  sta scr+1
+
   lda x
   and #7
   sta sh

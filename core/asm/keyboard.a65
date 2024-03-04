@@ -1,0 +1,19 @@
+  lda allowShortcutKeys
+  bne xitSK
+
+  lda KEYB
+  and #%0011111
+  cmp #$FF
+  bne testKeys
+
+  asl @
+  tay
+
+  lda adr.__SCKeyVec,y
+  sta keyJump
+  lda adr.__SCKeyVec+1,y
+  sta keyJump+1
+
+  jsr keyJump:main.nullProc
+
+xitSK:

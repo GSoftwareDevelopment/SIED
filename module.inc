@@ -14,6 +14,7 @@ begin
   XIO($28, 2, 4, $00, FN);
   clearStatus();
   setCursorShapeAnchor(0,0); setCursorShape(_ARROW);
+  clearAllShortcutsKey();
 end;
 
 procedure setModule();

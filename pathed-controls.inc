@@ -1,10 +1,4 @@
-const
-  _LISTY:Array[0..4] of shortint = (13,20,27,34,41);
-
-var
-  listShift:shortint;
-
-procedure updateSearch();
+procedure updateSearchField();
 begin
   blank(9,1,PATHNAMESIZE,5);
   if pathNameSearch[0]=#0 then
@@ -20,32 +14,50 @@ var
 begin
   if n>4 then exit;
   y:=_LISTY[n];
-  putText(10,y,name);
-  addZoneN(LISTZONE+n,9,y-1,14,7,@doSelectPath);
+  putText(9,y,name);
+  addZoneN(LISTZONE+n,8,y-1,PATHNAMESIZE+2,7,@doSelectPath);
 End;
 
-procedure showPathList();
+procedure blankList();
+begin
+  for i:=0 to 4 do
+  begin
+    blank(9,_LISTY[i],PATHNAMESIZE,5);
+    clearZone(LISTZONE+i);
+  end;
+end;
+
+procedure updateListScroll();
+begin
+  _mzoneActive[14]:=(listShift>0);
+  _mzoneActive[15]:=(foundItems>5);
+end;
+
+procedure showPathList(n:byte);
 var
-  i,n:byte;
   entry:pointer;
   name:PString;
 
 begin
-  n:=listShift; i:=0;
-  repeat
+  if redrawList then blankList();
+  foundItems:=0;
+  while (n<MAXPATHDEFINITIONS) and (i<=5) do
+  begin
     entry:=pathListPtr[n];
     if entry<>pointer(0) then
     begin
       name:=pathNamePtr[n];
-      addPathLabel(i,name);
-      inc(n); if (n=MAXPATHDEFINITIONS) then break;
-    end
-    else
-    begin
-      clearZone(LISTZONE+i);
-      blank(9,_LISTY[i],PATHNAMESIZE,5);
+      if (pathNameSearch[0]=#0) or (findText(pathNameSearch,name)>0) then
+      begin
+        if redrawList and (foundItems<5) then addPathLabel(foundItems,name);
+        inc(foundItems);
+      end;
     end;
-    inc(i);
-  until (i=5);
-  if n=listShift then putText(14,27,MSG_NOTFOUND);
+    inc(n);
+  end;
+  if redrawList then
+  begin
+    updateListScroll()
+  end;
+  redrawList:=true;
 end;

@@ -24,3 +24,8 @@ Korzysta przy tym z tablicy konwersji `asc2int`
 
 Konwertuje kod skaningowy klawiartry do kodu ATASCI.
 Korzysta przy tym z tablicy konwersji, której adres wskazywany jest przez wektor pod adresem $79 (KEYDEFP)
+
+### function findText(sPhrase,sText:PString):Byte;
+
+Wyszukuje podaną frazę `sPhrase` w ciągu `sText`.
+Zwraca pozycję występowania frazy, lub 0, gdy niezostała znaleziona.

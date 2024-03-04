@@ -80,6 +80,13 @@ begin
   result:=addZoneN(n,__x,__y+__h,__w,__h,prc);
 End;
 
+procedure setCursorInZone(n:Shortint); Register;
+begin
+  if not _mZoneActive[n] then exit;
+  i:=_mZoneX2[n] shl 2; inc(i,1);
+  setCursorPos(i,_mZoneY2[n]-2);
+end;
+
 function checkZones:Boolean;
 var
   nzone:Shortint absolute $57;

@@ -133,7 +133,7 @@ begin
   inc(x);
   refreshValue();
   cx:=Byte(ln);
-  ctm:=Byte(tm+1); isCrs:=false; mAllowKeys:=false; KEYB:=255;
+  ctm:=Byte(tm+1); isCrs:=false; KEYB:=255;
   repeat
     ch:=x+cx;
     if (tm=ctm) then
@@ -173,7 +173,6 @@ begin
       ctm:=Byte(tm); KEYB:=255;
     End;
   until (false);
-  mAllowKeys:=true;
   KEYB:=255;
   _mzoneActive[ozone]:=true;
 End;

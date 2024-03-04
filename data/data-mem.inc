@@ -28,3 +28,4 @@ PATHNAMEV_ADDR      = $C100;                // Table of path names vectors
 PATHNAMES_ADDR      = $C200;                // Address of path names table
 
 CORE_LIB            = $D800;                // core library base address
+SCKEYVEC_ADDR       = $FE00;                // shortcur keyboard vectors

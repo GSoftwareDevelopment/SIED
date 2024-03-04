@@ -30,7 +30,7 @@ calcSCR:
   add adr.YSCR,y
   sta scr
   lda adr.YSCR+1,y
-  add #0
+  adc #0
   sta scr+1
 
   lda x

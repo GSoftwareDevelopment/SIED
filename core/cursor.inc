@@ -22,6 +22,13 @@ Asm
   sta main.mpivotY
 End;
 
+procedure setCursorPos(x,y:Byte); Register;
+begin
+  _mx:=48+x;
+  _my:=24+y;
+  mdx:=0; mdy:=0; mRefresh:=true;
+end;
+
 procedure initCursor(VBLPtr:Pointer);
 begin
   PMBASE:=HI(PMG_ADDR);
@@ -32,7 +39,6 @@ begin
   PCOL[0]:=$0f; PCOL[1]:=$00;
   SetIntVec(iVBL,VBLPtr);
   mRefresh:=true;
-  mAllowKeys:=true;
   _mx:=128; _my:=64;
   setCursorShape(_ARROW);
   setCursorShapeAnchor(0,0);

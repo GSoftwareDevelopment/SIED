@@ -76,20 +76,20 @@ stickVtest:
   jmp clrcrs
 
 checkKeys:
-  lda mAllowKeys
-  beq xit
+;   lda mAllowKeys
+;   beq xit
 
-  lda SKSTAT
-  and #%00001000
-  bne skButton
-  lda #MBUT_LEFT
-  sta mbutton
+;   lda SKSTAT
+;   and #%00001000
+;   bne skButton
+;   lda #MBUT_LEFT
+;   sta mbutton
 
-skButton:
-  lda KEYB
-  and #%0011111
-  cmp #$FF
-  bne testKeys
+; skButton:
+;   lda KEYB
+;   and #%0011111
+;   cmp #$FF
+;   bne testKeys
 
 xit:
   lda #0
@@ -97,41 +97,41 @@ xit:
   sta mdy
   jmp exvbl
 
-testKeys:
-  cmp #K_UP
-  bne @+
-  ldx #(-4)
-  stx mdy
-  bmi clrKey
+; testKeys:
+;   cmp #K_UP
+;   bne @+
+;   ldx #(-4)
+;   stx mdy
+;   bmi clrKey
 
-@:
-  cmp #K_DOWN
-  bne @+
-  ldx #(+4)
-  stx mdy
-  bpl clrKey
+; @:
+;   cmp #K_DOWN
+;   bne @+
+;   ldx #(+4)
+;   stx mdy
+;   bpl clrKey
 
-@:
-  cmp #K_LEFT
-  bne @+
-  ldx #(-4)
-  stx mdx
-  bmi clrKey
+; @:
+;   cmp #K_LEFT
+;   bne @+
+;   ldx #(-4)
+;   stx mdx
+;   bmi clrKey
 
-@:
-  cmp #K_RIGHT
-  bne xit
-  ldx #(+4)
-  stx mdx
+; @:
+;   cmp #K_RIGHT
+;   bne xit
+;   ldx #(+4)
+;   stx mdx
 
-clrKey:
-  lda #$ff
-  sta KEYB
+; clrKey:
+;   lda #$ff
+;   sta KEYB
 
 clrcrs:
 // clear old cursor
   ldx #6
-  lda _my
+  lda _omy
   sub ompivotY:#00
   tay
   lda #0
@@ -144,6 +144,7 @@ lclrcrs:
 
 calccrs:      // calculate new cursor position
   lda mdx
+  beq checkMY
   bpl @+
   lsr @
   lsr @
@@ -170,6 +171,7 @@ adddx:
 
 checkMY:
   lda mdy
+  beq drawcrs
   bpl @+
   lsr @
   lsr @
@@ -224,6 +226,7 @@ ldrawcrs:
   sta mx
 
   lda _my
+  sta _omy
   sub #24
   sta my
 

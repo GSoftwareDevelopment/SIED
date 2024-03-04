@@ -1,7 +1,10 @@
 procedure doSearchPath();
 begin
   doInput(pathNameSearch);
-  updateSearch();
+  updateSearchField();
+  listShift:=0; showPathList(0);
+  if foundItems=0 then
+    putText(14,27,MSG_NOTFOUND);
 end;
 
 procedure doSelectPath();
@@ -9,26 +12,126 @@ var
   name:PString;
 
 begin
-  name:=pathNamePtr[szone-LISTZONE];
+  name:=pathNamePtr[listShift+szone-LISTZONE];
   pathNameSearch:=name;
-  updateSearch();
+  updateSearchField();
 end;
 
-procedure doSetAction();
+procedure doPageChange();
 begin
-  blank(0,0,7,6);
-  putText(1,1,ACTION[szone-USER_ZONES_BEGIN]);
-  invert(0,0,7,6);
-  if pathNameSearch[0]=#0 then
+  if szone-15>=0 then
   begin
-    setStatus(HELP_BEFOREACTION);
+    if listShift<(MAXPATHDEFINITIONS-10) then inc(listShift,5) else listShift:=MAXPATHDEFINITIONS-5;
+  end
+  else
+  begin
+    if listShift>5 then dec(listShift,5) else listShift:=0;
   end;
+  showPathList(listShift);
+end;
+
+procedure doCreate();
+var
+  p:PByte;
+  ln:Byte;
+
+begin
+// check for exist name in list
+  redrawList:=false; showPathList(0);
+  if foundItems<>0 then
+  begin
+    setStatus(MSG_DUPLICATEDNAME);
+    exit;
+  end;
+// find first free
+  i:=0;
+  while (pathListPtr[i]<>pointer(0)) and (i<MAXPATHDEFINITIONS) do inc(i);
+  if (i=MAXPATHDEFINITIONS) then exit;
+  pathListPtr[i]:=pointer($a000);
+  p:=pointer(PATHNAMES_ADDR); n:=0;
+  while (n<>i) do
+  begin
+    if p^=0 then begin n:=-1; break; end;
+    inc(n);
+    inc(p,p^+1);
+  end;
+  if n=i then
+  begin
+    pathNamePtr[i]:=p;
+    ln:=byte(pathNameSearch[0])+1;
+    // move(p,pointer(word(p)+ln),$800-ln);
+    move(@pathNameSearch,p,ln);
+    listShift:=0; showPathList(0);
+  end
+  else
+  begin
+    setStatus(MSG_FULLLIST);
+  end;
+end;
+
+procedure doEdit();
+begin
+end;
+
+procedure doName();
+begin
+end;
+
+procedure doSearch();
+begin
 end;
 
 procedure doDelete();
 begin
 end;
 
-procedure doEdit();
+procedure doSetAction();
 begin
+  if curAction<>-1 then invert(_ACTIONX[curAction],_ACTIONY[curAction],_ACTIONH[curAction]-1,11);
+  curAction:=szone-9;
+  invert(_ACTIONX[curAction],_ACTIONY[curAction],_ACTIONH[curAction]-1,11);
+  if pathNameSearch[0]=#0 then
+  begin
+    setStatus(HELP_BEFOREACTION);
+  end
+  else
+  begin
+    case szone of
+      9 : doCreate();
+      10: doEdit();
+      11: doName();
+      12: doSearch();
+      13: doDelete();
+    end;
+  end;
+end;
+
+procedure keyName();
+begin
+  szone:=16; setCursorInZone(szone); keyb:=$FF; doSearchPath();
+end;
+
+procedure keyCreate();
+begin
+  szone:=9; setCursorInZone(szone); doSetAction();
+end;
+
+procedure keyEdit();
+begin
+  szone:=10; setCursorInZone(szone); doSetAction();
+end;
+
+procedure keyRename();
+begin
+  szone:=11; setCursorInZone(szone); doSetAction();
+end;
+
+procedure keySearch();
+begin
+  szone:=12; setCursorInZone(szone); setCursorInZone(szone); doSetAction();
+end;
+
+procedure keyDelete();
+begin
+  szone:=13; setCursorInZone(szone); doSetAction();
 end;

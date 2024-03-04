@@ -4,9 +4,9 @@ const
 
 var
     mRefresh:Boolean  absolute $5c;
-  mAllowKeys:Boolean  absolute $5d;
          _mx:Byte     absolute $52;
          _my:Byte     absolute $53;
+        _omy:Byte     absolute $63;
           mx:Shortint absolute $55;
           my:Shortint absolute $54;
          mdx:Shortint absolute $5b;

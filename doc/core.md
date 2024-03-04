@@ -6,21 +6,25 @@
 
 Wszelkie dane graficzne.
 
-### [graphs](graph.md)
+### [controls](controls.md)
 
-Procedury i funkcjie do obsługi ekranu graficznego.
+Podstawowe kontrolki interfejsu graficznego.
 
 ### [cursor](cursor.md)
 
 Obsługa wskaźnika kursora ekranowego.
 
+### [graphs](graph.md)
+
+Procedury i funkcjie do obsługi ekranu graficznego.
+
 ### [interface](interface.md)
 
 Zarządzanie strefami interfejsu graficznego.
 
-### [controls](controls.md)
+### [keyboard](keyboard.md)
 
-Podstawowe kontrolki interfejsu graficznego.
+Obsługa gorących klawiszy (shortcut)
 
 ### [utils](utils.md)
 

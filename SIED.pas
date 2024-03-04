@@ -13,10 +13,10 @@ const
 {$R 'data/data.rc'}
 {$R 'libs.rc'}
 
-{$I 'core/keyboard.var.inc'}
 {$I 'core/pmg.var.inc'}
 
 {$I 'core/assets.h.inc'}
+{$I 'core/keyboard.h.inc'}
 {$I 'core/graph.h.inc'}
 {$I 'core/interface.h.inc'}
 {$I 'core/controls.h.inc'}
@@ -24,7 +24,6 @@ const
 {$I 'core/dlist-interrupt.inc'}
 {$I 'core/utils.h.inc'}
 {$I 'core/cursor.h.inc'}
-
 
 var
   i:Shortint absolute $3e;
@@ -73,6 +72,7 @@ begin
   KRPDEL:=10; KEYREP:=1;// SDMACTL:=%00100010;
 //
   initCursor(@myVBL);
+  initShortcutKeyboard();
   initInterface();
   initModules();
 End;
@@ -81,6 +81,7 @@ begin
   initEditor();
   while (true) do
   begin
+    checkShortcutKeyboard();
     if checkZones() then
     begin
       Asm

@@ -13,3 +13,4 @@ function addZoneHN(n:Shortint; prc:TZoneProc):Shortint; external 'core';
 function addZoneV(prc:TZoneProc):Shortint; external 'core';
 function addZoneVN(n:Shortint; prc:TZoneProc):Shortint; external 'core';
 function checkZones:Boolean; external 'core';
+procedure setCursorInZone(n:Shortint); Register; external 'core';
