@@ -7,6 +7,13 @@ begin
     putText(9,1,pathNameSearch);
 end;
 
+procedure refreshList();
+begin
+  listShift:=0; showPathList(0);
+  if foundItems=0 then
+    putText(14,27,MSG_NOTFOUND);
+end;
+
 procedure addPathLabel(n:Byte; name:PString);
 var
   y:Byte;

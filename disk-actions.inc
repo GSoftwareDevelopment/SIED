@@ -1,14 +1,41 @@
-procedure doChoiceFile();
+procedure startDirectory;
 begin
-  case szone of
-    LISTZONE..LISTZONE+MAXLISTITEMS-1: begin
-      fn:=dirName[szone-LISTZONE];
-      // set filename in field
-      blank(16,1,12,5);
-      putText(16,1,fn);
+  dirPageBegin:=0;
+  readDirectory();
+End;
+
+procedure doDevice();
+begin
+  if doInput(dev)>=0 then startDirectory();
+End;
+
+procedure doFilename();
+begin
+  doInput(fn);
+End;
+
+procedure doChoiceFile();
+var
+  zone:shortint absolute $3e;
+
+begin
+  if KEYB=255 then
+    zone:=szone
+  else
+    zone:=ozone;
+  case zone of
+    LISTZONE..LISTZONE+MAXLISTITEMS-1:
+    begin
+      fn:=dirName[zone-LISTZONE]; updateFileNameField();
     End;
   End;
 End;
+
+procedure doEraseFileName();
+begin
+  fn:=''; updateFileNameField();
+  szone:=14; doFilename();
+end;
 
 procedure doPrevPageDir();
 begin
@@ -22,63 +49,125 @@ begin
   readDirectory();
 End;
 
-procedure startDirectory;
-begin
-  dirPageBegin:=0;
-  readDirectory();
-End;
-
-procedure doFilename();
-begin
-  doInput(fn);
-End;
-
-procedure doDevice();
-begin
-  if doInput(dev)>=0 then startDirectory();
-End;
-
-procedure toZone(n:byte);
-begin
-  szone:=n; setCursorInZone(n);
-end;
+//
 
 procedure keyDevice();
 begin
-  toZone(13); doDevice();
+  asm
+    cmp #KMOD_CTRL
+    bne @exit
+  end;
+  setCursorInZone(13); doDevice();
 end;
 
 procedure keyFileName();
 begin
-  toZone(14); doFilename();
+  asm
+    cmp #KMOD_CTRL
+    bne @exit
+  end;
+  setCursorInZone(14); doFilename();
 end;
 
 procedure keyLoad();
 begin
-  toZone(10);
+  asm
+    cmp #KMOD_CTRL
+    bne @exit
+  end;
+  setCursorInZone(10);
 end;
 
 procedure keySave();
 begin
-  toZone(9);
+  asm
+    cmp #KMOD_CTRL
+    bne @exit
+  end;
+  setCursorInZone(9);
 end;
 
 procedure keyExport();
 begin
-  toZone(11);
+  asm
+    cmp #KMOD_CTRL
+    bne @exit
+  end;
+  setCursorInZone(11);
 end;
 
 procedure keyImport();
 begin
-  toZone(12);
+  asm
+    cmp #KMOD_CTRL
+    bne @exit
+  end;
+  setCursorInZone(12);
 end;
 
 procedure keyPrevPageDir();
 begin
-  toZone(LISTZONE-1); doPrevPageDir();
+  setCursorInZone(LISTZONE-1); doPrevPageDir();
 end;
 
 procedure keyNextPageDir();
 begin
-  toZone(LISTZONE+MAXLISTITEMS); doNextPageDir();
+  setCursorInZone(LISTZONE+MAXLISTITEMS); doNextPageDir();
+end;
+
+procedure keySelectFile();
+const
+  MIN=LISTZONE;
+  MAX=LISTZONE+MAXLISTITEMS-1;
+  STEP=5;
+
+var
+  modKey:Byte;
+  czone:shortint;
+
+begin
+  asm sta modKey end; //
+  KEYB:=KEYB and $3F;
+  if modKey=0 then  // only arrows
+  begin
+    czone:=ozone;
+    if (czone<MIN) or (czone>MAX) then
+      setCursorInZone(MIN)
+    else
+    begin
+      case KEYB of
+        k_UP: if czone>MIN then
+                dec(czone)
+              else // page change
+              if _mZoneActive[LISTZONE-1] then
+              begin
+                doPrevPageDir();
+                czone:=MAX; ozone:=-1;
+              end;
+        k_DOWN: if czone<MAX then
+                  inc(czone)
+                else
+                if _mZoneActive[LISTZONE+MAXLISTITEMS] then
+                begin
+                  doNextPageDir();
+                  czone:=MIN; ozone:=-1;
+                end;
+        k_LEFT: if czone-5>=MIN then
+                  dec(czone,STEP)
+                else
+                if _mZoneActive[LISTZONE-1] then
+                begin
+                  doPrevPageDir(); ozone:=-1;
+                end;
+        k_RIGHT: if czone+5<=MAX then
+                  inc(czone,STEP)
+                else
+                if _mZoneActive[LISTZONE+MAXLISTITEMS] then
+                begin
+                  doNextPageDir(); ozone:=-1;
+                end;
+      end;
+      setCursorInZone(czone);
+    end;
+  end;
 end;

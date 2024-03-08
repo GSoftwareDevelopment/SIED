@@ -36,64 +36,48 @@ Asm
   lda #0
   sta 77
 
-    // lda #<MAIN.cursor.myDLI
-    // sta DLIV
-    // lda #>MAIN.cursor.myDLI
-    // sta DLIV+1
+  lda #<MAIN.myDLI
+  sta DLIV
+  lda #>MAIN.myDLI
+  sta DLIV+1
 
   icl 'core/asm/cursor.a65'
 exVBL:
   jmp xitvbv
 End;
 
-procedure initEditor();
+procedure init();
 var
   KEYDEFP:Pointer absolute $79;
 
 begin
   SDMACTL:=0; // turn off screen
-  KEYDEFP:=Pointer(SCAN2ASC_ADDR);
+  // graphics init
   for i:=0 to 55 do YSCR[i]:=Pointer(SCREEN_ADDR+i*$10);
   for i:=0 to 47 do YSCR[56+i]:=Pointer(EDITOR_ADDR+i*20);
   for i:=0 to 23 do YSCR[56+48+i]:=Pointer(EDITOR_ADDR+(20*48)+i*40);
   fillchar(Pointer(PMG_ADDR+$180),$E00,0); // clear PMG, SCREEN & EDITOR area at once
   ActivePage:=1;
-  Asm
-    lda $14
-    cmp $14
-    beq *-2
-  End;
+  initCursor(@myVBL);
+  wait(1);
   Asm sei; End;
   setIntVec(iDLI,@myDLI);
   NMIEN:=$C0;
-  Asm cli; End;
   SDLST:=pointer(DLIST_ADDR);
   PFCOL0:=$EA; PFCOL1:=$00; PFCOL2:=$0F; PFCOL4:=$e0;
-  KRPDEL:=10; KEYREP:=1;// SDMACTL:=%00100010;
-//
-  initCursor(@myVBL);
+  // keyboard init
+  KEYDEFP:=Pointer(SCAN2ASC_ADDR);
+  KRPDEL:=10; KEYREP:=3;
+  wait(1);
+  Asm cli; End;
+  wait(1);
   initShortcutKeyboard();
+  // interface init
   initInterface();
-  initModules();
 End;
 
 begin
-  initEditor();
-  while (true) do
-  begin
-    checkShortcutKeyboard();
-    if checkZones() then
-    begin
-      Asm
-        lda szone
-        asl @
-        tay
-        lda adr._mzonePROC,y
-        sta jaddr
-        lda adr._mzonePROC+1,y
-        sta jaddr+1
-        jsr jaddr:$ffff
-      End;
-    End;
-  End;
+  init();
+  initModules();
+  runInterface();
 End.

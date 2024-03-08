@@ -1,5 +1,30 @@
 #!/bin/bash
-BUILD=$1
+export ERRORLEVEL="error-only"
+export KEEPLOG=0
+export LOG=1
+BUILD=''
+BUILDDISK=0
+
+for arg; do
+  case $arg in
+  all)
+    BUILD="all";
+    ;;
+  disk)
+    BUILD="all";
+    BUILDDISK=1;
+    ;;
+  full-log)
+    ERRORLEVEL="full-log"
+    ;;
+  keep-log)
+    KEEPLOG=1
+    ;;
+  *)
+    ;;
+  esac
+done
+# echo "${BUILD} ${BUILDDISK} ${ERRORLEVEL}"
 
 validChanges() {
   FN="${1}"
@@ -58,13 +83,10 @@ cd ..
 
 cd core
 validChanges
-if [ $ASSETS = 1 || $DATA = 1 ]; then
-  # wymuszenie budowy 'core'
-  CORE=1
-else
-  CORE=$?
-fi
-[[ $CORE = 1 ]] && ../mpc buildlib core.pas -data:0400 -define:DISABLEIOCBCOPY
+CORE=$?
+[[ $ASSETS = 1 ]] && CORE=1;
+[[ $DATA = 1 ]] && CORE=1;
+[[ $CORE = 1 ]] && ../mpc buildlib core.pas -data:D980 -define:DISABLEIOCBCOPY
 cd ..
 
 validChanges "about*.*"
@@ -79,5 +101,9 @@ validChanges "pathed*.*"
 validChanges "scened*.*"
 [[ $? = 1 || $CORE = 1 ]] && ./mpc buildlib scened.pas -define:DISABLEIOCBCOPY
 
+./mpc buildcom SIED.pas -code:8100 -define:DISABLEIOCBCOPY
 
-./mpc buildcom SIED.pas -code:8000 -define:DISABLEIOCBCOPY
+if [ $BUILDDISK = 1 ]; then
+echo "- Build disk image..."
+
+fi

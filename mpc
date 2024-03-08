@@ -8,8 +8,9 @@
 PATH=$MPBASE:$PATH
 DESTINATION="bin/"
 LIBPATH="${MPBASE}/base"
-MPLOG="log-mp.log"
-MADSLOG="log-mads.log"
+TEMPLOG=".log"
+GREPLOG=".grep.log"
+CURLOG=".build.log"
 
 help() {
 	echo "mpc {build|buildcom|buildlib|run} filename.pas"
@@ -23,15 +24,34 @@ checkfile() {
 	fi
 }
 
+errorlog() {
+	echo "${2}" >> $CURLOG
+	case $ERRORLEVEL in
+		error-only)
+			cat ${TEMPLOG} | grep $1 >> $GREPLOG
+			;;
+		full-log)
+			cat ${TEMPLOG} >> $GREPLOG
+			;;
+		*)
+			;;
+	esac
+	[[ $LOG = 1 ]] && cat $GREPLOG
+	cat $GREPLOG >> $CURLOG
+	echo -e "\n\n" >> $CURLOG
+	rm $TEMPLOG
+	[[ $KEEPLOG = 0 ]] && rm $CURLOG
+	rm $GREPLOG
+}
+
 build() {
 	checkfile
 	echo "- Build ${BASENAME}..."
 	mkdir -p bin
-	mp ${FULLNAME} -o:${DESTINATION}${BASENAME}.a65 $P1 $P2 $P3 $P4 > $MPLOG
-	cat ${MPLOG} | grep "Error:"
-	mads ${DESTINATION}${BASENAME}.a65 -x -l -t -s -i:${LIBPATH} -o:${DESTINATION}${BASENAME}.$1 > $MADSLOG
-	cat ${MADSLOG} | grep "ERROR:"
-	rm *.log
+	mp ${FULLNAME} -o:${DESTINATION}${BASENAME}.a65 $P1 $P2 $P3 $P4 > $TEMPLOG
+	errorlog "Error:" ${FULLNAME}
+	mads ${DESTINATION}${BASENAME}.a65 -x -l -t -s -i:${LIBPATH} -o:${DESTINATION}${BASENAME}.$1 >> $TEMPLOG
+	errorlog "ERROR:" ${DESTINATION}${BASENAME}.a65
 }
 
 buildlib() {
@@ -39,11 +59,11 @@ buildlib() {
 	echo "- Build ${BASENAME}..."
 	mkdir -p bin
 	FN=$FULLNAME
-	mp ${FULLNAME} -o:${DESTINATION}${BASENAME}.a65 $P1 $P2 $P3 $P4 > $MPLOG
-	cat ${MPLOG} | grep "Error:"
-	mads ${DESTINATION}${BASENAME}.a65 -hm -xi:${LIBPATH} -o:${DESTINATION}${BASENAME}.lib > $MADSLOG
-	cat ${MADSLOG} | grep "ERROR:"
-	rm *.log
+	mp ${FULLNAME} -o:${DESTINATION}${BASENAME}.a65 $P1 $P2 $P3 $P4 > $TEMPLOG
+	errorlog "Error:" ${FULLNAME}
+
+	mads ${DESTINATION}${BASENAME}.a65 -hm -xi:${LIBPATH} -o:${DESTINATION}${BASENAME}.lib >> $TEMPLOG
+	errorlog "ERROR:" ${DESTINATION}${BASENAME}.a65
 }
 
 if [ $# = 0 ]; then

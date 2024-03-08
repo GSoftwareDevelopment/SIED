@@ -22,6 +22,7 @@ const
 const
   MAXLISTITEMS = 10;
   LISTZONE = 16;
+  ITEMSIZE = 14;
   MSG_READING = 'READING DIRECTORY...';
   MSG_SEEKING = 'SEEKING...';
   MSG_IOERR   = 'I/O ERROR $00';
@@ -35,11 +36,11 @@ var
   _fn:string[20] absolute $04D7; //3f17;
   filemask:string[16] absolute $04EC; //3f2C;
   dirName:Array[0..MAXLISTITEMS-1] of string[12];
-  // dirType:Array[0..14] of Byte;
   dirPageBegin:smallint;
 
 //
 procedure readDirectory(); Forward;
+procedure updateFileNameField(); Forward;
 {$I 'disk-actions.inc'}
 {$I 'disk-controls.inc'}
 
@@ -51,15 +52,20 @@ begin
   addShortcutKey(k_S,@keySave);
   addShortcutKey(k_E,@keyExport);
   addShortcutKey(k_I,@keyImport);
-  // addShortcutKey(k_LEFT,@keyPrevPageDir);
-  // addShortcutKey(k_RIGHT,@keyNextPageDir);
+  addShortcutKey(k_UP,@keySelectFile);
+  addShortcutKey(k_DOWN,@keySelectFile);
+  addShortcutKey(k_LEFT,@keySelectFile);
+  addShortcutKey(k_RIGHT,@keySelectFile);
+  addShortcutKey(k_CLEAR,@doEraseFileName);
+  addShortcutKey(k_RETURN,@doChoiceFile);
   setScreenWidth(20);
-  fillchar(YSCR[56+8]+4,15,$FF);
+  fillchar(YSCR[56+8]+4,16,$FF);
   fillchar(Pointer(PMG_ADDR+$300+23),50,$FF);
   HPOSP[2]:=44; PCOL[2]:=$E6; SIZEP[2]:=%11;
   putImage(_IDISK,0,0,3,48);
   putImage(_VSCROLL,19,11,1,3);
   putImage(_VSCROLL+2,19,44,1,3);
+  putImage(_ERASEINPUT,19,1,1,5);
   addZoneN(LISTZONE-1,38,10,2,5,@doPrevPageDir);
   addZoneN(LISTZONE+MAXLISTITEMS,38,43,2,5,@doNextPageDir);
 
@@ -67,8 +73,11 @@ begin
   addZoneN(10,0,12,6,12,@nullProc);
   addZoneN(11,0,24,6,12,@nullProc);
   addZoneN(12,0,36,6,12,@nullProc);
-  addInput(9,1,4,dev,@doDevice);
-  addInput(16,1,12,fn,@doFilename);
+  putText(9,1,'DEV');
+  putText(20,1,'FILE');
+  addInput(13,1,4,dev,@doDevice);
+  addInput(25,1,12,fn,@doFilename);
+  addZoneN(31,38,0,2,7,@doEraseFileName);
   startDirectory();
 End;
 

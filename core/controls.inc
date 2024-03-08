@@ -109,70 +109,109 @@ begin
   result:=addZoneN(-1,x-1,y-1,w+2,7,prc);
 End;
 
-function doInput(value:PString):Shortint;
+function doInput(var sEdit:String):Shortint;
 var
-  ozone:Shortint;
+  _zone:Shortint;
   cx:Shortint;
-  ch,ln,x,y,w:Byte;
+  ch,ln:Byte;
   ctm:Byte;
   isCrs:Boolean;
+  firstKey:Boolean;
+  value:String[40] absolute $400;
 
   procedure refreshValue();
   begin
-    blank(x,y,w,7);
-    putText(x,y+1,value);
+    ch:=__x+cx-1;
     ln:=Byte(value[0]);
+    blank(ch,__y,0,7);
+    putChar(ch,__y+1,value[cx]);
+    blank(__x+ln,__y,__w-ln,7);
   End;
 
+  procedure drawCursor(n:Boolean);
+  begin
+    invert(ch,__y,0,6);
+    isCrs:=n;
+  end;
+
+  procedure clearValue();
+  begin
+    cx:=0; value[0]:=#0; ln:=0;
+  end;
+
+  procedure storeValue();
+  begin
+    sEDIT:=value; move(value,sEDIT,ln+1);
+  end;
+
 begin
-  ozone:=szone; // remember zone id call
-  x:=_mzoneX1[szone];
-  y:=_mzoneY1[szone];
-  w:=(_mzoneX2[szone]-x)-1;
+  _zone:=szone; // remember zone id call
+  if not _mZoneActive[szone] then exit(-3);
+  setScreenWidth(20);
+  __x:=_mzoneX1[szone];
+  __y:=_mzoneY1[szone];
+  __w:=(_mzoneX2[szone]-__x)-1;
   _mzoneActive[szone]:=false;
-  inc(x);
-  refreshValue();
-  cx:=Byte(ln);
-  ctm:=Byte(tm+1); isCrs:=false; KEYB:=255;
+  inc(__x);
+  ln:=byte(sEdit[0]);
+  move(sEDIT,value,ln+1);
+  cx:=Byte(ln); ctm:=Byte(tm+1); isCrs:=false; KEYB:=255;
+  firstKey:=true;
   repeat
-    ch:=x+cx;
+    ch:=__x+cx;
     if (tm=ctm) then
     begin
       ctm:=Byte(tm+20);
-      invert(ch,y,0,6); isCrs:=not isCrs;
-    End;
-    checkZones();
-    if mbutton<>MBUT_NONE then
-    begin
-      if isCrs then invert(ch,y,0,6);
-      result:=-2; break;
+      drawCursor(not isCrs);
     End;
     if KEYB<>255 then
     begin
-      if isCrs then begin invert(ch,y,0,6); isCrs:=false; End;
+      if isCrs then drawCursor(false);
       case KEYB of
-        K_ESC: begin result:=-1; break; End;
-        K_RETURN: begin result:=ozone; break; End;
+        K_ESC:
+        begin
+          blankZone(_zone); putText(__x,__y+1,sEdit);
+          result:=-128; break;
+        End;
+        K_RETURN:
+        begin
+          storeValue();
+          result:=_zone; break;
+        End;
         KMOD_CTRL+K_LEFT: if cx>0 then dec(cx);
-        KMOD_CTRL+K_RIGHT: if cx<w then inc(cx);
+        KMOD_CTRL+K_RIGHT: if cx<ln then inc(cx);
         K_DELETE:
         begin
-          if cx=ln then value[0]:=char(ln-1);
-          value[cx]:=#0;
-          if cx>0 then dec(cx);
+          if firstKey then
+            clearValue()
+          else
+          begin
+            if cx=ln then value[0]:=char(ln-1);
+            value[cx]:=#0;
+            if cx>0 then dec(cx);
+          end;
           refreshValue();
         End;
       else
+        if firstKey then clearValue();
         ch:=keyscan2asc(KEYB);
         if (ch>95) then dec(ch,32);
-        if (cx<w) then inc(cx);
+        if (cx<__w) then inc(cx);
         value[cx]:=char(ch);
         if cx>ln then value[0]:=char(cx);
         refreshValue();
       End;
-      ctm:=Byte(tm); KEYB:=255;
+      ctm:=Byte(tm); KEYB:=255; firstKey:=false;
+    End;
+    checkZones();
+    checkShortcutKeyboard(KMOD_CTRL+KMOD_SHIFT);
+    if (mbutton<>MBUT_NONE) or (_callShortcutKeys<>$FF) then
+    begin
+      if isCrs then drawCursor(isCrs);
+      storeValue(); result:=-_zone;
+      break;
     End;
   until (false);
-  KEYB:=255;
-  _mzoneActive[ozone]:=true;
+  if _callShortcutKeys=$FF then KEYB:=255;
+  _mzoneActive[_zone]:=true;
 End;

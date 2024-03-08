@@ -24,8 +24,9 @@ const
   MSG_NOTFOUND = 'NO ENTRIES FOUND :(';
   MSG_DUPLICATEDNAME = 'DUPLICATED TRAIL NAME';
   MSG_FULLLIST = 'LIST IS FULL!';
+  HELP_TRAILEDITOR = 'TRAIL EDITOR';
   HELP_BEFOREACTION = 'ENTER TRAIL NAME AND/OR SELECT FROM LIST';
-  // ACTION : Array of String = ['CREATE','EDIT','RENAME','SEARCH','DELETE'];
+  HELP_ACTION : Array of String = ['CREATE','EDIT','RENAME','SEARCH','DELETE'];
   _ACTIONX: Array[0..4] of Shortint = ( 0 ,0 ,0, 3, 0 );
   _ACTIONY: Array[0..4] of Shortint = ( 0,12,24,24,36 );
   _ACTIONH: Array[0..4] of Shortint = ( 6 ,6 ,3, 3, 6 );
@@ -46,11 +47,12 @@ var
 //
 
 procedure updateSearchField(); forward;
+procedure refreshList(); forward;
 procedure showPathList(n:byte); forward;
 {$I 'pathed-actions.inc'}
 {$I 'pathed-controls.inc'}
 
-procedure showPathChoice();
+procedure showPathEditor();
 begin
   addShortcutKey(k_N,@keyName);
   addShortcutKey(k_C,@keyCreate);
@@ -58,14 +60,15 @@ begin
   addShortcutKey(k_R,@keyRename);
   addShortcutKey(k_S,@keySearch);
   addShortcutKey(k_DELETE,@keyDelete);
-  setStatus(HELP_BEFOREACTION);
+  setStatus(HELP_TRAILEDITOR);
   setScreenWidth(20);
-  fillchar(YSCR[56+8]+4,15,$FF);
+  fillchar(YSCR[56+8]+4,16,$FF);
   fillchar(Pointer(PMG_ADDR+$300+23),50,$FF);
   HPOSP[2]:=44; PCOL[2]:=$E6; SIZEP[2]:=%11;
   putImage(_IPATH,0,0,3,48);
   putImage(_VSCROLL,19,11,1,3);
   putImage(_VSCROLL+2,19,44,1,3);
+  putImage(_ERASEINPUT,19,1,1,5);
   for i:=0 to 4 do
     addZone(_ACTIONX[i],_ACTIONY[i],_ACTIONH[i],12,@doSetAction);
   addZoneN(LISTZONE-1,38,10,2,5,@doPageChange);
@@ -73,16 +76,15 @@ begin
   szone:=12; doSetAction();
   pathNameSearch:='';
   addInput(9,1,PATHNAMESIZE,pathNameSearch,@doSearchPath);
-  // addButton(38,1,' ',@nullProc);
+  addZone(38,0,2,7,@doEraseSearch);
   updateSearchField();
   listShift:=0; showPathList(0);
   if foundItems=0 then
     putText(14,27,MSG_NOTFOUND);
 end;
 
-procedure showPathEditor();
-begin
-  showPathChoice();
+// begin
+//   showPathChoice();
   //  addZoneN(3,1,YCONTROLS,3,7,@nullProc);   // previous
   // addZoneHN(4,@nullProc);                   // play
   // addZoneHN(5,@nullProc);                   // stop
@@ -105,7 +107,7 @@ begin
   //  addZone(3,0,3,12,@nullProc); // arrow
   // addZoneV(@nullProc);          // line
   // addZoneV(@nullProc);          // path 2
-End;
+// End;
 
 exports
   showPathEditor;

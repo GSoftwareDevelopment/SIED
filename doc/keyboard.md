@@ -91,10 +91,26 @@ var
 
 ### procedure initShortcutKeyboard();
 
+Inicjalizacja.
+Czyści ustawienia dotyczące gorących klawiszy i włącza możliwość ich stosowania `allowShortcutKeys:=true`
+
 ### procedure addShortcutKey(key:byte; prc:TKeyProc); register;
+
+Przypisuje procedure `prc` do klawisza `key`
 
 ### procedure checkShortcutKeyboard();
 
+Funkcja pollingu dla gorących glawiszy.
+W przypadku wykrycia naciśnięcia klawisza, wykonuje skosk do przypisane klawiszowu procedury.
+Przed wykonaniem skoku w rejestrze akumulatora, umieszczana jest wartość klawiszy modyfikujących (Control, Shift).
+Kod klawisza można pobrać z rejestru KEYB.
+
+Po wyjściu z procedury obsługi gorącego klawisza, rejestr KEYB jest ustawiany na `$FF`
+
 ### procedure clearAllShortcutsKey();
 
+Czyści ustawienia dotyczące gorących klawiszy.
+
 ### procedure clearShortcutKey(key:byte); register;
+
+Usuwa przypisaną procedurę dla klawisza `key`

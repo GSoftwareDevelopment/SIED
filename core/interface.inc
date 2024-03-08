@@ -80,30 +80,38 @@ begin
   result:=addZoneN(n,__x,__y+__h,__w,__h,prc);
 End;
 
-procedure setCursorInZone(n:Shortint); Register;
+procedure refreshZone();
+var
+  nzone:Shortint absolute $57;
+
 begin
+  if (ozone>=USER_ZONES_BEGIN) then
+  begin
+    invertZone(ozone);
+    ozone:=-1;
+  End;
+  if (nzone>=USER_ZONES_BEGIN) then
+  begin
+    invertZone(nzone);
+    ozone:=nzone;
+  End;
+End;
+
+procedure setCursorInZone(n:Shortint);
+var
+  nzone:Shortint absolute $57;
+
+begin
+  nzone:=-1;
+  szone:=n; refreshZone();
   if not _mZoneActive[n] then exit;
-  i:=_mZoneX2[n] shl 2; inc(i,1);
-  setCursorPos(i,_mZoneY2[n]-2);
+  i:=_mZoneX2[n] shl 2; inc(i,2);
+  setCursorPos(i,_mZoneY2[n]-1);
 end;
 
 function checkZones:Boolean;
 var
   nzone:Shortint absolute $57;
-
-  procedure refreshZone();
-  begin
-    if (ozone>=USER_ZONES_BEGIN) then
-    begin
-      invertZone(ozone);
-      ozone:=-1;
-    End;
-    if (nzone>=USER_ZONES_BEGIN) then
-    begin
-      invertZone(nzone);
-      ozone:=nzone;
-    End;
-  End;
 
   function pressed:Boolean;
   begin
@@ -178,3 +186,24 @@ begin
     End;
   End;
 End;
+
+procedure callZoneProc(); Assembler;
+Asm
+  lda szone
+  asl @
+  tay
+  lda adr._mzonePROC,y
+  sta jaddr
+  lda adr._mzonePROC+1,y
+  sta jaddr+1
+  jmp jaddr:$ffff
+End;
+
+procedure runInterface();
+begin
+  while (true) do
+  begin
+    if checkShortcutKeyboard(0) then callShortcutKeyboard();
+    if checkZones() then callZoneProc();
+  End;
+end;

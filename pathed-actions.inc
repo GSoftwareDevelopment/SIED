@@ -2,9 +2,7 @@ procedure doSearchPath();
 begin
   doInput(pathNameSearch);
   updateSearchField();
-  listShift:=0; showPathList(0);
-  if foundItems=0 then
-    putText(14,27,MSG_NOTFOUND);
+  refreshList();
 end;
 
 procedure doSelectPath();
@@ -13,8 +11,13 @@ var
 
 begin
   name:=pathNamePtr[listShift+szone-LISTZONE];
-  pathNameSearch:=name;
-  updateSearchField();
+  pathNameSearch:=name; updateSearchField();
+end;
+
+procedure doEraseSearch();
+begin
+  pathNameSearch:=''; updateSearchField();
+  refreshList();
 end;
 
 procedure doPageChange();
@@ -27,6 +30,8 @@ begin
   begin
     if listShift>5 then dec(listShift,5) else listShift:=0;
   end;
+  redrawList:=false; showPathList(listShift);
+  if foundItems=0 then listShift:=0;
   showPathList(listShift);
 end;
 

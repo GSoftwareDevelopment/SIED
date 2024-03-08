@@ -1,12 +1,26 @@
+procedure updateFileNameField();
+begin
+  blank(25,1,12,5);
+  putText(25,1,fn);
+end;
+
 procedure addFileLabel(n:Byte; prc:TZoneProc);
 var
   x,y:Byte;
+  name:PString;
+  dirSign:byte;
 
 begin
   if n>LISTZONE+MAXLISTITEMS-1 then exit;
   x:=_DIRFILEX[n]; y:=_DIRFILEY[n];
-  putText(x,y,dirName[n]);
-  addZoneN(LISTZONE+n,x-1,y-1,14,7,prc);
+  name:=dirName[n]; dirSign:=byte(name[1]);
+  if (dirSign and $80)<>0 then
+  begin
+    putChar(x-1,y,'<');
+    putChar(x+byte(name[0]),y,'>');
+  end;
+  putText(x,y,name);
+  addZoneN(LISTZONE+n,x-1,y-1,ITEMSIZE,7,prc);
 End;
 
 procedure getLn(chn:Byte; buf:PString); Register; Assembler; Asm icl 'core/asm/get_line.a65' End;
@@ -14,18 +28,20 @@ procedure getLn(chn:Byte; buf:PString); Register; Assembler; Asm icl 'core/asm/g
 procedure readDirectory;
 var
   n,j:Shortint;
-  dirSeek:smallint;
+  totalFiles:smallint;
+  name:PString;
+  isDir:Boolean;
 
 begin
   if dev[1]='D' then
   begin
     setCursorShapeAnchor(3,3); setCursorShape(_WAIT);
     _fn:=dev; move(filemask[1],_fn[Byte(_fn[0])+1],Byte(filemask[0]));
-    dirSeek:=dirPageBegin;
+    totalFiles:=0;
     if dirPageBegin>0 then setStatus(MSG_SEEKING) else setStatus(MSG_READING);
     opn(1,6,0,_fn);
     n:=-1;
-    while (IOResult=1) and (n<MAXLISTITEMS-1) do
+    while (IOResult=1) do
     begin
       getLn(1,_fn);
       if (_fn[1]>='0') then
@@ -34,16 +50,20 @@ begin
         IOResult:=3;
         break;
       End;
-      if dirSeek>0 then
+      inc(totalFiles);
+      if totalFiles>=dirPageBegin then
       begin
-        dec(dirSeek);
-        continue;
+        if (n=-1) then setStatus(MSG_READING);
+        if (n<MAXLISTITEMS-1) then
+        begin
+          inc(n);
+          name:=dirName[n];
+          isDir:=((_fn[2]=':') or (_fn[14]='>'));
+          reduceFileName(_fn,name);
+          if isDir then
+            name[1]:=char(byte(name[1]) or $80);
+        End;
       End;
-      if (n=-1) then setStatus(MSG_READING);
-
-      // isDir:=((_fn[2]=':') or (_fn[18]='>'));
-      inc(n);
-      reduceFileName(_fn,dirName[n]);
     End;
   End
   else
@@ -57,22 +77,19 @@ begin
   End
   else
   begin
-    for j:=LISTZONE to LISTZONE+MAXLISTITEMS-1 do
+    for j:=0 to MAXLISTITEMS-1 do
     begin
-      blankZone(j);
-      clearZone(j);
+      blank(_DIRFILEX[j]-1,_DIRFILEY[j]-1,ITEMSIZE,6);
+      clearZone(LISTZONE+j);
     end;
     j:=0; while (j<=n) do
     begin
       addFileLabel(j,@doChoiceFile);
       inc(j);
     End;
-    if (dirPageBegin>0) or (IOResult<3) then
-    begin
-      _mZoneActive[LISTZONE-1]:=(dirPageBegin>0);
-      _mZoneActive[LISTZONE+MAXLISTITEMS]:=IOResult<3;
-      clearStatus();
-    End;
+    _mZoneActive[LISTZONE-1]:=(dirPageBegin>0);
+    _mZoneActive[LISTZONE+MAXLISTITEMS]:=((dirPageBegin+MAXLISTITEMS)<totalFiles);
+    if IOResult<3 then clearStatus();
   End;
   cls(1);
   setCursorShapeAnchor(0,0); setCursorShape(_ARROW);

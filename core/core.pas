@@ -1,7 +1,7 @@
 // {$define BASICOFF}
 // {$define ROMOFF}
 // {$define NOROMFONT}
-library core:$d800;
+library core:$da00;
 
 const
 {$I '../data/data-mem.inc'}
@@ -24,9 +24,9 @@ procedure invertZone(i:Shortint); Forward;
 procedure setIcon(n:Shortint); Forward;
 procedure setControl(n:Shortint); Forward;
 
+{$I 'keyboard.inc'}
 {$I 'interface.inc'}
 {$I 'controls.inc'}
-{$I 'keyboard.inc'}
 
 exports
 // assets
@@ -35,6 +35,8 @@ exports
   _ICARD,
   _IDISK,
   _IPATH,
+  _VSCROLL,
+  _ERASEINPUT,
   _ARROW,
   _WAIT,
 
@@ -43,6 +45,7 @@ exports
   putSprite,
   putSpriteXOR,
   putText,
+  putChar,
   putTextC,
   invert,
   blank,
@@ -55,6 +58,7 @@ exports
   setCursorShapeAnchor,
   initCursor,
   setCursorPos,
+
 // interface
   nullProc,
   setZone,
@@ -70,6 +74,8 @@ exports
   addZoneVN,
   setCursorInZone,
   checkZones,
+  callZoneProc,
+  runInterface,
 
 // controls
   invertZone,
@@ -97,7 +103,8 @@ exports
   clearShortcutKey,
   addShortcutKey,
   initShortcutKeyboard,
-  checkShortcutKeyboard;
+  checkShortcutKeyboard,
+  callShortcutKeyboard;
 
 begin
   moduleInitialized:=0;

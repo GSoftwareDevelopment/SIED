@@ -5,5 +5,6 @@ var
   _IDISK    : Pointer                 absolute IDISK_ADDR;
   _IPATH    : Pointer                 absolute IPATH_ADDR;
   _VSCROLL  : Pointer                 absolute VSCROLL_ADDR;
+  _ERASEINPUT : Pointer               absolute ERASEINPUT_ADDR;
   _ARROW    : Pointer                 absolute CARROW_ADDR;
   _WAIT     : Pointer                 absolute CWAIT_ADDR;

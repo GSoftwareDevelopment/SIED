@@ -18,7 +18,8 @@ end;
 procedure initShortcutKeyboard();
 begin
   clearAllShortcutsKey();
-  AllowShortcutKeys:=true;
+  allowShortcutKeys:=true;
+  _callShortcutKeys:=$FF;
 end;
 
 procedure addShortcutKey(key:byte; prc:TKeyProc); register;
@@ -27,15 +28,55 @@ begin
   __SCKeyVec[key]:=prc;
 end;
 
-procedure checkShortcutKeyboard(); assembler;
+function checkShortcutKeyboard(mKey:Byte):Boolean; Assembler;
 asm
+  lda _callShortcutKeys
+  cmp #$FF
+  bne setTrue
+
+  lda #$FF
+  sta _callShortcutKeys
+  lda #false
+  sta Result
+
   lda allowShortcutKeys
-  beq xitSK
+  beq @exit
 
   lda KEYB
   cmp #$FF
-  beq xitSK
+  beq @exit
 
+  lda mKey
+  beq skipMod
+
+  lda KEYB
+  and mKey
+  beq @exit
+
+skipMod:
+  lda KEYB
+  and #$3F
+  clc
+  asl @
+  tay
+
+  lda adr.__SCKeyVec,y
+  cmp #<__noShortcurKey
+  bne setTrue
+  lda adr.__SCKeyVec+1,y
+  cmp #>__noShortcurKey
+  beq @exit
+
+setTrue:
+  lda KEYB
+  sta _callShortcutKeys
+  lda #true
+  sta result
+end;
+
+procedure callShortcutKeyboard(); assembler;
+asm
+  lda _callShortcutKeys
   and #%00111111   ; remove mod-keys (Control, Shift)
   asl @
   tay
@@ -45,20 +86,18 @@ asm
   lda adr.__SCKeyVec+1,y
   sta keyJump+1
 
-  // lda keyJump
-  // cmp #<main.__noShortcurKey
-  // bne jump
-  // lda keyJump+1
-  // cmp #>main.__noShortcurKey
-  // beq xitsk
+  lda #$FF
+  sta _callShortcutKeys
 
-jump:
   lda KEYB
   and #%11000000
-  jsr keyJump:main.__noShortcurKey
+  jsr keyJump:$FFFF
+
+  lda _callShortcutKeys
+  cmp #$FF
+  bne @+
 
   lda #$FF
   sta KEYB
-
-xitSK:
+@:
 end;

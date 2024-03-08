@@ -1,19 +1,6 @@
   txa:pha
 
-sptr = $fa
-
-  lda S
-  sta sptr
-  lda s+1
-  sta sptr+1
-
-// get text length
   clc
-  ldy #0
-  sty I
-  lda (sptr),y
-  sta tlen
-  inw sptr
 
 // putchar
 //  if activePage=1 then inc(y,56);
@@ -28,29 +15,23 @@ skPage:
   tay
 
 //  scr:=Pointer(YSCR[y]);
-  lda adr.YSCR,y
+  lda x
+  ror @
+  add adr.YSCR,y
   sta scr
   lda adr.YSCR+1,y
+  adc #0
   sta scr+1
 
 //
 // --
 //
-  clc
 lputchar:
-  lda I
-  cmp tlen:#00
-  bpl exPutText
-  tay
-  adc x
-  ror @
-  tax
-  inc I
-
-  lda (sptr),y      // get string char
-  and #$7f
-  tay
+  lda x
+  lsr @
+  ldy ch              // get string char
   lda adr._asc2int,y  // convert ATASCII to INTERNAL
+  and #$7f
   bcc skipSh
   ora #64
 skipSh:
@@ -62,8 +43,7 @@ skipSh:
   sta adr+1
 
 lsimple:
-  txa
-  tay
+  ldy #0
   ldx #0
 
 lln:
@@ -79,7 +59,6 @@ lbyte:
   inx
   cpx #5
   bne lln
-  beq lputchar  // always jymp
 
 exPutText:
   pla:tax

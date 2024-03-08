@@ -5,3 +5,4 @@ var
   _IDISK:Pointer external 'core';
   _IPATH:Pointer external 'core';
   _VSCROLL:Pointer external 'core';
+  _ERASEINPUT:Pointer external 'core';

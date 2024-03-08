@@ -79,4 +79,5 @@ var
   BRKKEY:Byte absolute $11;
 
   allowShortcutKeys:Boolean absolute $56;
+  _callShortcutKeys:Byte absolute $3F;
   __SCKeyVec:Array[0..63] of TKeyProc absolute SCKEYVEC_ADDR;
