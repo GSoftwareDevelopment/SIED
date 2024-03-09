@@ -53,55 +53,37 @@ End;
 
 procedure keyDevice();
 begin
-  asm
-    cmp #KMOD_CTRL
-    bne @exit
-  end;
+  if (KEYB<>$FF) and (KEYB and KMOD_CTRL=0) then exit;
   setCursorInZone(13); doDevice();
 end;
 
 procedure keyFileName();
 begin
-  asm
-    cmp #KMOD_CTRL
-    bne @exit
-  end;
+  if (KEYB<>$FF) and (KEYB and KMOD_CTRL=0) then exit;
   setCursorInZone(14); doFilename();
 end;
 
 procedure keyLoad();
 begin
-  asm
-    cmp #KMOD_CTRL
-    bne @exit
-  end;
+  if (KEYB<>$FF) and (KEYB and KMOD_CTRL=0) then exit;
   setCursorInZone(10);
 end;
 
 procedure keySave();
 begin
-  asm
-    cmp #KMOD_CTRL
-    bne @exit
-  end;
+  if (KEYB<>$FF) and (KEYB and KMOD_CTRL=0) then exit;
   setCursorInZone(9);
 end;
 
 procedure keyExport();
 begin
-  asm
-    cmp #KMOD_CTRL
-    bne @exit
-  end;
+  if (KEYB<>$FF) and (KEYB and KMOD_CTRL=0) then exit;
   setCursorInZone(11);
 end;
 
 procedure keyImport();
 begin
-  asm
-    cmp #KMOD_CTRL
-    bne @exit
-  end;
+  if (KEYB<>$FF) and (KEYB and KMOD_CTRL=0) then exit;
   setCursorInZone(12);
 end;
 
@@ -126,48 +108,45 @@ var
   czone:shortint;
 
 begin
-  asm sta modKey end; //
+  if (KEYB<>$FF) and (KEYB and (KMOD_CTRL+KMOD_SHIFT)<>0) then exit;
   KEYB:=KEYB and $3F;
-  if modKey=0 then  // only arrows
+  czone:=ozone;
+  if (czone<MIN) or (czone>MAX) then
+    setCursorInZone(MIN)
+  else
   begin
-    czone:=ozone;
-    if (czone<MIN) or (czone>MAX) then
-      setCursorInZone(MIN)
-    else
-    begin
-      case KEYB of
-        k_UP: if czone>MIN then
-                dec(czone)
-              else // page change
+    case KEYB of
+      k_UP: if czone>MIN then
+              dec(czone)
+            else // page change
+            if _mZoneActive[LISTZONE-1] then
+            begin
+              doPrevPageDir();
+              czone:=MAX; ozone:=-1;
+            end;
+      k_DOWN: if czone<MAX then
+                inc(czone)
+              else
+              if _mZoneActive[LISTZONE+MAXLISTITEMS] then
+              begin
+                doNextPageDir();
+                czone:=MIN; ozone:=-1;
+              end;
+      k_LEFT: if czone-5>=MIN then
+                dec(czone,STEP)
+              else
               if _mZoneActive[LISTZONE-1] then
               begin
-                doPrevPageDir();
-                czone:=MAX; ozone:=-1;
+                doPrevPageDir(); ozone:=-1;
               end;
-        k_DOWN: if czone<MAX then
-                  inc(czone)
-                else
-                if _mZoneActive[LISTZONE+MAXLISTITEMS] then
-                begin
-                  doNextPageDir();
-                  czone:=MIN; ozone:=-1;
-                end;
-        k_LEFT: if czone-5>=MIN then
-                  dec(czone,STEP)
-                else
-                if _mZoneActive[LISTZONE-1] then
-                begin
-                  doPrevPageDir(); ozone:=-1;
-                end;
-        k_RIGHT: if czone+5<=MAX then
-                  inc(czone,STEP)
-                else
-                if _mZoneActive[LISTZONE+MAXLISTITEMS] then
-                begin
-                  doNextPageDir(); ozone:=-1;
-                end;
-      end;
-      setCursorInZone(czone);
+      k_RIGHT: if czone+5<=MAX then
+                inc(czone,STEP)
+              else
+              if _mZoneActive[LISTZONE+MAXLISTITEMS] then
+              begin
+                doNextPageDir(); ozone:=-1;
+              end;
     end;
+    setCursorInZone(czone);
   end;
 end;

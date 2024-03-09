@@ -95,3 +95,13 @@ Zwraca `true`, jeśli strefa została naciśnięta.
 W zmiennej `szone`, po detekcji naciśnięcia, będzie znajdował się numer naciśniętej strefy, do momentu następnego wywołania funkcji.
 
 Obsługuje graficznie strefy panelu kontrolnego!
+
+### procedure callZoneProc();
+
+Wywołanie przypisanej procedury dla strefy.
+W zmiennej `szone` musi być umieszczony numer strefy
+
+### procedure runInterface();
+
+Wykonuje podstawowe operacje związane z pollingiem interfejsu.
+Nieskończona pętla interfejsu.

@@ -73,6 +73,7 @@ type
   TKeyProc = Procedure();
 
 var
+  SHFLOK:Byte absolute $2BE;
   KRPDEL:Byte absolute $2D9;
   KEYREP:Byte absolute $2DA;
   KEYB:Byte absolute $2FC;

@@ -1,5 +1,6 @@
 procedure doSearchPath();
 begin
+  // setStatus(HELP_BEFOREACTION);
   doInput(pathNameSearch);
   updateSearchField();
   refreshList();
@@ -43,35 +44,35 @@ var
 begin
 // check for exist name in list
   redrawList:=false; showPathList(0);
-  if foundItems<>0 then
+  if foundItems=0 then
   begin
-    setStatus(MSG_DUPLICATEDNAME);
-    exit;
-  end;
-// find first free
-  i:=0;
-  while (pathListPtr[i]<>pointer(0)) and (i<MAXPATHDEFINITIONS) do inc(i);
-  if (i=MAXPATHDEFINITIONS) then exit;
-  pathListPtr[i]:=pointer($a000);
-  p:=pointer(PATHNAMES_ADDR); n:=0;
-  while (n<>i) do
-  begin
-    if p^=0 then begin n:=-1; break; end;
-    inc(n);
-    inc(p,p^+1);
-  end;
-  if n=i then
-  begin
-    pathNamePtr[i]:=p;
-    ln:=byte(pathNameSearch[0])+1;
-    // move(p,pointer(word(p)+ln),$800-ln);
-    move(@pathNameSearch,p,ln);
-    listShift:=0; showPathList(0);
+  // find first free
+    i:=0;
+    while (pathListPtr[i]<>pointer(0)) and (i<MAXPATHDEFINITIONS) do inc(i);
+    if (i=MAXPATHDEFINITIONS) then exit;
+    pathListPtr[i]:=pointer($a000);
+    p:=pointer(PATHNAMES_ADDR); n:=0;
+    while (n<>i) do
+    begin
+      if p^=0 then begin n:=-1; break; end;
+      inc(n);
+      inc(p,p^+1);
+    end;
+    if n=i then
+    begin
+      pathNamePtr[i]:=p;
+      ln:=byte(pathNameSearch[0])+1;
+      // move(p,pointer(word(p)+ln),$800-ln);
+      move(@pathNameSearch,p,ln);
+      listShift:=0; showPathList(0);
+      p:=@MSG_NAMECREATED;
+    end
+    else
+      p:=@MSG_FULLLIST;
   end
   else
-  begin
-    setStatus(MSG_FULLLIST);
-  end;
+    p:=@MSG_DUPLICATEDNAME;
+  setStatus(p);
 end;
 
 procedure doEdit();
@@ -97,7 +98,7 @@ begin
   invert(_ACTIONX[curAction],_ACTIONY[curAction],_ACTIONH[curAction]-1,11);
   if pathNameSearch[0]=#0 then
   begin
-    setStatus(HELP_BEFOREACTION);
+
   end
   else
   begin
@@ -118,30 +119,36 @@ end;
 
 procedure keyName();
 begin
+  if (KEYB<>$FF) and (KEYB and KMOD_CTRL=0) then exit;
   toZone(14); keyb:=$FF; doSearchPath();
 end;
 
 procedure keyCreate();
 begin
+  if (KEYB<>$FF) and (KEYB and KMOD_CTRL=0) then exit;
   toZone(9); doSetAction();
 end;
 
 procedure keyEdit();
 begin
+  if (KEYB<>$FF) and (KEYB and KMOD_CTRL=0) then exit;
   toZone(10); doSetAction();
 end;
 
 procedure keyRename();
 begin
+  if (KEYB<>$FF) and (KEYB and KMOD_CTRL=0) then exit;
   toZone(11); doSetAction();
 end;
 
 procedure keySearch();
 begin
+  if (KEYB<>$FF) and (KEYB and KMOD_CTRL=0) then exit;
   toZone(12); doSetAction();
 end;
 
 procedure keyDelete();
 begin
+  if (KEYB<>$FF) and (KEYB and KMOD_CTRL=0) then exit;
   toZone(13); doSetAction();
 end;

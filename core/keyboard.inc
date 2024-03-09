@@ -89,8 +89,6 @@ asm
   lda #$FF
   sta _callShortcutKeys
 
-  lda KEYB
-  and #%11000000
   jsr keyJump:$FFFF
 
   lda _callShortcutKeys

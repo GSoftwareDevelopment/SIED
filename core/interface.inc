@@ -87,13 +87,17 @@ var
 begin
   if (ozone>=USER_ZONES_BEGIN) then
   begin
-    invertZone(ozone);
+    if _mZoneActive[ozone] then
+      invertZone(ozone);
     ozone:=-1;
   End;
   if (nzone>=USER_ZONES_BEGIN) then
   begin
-    invertZone(nzone);
-    ozone:=nzone;
+    if _mZoneActive[nzone] then
+    begin
+      invertZone(nzone);
+      ozone:=nzone;
+    end;
   End;
 End;
 

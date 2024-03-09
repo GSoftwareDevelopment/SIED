@@ -1,1 +1,0 @@
-procedure showPathEditor(); external 'pathed';

@@ -11,7 +11,9 @@ procedure refreshList();
 begin
   listShift:=0; showPathList(0);
   if foundItems=0 then
-    putText(14,27,MSG_NOTFOUND);
+    setStatus(MSG_NOTFOUND)
+  else
+    clearStatus();
 end;
 
 procedure addPathLabel(n:Byte; name:PString);
@@ -29,7 +31,7 @@ procedure blankList();
 begin
   for i:=0 to 4 do
   begin
-    blank(9,_LISTY[i],PATHNAMESIZE,5);
+    blank(8,_LISTY[i]-1,PATHNAMESIZE+1,6);
     clearZone(LISTZONE+i);
   end;
 end;
@@ -62,9 +64,6 @@ begin
     end;
     inc(n);
   end;
-  if redrawList then
-  begin
-    updateListScroll()
-  end;
+  if redrawList then updateListScroll();
   redrawList:=true;
 end;

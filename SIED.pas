@@ -52,6 +52,7 @@ var
 
 begin
   SDMACTL:=0; // turn off screen
+  NMIEN:=$00;
   // graphics init
   for i:=0 to 55 do YSCR[i]:=Pointer(SCREEN_ADDR+i*$10);
   for i:=0 to 47 do YSCR[56+i]:=Pointer(EDITOR_ADDR+i*20);
@@ -59,17 +60,16 @@ begin
   fillchar(Pointer(PMG_ADDR+$180),$E00,0); // clear PMG, SCREEN & EDITOR area at once
   ActivePage:=1;
   initCursor(@myVBL);
-  wait(1);
   Asm sei; End;
   setIntVec(iDLI,@myDLI);
-  NMIEN:=$C0;
   SDLST:=pointer(DLIST_ADDR);
   PFCOL0:=$EA; PFCOL1:=$00; PFCOL2:=$0F; PFCOL4:=$e0;
   // keyboard init
   KEYDEFP:=Pointer(SCAN2ASC_ADDR);
-  KRPDEL:=10; KEYREP:=3;
-  wait(1);
+  KRPDEL:=10; KEYREP:=2;
+  SHFLOK:=$00; // Shift & Control Lock are disabled
   Asm cli; End;
+  NMIEN:=$C0;
   wait(1);
   initShortcutKeyboard();
   // interface init

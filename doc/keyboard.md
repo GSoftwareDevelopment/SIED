@@ -79,6 +79,7 @@ type
   TKeyProc = Procedure();
 
 var
+  SHFLOK:Byte absolute $2BE;
   KRPDEL:Byte absolute $2D9;
   KEYREP:Byte absolute $2DA;
   KEYB:Byte absolute $2FC;
@@ -98,14 +99,17 @@ Czyści ustawienia dotyczące gorących klawiszy i włącza możliwość ich sto
 
 Przypisuje procedure `prc` do klawisza `key`
 
-### procedure checkShortcutKeyboard();
+
+### function checkShortcutKeyboard(mKey:Byte):Boolean;
 
 Funkcja pollingu dla gorących glawiszy.
-W przypadku wykrycia naciśnięcia klawisza, wykonuje skosk do przypisane klawiszowu procedury.
-Przed wykonaniem skoku w rejestrze akumulatora, umieszczana jest wartość klawiszy modyfikujących (Control, Shift).
-Kod klawisza można pobrać z rejestru KEYB.
+W przypadku wykrycia naciśnięcia klawisza, zwraca wartość `true`
+Parametr `mKey` jest maską filtru dla klawiszy modyfikujących (Control, Shift) Wartość `0` (zero) tego parametru "przepuszcza" każdy klawisz. Ustawiając `MOD_CTRL` i/lub `MOD_SHOFT` można wymusić działanie gorących klawiszy TYLKO z tymi modyfikatorami.
 
-Po wyjściu z procedury obsługi gorącego klawisza, rejestr KEYB jest ustawiany na `$FF`
+### procedure callShortcutKeyboard();
+
+Wykonuje skok do przypisanej gorącemu klawiszowi procedury, jeżeli ten, został wciśnięty.
+Po wyjściu z procedury obsługi gorącego klawisza, rejestr KEYB jest ustawiany na `$FF`.
 
 ### procedure clearAllShortcutsKey();
 

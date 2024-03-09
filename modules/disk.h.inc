@@ -1,1 +1,0 @@
-procedure showDiskDirectory(); external 'disk';

@@ -141,7 +141,7 @@ var
 
   procedure storeValue();
   begin
-    sEDIT:=value; move(value,sEDIT,ln+1);
+    move(value,sEDIT,ln+1);
   end;
 
 begin
