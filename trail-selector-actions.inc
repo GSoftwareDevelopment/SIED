@@ -128,30 +128,30 @@ end;
 
 procedure keyName(); Keep;
 begin
-  if (KEYB and (KMOD_CTRL+KMOD_SHIFT)<>(KMOD_CTRL)) then exit;
+  if (_modKey<>(KMOD_CTRL)) then exit;
   toZone(13); keyb:=$FF; doSearchPath();
 end;
 
 procedure keyCreate(); Keep;
 begin
-  if (KEYB and (KMOD_CTRL+KMOD_SHIFT)<>(KMOD_CTRL)) then exit;
+  if (_modKey<>(KMOD_CTRL)) then exit;
   toZone(9); doSetAction();
 end;
 
 procedure keyEdit(); Keep;
 begin
-  if (KEYB and (KMOD_CTRL+KMOD_SHIFT)<>(KMOD_CTRL)) then exit;
+  if (_modKey<>(KMOD_CTRL)) then exit;
   toZone(10); doSetAction();
 end;
 
 procedure keyRename(); Keep;
 begin
-  if (KEYB and (KMOD_CTRL+KMOD_SHIFT)<>(KMOD_CTRL)) then exit;
+  if (_modKey<>(KMOD_CTRL)) then exit;
   toZone(11); doSetAction();
 end;
 
 procedure keyDelete(); Keep;
 begin
-  if (KEYB and (KMOD_CTRL+KMOD_SHIFT)<>(KMOD_CTRL+KMOD_SHIFT)) then exit;
+  if (_modKey<>(KMOD_CTRL+KMOD_SHIFT)) then exit;
   toZone(12); doSetAction();
 end;

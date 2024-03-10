@@ -122,6 +122,8 @@ skipMod:
 setTrue:
   lda KEYB
   sta _callShortcutKeys
+  and #(KMOD_CTRL+KMOD_SHIFT)
+  sta _modKey
   lda #true
   sta result
 end;

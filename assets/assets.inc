@@ -7,5 +7,6 @@ var
   _ITRLED   : Pointer                 absolute ITRLED_ADDR;
   _VSCROLL  : Pointer                 absolute VSCROLL_ADDR;
   _ERASEINPUT : Pointer               absolute ERASEINPUT_ADDR;
+  _ISELECT4 : Pointer                 absolute ISELECT4_ADDR;
   _ARROW    : Pointer                 absolute CARROW_ADDR;
   _WAIT     : Pointer                 absolute CWAIT_ADDR;

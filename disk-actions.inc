@@ -53,37 +53,37 @@ End;
 
 procedure keyDevice(); Keep;
 begin
-  if (KEYB and (KMOD_CTRL+KMOD_SHIFT)<>KMOD_CTRL) then exit;
+  if _modKey<>KMOD_CTRL then exit;
   setCursorInZone(13); doDevice();
 end;
 
 procedure keyFileName(); Keep;
 begin
-  if (KEYB and (KMOD_CTRL+KMOD_SHIFT)<>KMOD_CTRL) then exit;
+  if _modKey<>KMOD_CTRL then exit;
   setCursorInZone(14); doFilename();
 end;
 
 procedure keyLoad(); Keep;
 begin
-  if (KEYB and (KMOD_CTRL+KMOD_SHIFT)<>KMOD_CTRL) then exit;
+  if _modKey<>KMOD_CTRL then exit;
   setCursorInZone(10);
 end;
 
 procedure keySave(); Keep;
 begin
-  if (KEYB and (KMOD_CTRL+KMOD_SHIFT)<>KMOD_CTRL) then exit;
+  if _modKey<>KMOD_CTRL then exit;
   setCursorInZone(9);
 end;
 
 procedure keyExport(); Keep;
 begin
-  if (KEYB and (KMOD_CTRL+KMOD_SHIFT)<>KMOD_CTRL) then exit;
+  if _modKey<>KMOD_CTRL then exit;
   setCursorInZone(11);
 end;
 
 procedure keyImport(); Keep;
 begin
-  if (KEYB and (KMOD_CTRL+KMOD_SHIFT)<>KMOD_CTRL) then exit;
+  if _modKey<>KMOD_CTRL then exit;
   setCursorInZone(12);
 end;
 
@@ -108,7 +108,7 @@ var
   czone:shortint;
 
 begin
-  if (KEYB and (KMOD_CTRL+KMOD_SHIFT)<>0) then exit;
+  if _modKey<>0 then exit;
   KEYB:=KEYB and $3F;
   czone:=ozone;
   if (czone<MIN) or (czone>MAX) then

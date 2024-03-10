@@ -38,6 +38,7 @@ exports
   _ITRLED,
   _VSCROLL,
   _ERASEINPUT,
+  _ISELECT4,
   _ARROW,
   _WAIT,
 
@@ -100,6 +101,7 @@ exports
 
 // keyboard
   __SCKeyVec,
+  _modKey,
   clearAllShortcutsKey,
   clearShortcutKey,
   addShortcutKey,

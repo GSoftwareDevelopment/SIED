@@ -65,8 +65,6 @@ begin
   registerShortcutKeys(@shortKeys,12);
   setScreenWidth(20);
   fillchar(YSCR[56+8]+4,16,$FF);
-  fillchar(Pointer(PMG_ADDR+$300+23),50,$FF);
-  HPOSP[2]:=44; PCOL[2]:=$E6; SIZEP[2]:=%11;
   putImage(_IDISK,0,0,3,48);
   putImage(_VSCROLL,19,11,1,3);
   putImage(_VSCROLL+2,19,44,1,3);
@@ -103,6 +101,8 @@ begin
     fn:='NONAME';
     moduleInitialized:=moduleInitialized or $1;
   end;
+  fillchar(Pointer(PMG_ADDR+$300+23),50,$FF);
+  HPOSP[2]:=44; PCOL[2]:=$E6; SIZEP[2]:=%11;
   clearAllShortcutsKey();
   showDiskDirectory();
   asm

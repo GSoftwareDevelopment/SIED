@@ -18,8 +18,9 @@ ITRLSEL_ADDR        = ASSETS_ADDR   +  46;  // tray icons for trail-selector mod
 ITRLED_ADDR         = ASSETS_ADDR   +  48;  // tray icons for trail-editor module
 VSCROLL_ADDR        = ASSETS_ADDR   +  50;
 ERASEINPUT_ADDR     = ASSETS_ADDR   +  52;
-CARROW_ADDR         = ASSETS_ADDR   +  54;
-CWAIT_ADDR          = ASSETS_ADDR   +  56;
+ISELECT4_ADDR       = ASSETS_ADDR   +  54;
+CARROW_ADDR         = ASSETS_ADDR   +  56;
+CWAIT_ADDR          = ASSETS_ADDR   +  58;
 
 MODULE_ADDR         = $4000;                // module base address
 

@@ -25,19 +25,19 @@ end;
 
 procedure keyDisk(); Keep;
 begin
-  if (KEYB and (KMOD_CTRL+KMOD_SHIFT)<>(KMOD_CTRL+KMOD_SHIFT)) then exit;
+  if _modKey<>(KMOD_CTRL+KMOD_SHIFT) then exit;
   toZone(0); setModule();
 end;
 
 procedure keyTrailEd();Keep;
 begin
-  if (KEYB and (KMOD_CTRL+KMOD_SHIFT)<>(KMOD_CTRL+KMOD_SHIFT)) then exit;
+  if _modKey<>(KMOD_CTRL+KMOD_SHIFT) then exit;
   toZone(1); setModule();
 end;
 
 procedure keyScenarioEd();Keep;
 begin
-  if (KEYB and (KMOD_CTRL+KMOD_SHIFT)<>(KMOD_CTRL+KMOD_SHIFT)) then exit;
+  if _modKey<>(KMOD_CTRL+KMOD_SHIFT) then exit;
   toZone(2); setModule();
 end;
 
@@ -53,11 +53,10 @@ begin
   if szone=curModule then exit;
   curModule:=szone;
 
-  // for i:=3 to 9 do clearZone(i);
   _mzoneActive[0]:=true;
   _mzoneActive[1]:=true;
   _mzoneActive[2]:=true;
-  fillchar(YSCR[56+48],600,0);
+  fillchar(YSCR[56+48],800,0);
   HPOSP[2]:=0;
   setIcon(szone);
   clearStatus();
@@ -67,10 +66,10 @@ begin
   _mzoneActive[1]:=(szone<>1);
   _mzoneActive[2]:=(szone<>2);
   case szone of
-    0:begin loadModule('D:DISK.LIB'); end;
-    1:begin loadModule('D:TRAIL.LIB'); end;
-    2:begin loadModule('D:SCENED.LIB'); end;
-   -1:begin loadModule('D:ABOUT.LIB'); end;
+    0: loadModule('D:DISK.LIB');
+    1: loadModule('D:TRAIL.LIB');
+    2: loadModule('D:SCENED.LIB');
+   -1: loadModule('D:ABOUT.LIB');
   end;
   registerShortcutKeys(@shortKeys,3);
 End;
@@ -90,6 +89,4 @@ begin
   addZoneHN(8,@nullProc);                   // delete
 
   szone:=-1; setModule();
-  for i:=56+48+16 to 56+48+18 do fillchar(Pointer(word(YSCR[i])+8),32,%01010101);
-  putTextC(0,63,'00:00.00');
 End;

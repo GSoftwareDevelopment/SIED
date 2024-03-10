@@ -47,9 +47,12 @@ begin
   begin
     fillchar(pointer(PATHLISTV_ADDR),$1000,$00); // clear pathListPtr, pathNamePtr, pathNames
     pathListPtr[0]:=pointer($A000);
+    pathNameSearch:='TEST_PATH'; doCreate();
     moduleInitialized:=moduleInitialized or $2;
   end;
   redrawList:=true; curAction:=-1;
+  fillchar(Pointer(PMG_ADDR+$300+23),50,$FF);
+  HPOSP[2]:=44; PCOL[2]:=$E6; SIZEP[2]:=%11;
   clearAllShortcutsKey();
   showTrailSelector();
   asm
