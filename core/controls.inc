@@ -63,13 +63,23 @@ begin
 End;
 
 procedure setControls(s:Byte);
+var
+  b:Byte;
+
 begin
-  _mzoneActive[3]:=(s and 1<>0);  // prev
-  _mzoneActive[4]:=(s and 2<>0);  // play
-  _mzoneActive[5]:=(s and 4<>0);  // stop
-  _mzoneActive[6]:=(s and 8<>0);  // next
-  _mzoneActive[7]:=(s and 16<>0); // insert
-  _mzoneActive[8]:=(s and 32<>0); // delete
+  b:=1;
+  for i:=3 to 8 do
+  begin
+    _mzoneActive[i]:=(s and b)<>0;
+    _mZoneProc[i]:=@nullProc;
+    b:=b shl 1;
+  end;
+  // _mzoneActive[3]:=(s and 1<>0);  // prev
+  // _mzoneActive[4]:=(s and 2<>0);  // play
+  // _mzoneActive[5]:=(s and 4<>0);  // stop
+  // _mzoneActive[6]:=(s and 8<>0);  // next
+  // _mzoneActive[7]:=(s and 16<>0); // insert
+  // _mzoneActive[8]:=(s and 32<>0); // delete
 End;
 
 procedure setControl(n:Shortint);
@@ -175,8 +185,14 @@ begin
         End;
         K_RETURN:
         begin
-          storeValue();
-          result:=_zone; break;
+          if value<>sEDIT then
+          begin
+            storeValue();
+            result:=_zone;
+          end
+          else
+            result:=_zone or 64;
+          break;
         End;
         KMOD_CTRL+K_LEFT: if cx>0 then dec(cx);
         KMOD_CTRL+K_RIGHT: if cx<ln then inc(cx);
@@ -208,7 +224,7 @@ begin
     if (mbutton<>MBUT_NONE) or (_callShortcutKeys<>$FF) then
     begin
       if isCrs then drawCursor(isCrs);
-      storeValue(); result:=-_zone;
+      storeValue(); result:=_zone xor $FF;
       break;
     End;
   until (false);

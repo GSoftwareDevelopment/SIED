@@ -28,6 +28,58 @@ begin
   __SCKeyVec[key]:=prc;
 end;
 
+procedure registerShortcutKeys(SCList:Pointer; count:Byte); register; assembler;
+asm
+  txa:pha
+  ldy #0
+lreg:
+  lda count
+  beq xit
+  lda (SCList),y  ; get key
+  and #$3F
+  asl @
+  tax
+  iny
+  lda (SCList),y  ; get LSB of address
+  sta adr.__SCKeyVec,x
+  iny
+  lda (SCList),y  ; get MSB of address
+  sta adr.__SCKeyVec+1,x
+  iny
+  dec count
+  jmp lreg
+
+xit:
+  pla:tax
+end;
+
+procedure unregisterShortcutKeys(SCList:Pointer; count:Byte); register; assembler;
+asm
+  txa:pha
+  ldy #0
+lreg:
+  lda count
+  beq xit
+  lda (SCList),y  ; get key
+  and #$3F
+  asl @
+  tax
+  iny
+  lda #<__noShortcurKey  ; get LSB of address
+  sta adr.__SCKeyVec,x
+  iny
+  lda #>__noShortcurKey  ; get MSB of address
+  sta adr.__SCKeyVec+1,x
+  iny
+  dec count
+  jmp lreg
+
+xit:
+  pla:tax
+end;
+
+//
+
 function checkShortcutKeyboard(mKey:Byte):Boolean; Assembler;
 asm
   lda _callShortcutKeys

@@ -19,17 +19,34 @@ const
 
 procedure showScenarioEditor();
 begin
-   addZoneN(3,1,YCONTROLS,3,7,@nullProc);  // previous
-  addZoneHN(4,@nullProc);  // play
-  addZoneHN(5,@nullProc);  // stop
-  addZoneHN(6,@nullProc);  // next
+  //  addZoneN(3,1,YCONTROLS,3,7,@nullProc);  // previous
+  // addZoneHN(4,@nullProc);  // play
+  // addZoneHN(5,@nullProc);  // stop
+  // addZoneHN(6,@nullProc);  // next
 
-   addZoneN(7,15,YCONTROLS,3,7,@nullProc);  // insert
-  addZoneHN(8,@nullProc);  // delete
+  //  addZoneN(7,15,YCONTROLS,3,7,@nullProc);  // insert
+  // addZoneHN(8,@nullProc);  // delete
+  setControls(%111111); // all controls
   setControl(-1);
 End;
 
-exports
-  showScenarioEditor;
+var
+  moduleInitialized:Byte absolute $62;
 
+begin
+  asm
+    lda PORTB
+    pha
+    and #$FE
+    sta PORTB
+  end;
+  if (moduleInitialized and $4=0) then
+  begin
+    moduleInitialized:=moduleInitialized or $4;
+  end;
+  showScenarioEditor();
+  asm
+    pla
+    sta PORTB
+  end;
 end.

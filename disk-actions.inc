@@ -14,7 +14,7 @@ begin
   doInput(fn);
 End;
 
-procedure doChoiceFile();
+procedure doChoiceFile(); Keep;
 var
   zone:shortint absolute $3e;
 
@@ -31,7 +31,7 @@ begin
   End;
 End;
 
-procedure doEraseFileName();
+procedure doEraseFileName(); Keep;
 begin
   fn:=''; updateFileNameField();
   szone:=14; doFilename();
@@ -51,53 +51,53 @@ End;
 
 //
 
-procedure keyDevice();
+procedure keyDevice(); Keep;
 begin
-  if (KEYB<>$FF) and (KEYB and KMOD_CTRL=0) then exit;
+  if (KEYB and (KMOD_CTRL+KMOD_SHIFT)<>KMOD_CTRL) then exit;
   setCursorInZone(13); doDevice();
 end;
 
-procedure keyFileName();
+procedure keyFileName(); Keep;
 begin
-  if (KEYB<>$FF) and (KEYB and KMOD_CTRL=0) then exit;
+  if (KEYB and (KMOD_CTRL+KMOD_SHIFT)<>KMOD_CTRL) then exit;
   setCursorInZone(14); doFilename();
 end;
 
-procedure keyLoad();
+procedure keyLoad(); Keep;
 begin
-  if (KEYB<>$FF) and (KEYB and KMOD_CTRL=0) then exit;
+  if (KEYB and (KMOD_CTRL+KMOD_SHIFT)<>KMOD_CTRL) then exit;
   setCursorInZone(10);
 end;
 
-procedure keySave();
+procedure keySave(); Keep;
 begin
-  if (KEYB<>$FF) and (KEYB and KMOD_CTRL=0) then exit;
+  if (KEYB and (KMOD_CTRL+KMOD_SHIFT)<>KMOD_CTRL) then exit;
   setCursorInZone(9);
 end;
 
-procedure keyExport();
+procedure keyExport(); Keep;
 begin
-  if (KEYB<>$FF) and (KEYB and KMOD_CTRL=0) then exit;
+  if (KEYB and (KMOD_CTRL+KMOD_SHIFT)<>KMOD_CTRL) then exit;
   setCursorInZone(11);
 end;
 
-procedure keyImport();
+procedure keyImport(); Keep;
 begin
-  if (KEYB<>$FF) and (KEYB and KMOD_CTRL=0) then exit;
+  if (KEYB and (KMOD_CTRL+KMOD_SHIFT)<>KMOD_CTRL) then exit;
   setCursorInZone(12);
 end;
 
-procedure keyPrevPageDir();
+procedure keyPrevPageDir(); Keep;
 begin
   setCursorInZone(LISTZONE-1); doPrevPageDir();
 end;
 
-procedure keyNextPageDir();
+procedure keyNextPageDir(); Keep;
 begin
   setCursorInZone(LISTZONE+MAXLISTITEMS); doNextPageDir();
 end;
 
-procedure keySelectFile();
+procedure keySelectFile(); Keep;
 const
   MIN=LISTZONE;
   MAX=LISTZONE+MAXLISTITEMS-1;
@@ -108,7 +108,7 @@ var
   czone:shortint;
 
 begin
-  if (KEYB<>$FF) and (KEYB and (KMOD_CTRL+KMOD_SHIFT)<>0) then exit;
+  if (KEYB and (KMOD_CTRL+KMOD_SHIFT)<>0) then exit;
   KEYB:=KEYB and $3F;
   czone:=ozone;
   if (czone<MIN) or (czone>MAX) then

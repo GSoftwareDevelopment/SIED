@@ -3,7 +3,8 @@ var
   _ICONS    : Array[0.. 8] of Pointer absolute ICONS_ADDR;
   _ICARD    : Pointer                 absolute ICARD_ADDR;
   _IDISK    : Pointer                 absolute IDISK_ADDR;
-  _IPATH    : Pointer                 absolute IPATH_ADDR;
+  _ITRLSEL  : Pointer                 absolute ITRLSEL_ADDR;
+  _ITRLED   : Pointer                 absolute ITRLED_ADDR;
   _VSCROLL  : Pointer                 absolute VSCROLL_ADDR;
   _ERASEINPUT : Pointer               absolute ERASEINPUT_ADDR;
   _ARROW    : Pointer                 absolute CARROW_ADDR;

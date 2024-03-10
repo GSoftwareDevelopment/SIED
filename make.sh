@@ -95,8 +95,8 @@ validChanges "about*.*"
 validChanges "disk*.*"
 [[ $? = 1 || $CORE = 1 ]] && ./mpc buildlib disk.pas -define:DISABLEIOCBCOPY
 
-validChanges "pathed*.*"
-[[ $? = 1 || $CORE = 1 ]] && ./mpc buildlib pathed.pas -define:DISABLEIOCBCOPY
+validChanges "trail*.*"
+[[ $? = 1 || $CORE = 1 ]] && ./mpc buildlib trail.pas -define:DISABLEIOCBCOPY
 
 validChanges "scened*.*"
 [[ $? = 1 || $CORE = 1 ]] && ./mpc buildlib scened.pas -define:DISABLEIOCBCOPY
@@ -105,5 +105,12 @@ validChanges "scened*.*"
 
 if [ $BUILDDISK = 1 ]; then
 echo "- Build disk image..."
-
+cd tools
+cp mydos450.atr sied.atr
+./atr sied.atr put ../bin/SIED.com AUTORUN.SYS
+./atr sied.atr put ../bin/about.lib ABOUT.LIB
+./atr sied.atr put ../bin/disk.lib DISK.LIB
+./atr sied.atr put ../bin/trail.lib TRAIL.LIB
+./atr sied.atr put ../bin/scened.lib SCENED.LIB
+cd ..
 fi

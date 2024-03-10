@@ -99,12 +99,24 @@ Czyści ustawienia dotyczące gorących klawiszy i włącza możliwość ich sto
 
 Przypisuje procedure `prc` do klawisza `key`
 
-
 ### function checkShortcutKeyboard(mKey:Byte):Boolean;
 
 Funkcja pollingu dla gorących glawiszy.
 W przypadku wykrycia naciśnięcia klawisza, zwraca wartość `true`
 Parametr `mKey` jest maską filtru dla klawiszy modyfikujących (Control, Shift) Wartość `0` (zero) tego parametru "przepuszcza" każdy klawisz. Ustawiając `MOD_CTRL` i/lub `MOD_SHOFT` można wymusić działanie gorących klawiszy TYLKO z tymi modyfikatorami.
+
+### procedure registerShortcutKeys(SCList:Pointer; count:Byte); register;
+
+Rejestruje tablicę `SCList` gorących klawiszy. Ilość elementów tablicy określa zmienna `count`
+Tablica zawiera dwa pola:
+- (byte) określający kod klawisza (bez modyfikatorów)
+- (pointer) określający procedurę do wywołania
+
+### procedure unregisterShortcutKeys(SCList:Pointer; count:Byte); register;
+
+Dokonuje wyrejestrowania gorących klawiszy, zgodnie z tablicą `SCList`.
+Parametr `count` określi ilość elementów tablicy.
+Konstrukcja tabliy jest taka sama jak dla `registerShortcutKeys`.
 
 ### procedure callShortcutKeyboard();
 

@@ -70,6 +70,9 @@ Zwraca numer strefy, jaki został przypisany dla elementu, lub -1, gdy nie było
 Akcja edycji pola tekstowego.
 Musi być wywołana z procedury przekazanej przez `addInput` jako zdarzenie `prc`.
 Zwraca następujące wartości:
--2, gdy pole zostało opuszczone przez kliknięcie w inną strefę
--1, gdy został naciśnięty klawisz ESC
-0..31, a dokładniej numer strefy, jaki został przypisany elementowi, gdy został naciśnięty RETURN
+-128, gdy został naciśnięty klawisz ESC
+0..31, a dokładniej numer strefy, jaki został przypisany polu wprowadzania, gdy został naciśnięty RETURN
+0..31 (+64), jak powyżej, tylko nie ma zmian w wartości pola
+-1..-32, gdy pole zostało opuszczone przez kliknięcie w inną strefę - zwraca ujemny numer strefy pola wprowadzania; operacja XOR $FF zwróci właściwy jej numer - lub, gdy został naciśnięty gorący klawisz
+
+Funkcja zezwala na gorące klawisze, ale TYLKO z modyfikatorami `MOD_CTRL` i/lub `MOD_SHIFT`

@@ -44,20 +44,25 @@ procedure updateFileNameField(); Forward;
 {$I 'disk-actions.inc'}
 {$I 'disk-controls.inc'}
 
+procedure shortKeys(); assembler;
+asm
+  dta k_D,a(MAIN.keyDevice)
+  dta k_F,a(MAIN.keyFileName)
+  dta k_L,a(MAIN.keyLoad)
+  dta k_S,a(MAIN.keySave)
+  dta k_E,a(MAIN.keyExport)
+  dta k_I,a(MAIN.keyImport)
+  dta k_UP,a(MAIN.keySelectFile)
+  dta k_DOWN,a(MAIN.keySelectFile)
+  dta k_LEFT,a(MAIN.keySelectFile)
+  dta k_RIGHT,a(MAIN.keySelectFile)
+  dta k_CLEAR,a(MAIN.doEraseFileName)
+  dta k_RETURN,a(MAIN.doChoiceFile)
+end;
+
 procedure showDiskDirectory();
 begin
-  addShortcutKey(k_D,@keyDevice);
-  addShortcutKey(k_F,@keyFileName);
-  addShortcutKey(k_L,@keyLoad);
-  addShortcutKey(k_S,@keySave);
-  addShortcutKey(k_E,@keyExport);
-  addShortcutKey(k_I,@keyImport);
-  addShortcutKey(k_UP,@keySelectFile);
-  addShortcutKey(k_DOWN,@keySelectFile);
-  addShortcutKey(k_LEFT,@keySelectFile);
-  addShortcutKey(k_RIGHT,@keySelectFile);
-  addShortcutKey(k_CLEAR,@doEraseFileName);
-  addShortcutKey(k_RETURN,@doChoiceFile);
+  registerShortcutKeys(@shortKeys,12);
   setScreenWidth(20);
   fillchar(YSCR[56+8]+4,16,$FF);
   fillchar(Pointer(PMG_ADDR+$300+23),50,$FF);
@@ -81,17 +86,27 @@ begin
   startDirectory();
 End;
 
-exports showDiskDirectory;
-
 var
   moduleInitialized:Byte absolute $62;
 
 begin
+  asm
+    lda PORTB
+    pha
+    and #$FE
+    sta PORTB
+  end;
   if (moduleInitialized and $1=0) then
   begin
     filemask:='*.*'#$9B;
     dev:='D:';
     fn:='NONAME';
     moduleInitialized:=moduleInitialized or $1;
+  end;
+  clearAllShortcutsKey();
+  showDiskDirectory();
+  asm
+    pla
+    sta PORTB
   end;
 end.

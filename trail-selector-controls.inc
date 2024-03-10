@@ -44,23 +44,24 @@ end;
 
 procedure showPathList(n:byte);
 var
-  entry:pointer;
   name:PString;
+  p:PByte;
 
 begin
   if redrawList then blankList();
   foundItems:=0;
+  p:=pointer(PATHNAMES_ADDR);
   while (n<MAXPATHDEFINITIONS) and (i<=5) do
   begin
-    entry:=pathListPtr[n];
-    if entry<>pointer(0) then
+    if p^>0 then
     begin
-      name:=pathNamePtr[n];
+      name:=PString(p);
       if (pathNameSearch[0]=#0) or (findText(pathNameSearch,name)>0) then
       begin
         if redrawList and (foundItems<5) then addPathLabel(foundItems,name);
         inc(foundItems);
       end;
+      inc(p,p^+1);
     end;
     inc(n);
   end;

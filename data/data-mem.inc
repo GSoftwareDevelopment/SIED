@@ -14,11 +14,12 @@ CONTROLS_ADDR       = ASSETS_ADDR   +   0;  // time controls
 ICONS_ADDR          = ASSETS_ADDR   +  24;  // module icons
 ICARD_ADDR          = ASSETS_ADDR   +  42;  // selected module background
 IDISK_ADDR          = ASSETS_ADDR   +  44;  // tray icons for disk module
-IPATH_ADDR          = ASSETS_ADDR   +  46;  // tray icons for path module
-VSCROLL_ADDR        = ASSETS_ADDR   +  48;
-ERASEINPUT_ADDR     = ASSETS_ADDR   +  50;
-CARROW_ADDR         = ASSETS_ADDR   +  52;
-CWAIT_ADDR          = ASSETS_ADDR   +  54;
+ITRLSEL_ADDR        = ASSETS_ADDR   +  46;  // tray icons for trail-selector module
+ITRLED_ADDR         = ASSETS_ADDR   +  48;  // tray icons for trail-editor module
+VSCROLL_ADDR        = ASSETS_ADDR   +  50;
+ERASEINPUT_ADDR     = ASSETS_ADDR   +  52;
+CARROW_ADDR         = ASSETS_ADDR   +  54;
+CWAIT_ADDR          = ASSETS_ADDR   +  56;
 
 MODULE_ADDR         = $4000;                // module base address
 
@@ -30,4 +31,5 @@ PATHNAMES_ADDR      = $C200;                // Address of path names table
 
 SCREEN_LINES_ADDR   = $D800;                // table of screen lines addresses
 SCKEYVEC_ADDR       = $D900;                // shortcur keyboard vectors
-CORE_LIB            = $DA00;                // core library base address
+IZONE_ADDR          = $DA00;
+CORE_LIB            = $DB00;                // core library base address

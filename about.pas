@@ -20,7 +20,16 @@ begin
   setStatus({$I %DATE%});
 End;
 
-exports
-  showAbout;
-
+begin
+  asm
+    lda PORTB
+    pha
+    and #$FE
+    sta PORTB
+  end;
+  showAbout();
+  asm
+    pla
+    sta PORTB
+  end;
 end.

@@ -1,7 +1,7 @@
 // {$define BASICOFF}
 // {$define ROMOFF}
 // {$define NOROMFONT}
-library core:$da00;
+library core:$DB00;
 
 const
 {$I '../data/data-mem.inc'}
@@ -34,7 +34,8 @@ exports
   _ICONS,
   _ICARD,
   _IDISK,
-  _IPATH,
+  _ITRLSEL,
+  _ITRLED,
   _VSCROLL,
   _ERASEINPUT,
   _ARROW,
@@ -103,6 +104,8 @@ exports
   clearShortcutKey,
   addShortcutKey,
   initShortcutKeyboard,
+  registerShortcutKeys,
+  unregisterShortcutKeys,
   checkShortcutKeyboard,
   callShortcutKeyboard;
 

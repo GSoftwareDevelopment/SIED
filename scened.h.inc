@@ -1,1 +1,0 @@
-procedure showScenarioEditor(); external 'scened';
