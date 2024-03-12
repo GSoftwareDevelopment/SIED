@@ -2,11 +2,9 @@ var
   _CONTROLS : Array[0..11] of Pointer absolute CONTROLS_ADDR;
   _ICONS    : Array[0.. 8] of Pointer absolute ICONS_ADDR;
   _ICARD    : Pointer                 absolute ICARD_ADDR;
-  _IDISK    : Pointer                 absolute IDISK_ADDR;
-  _ITRLSEL  : Pointer                 absolute ITRLSEL_ADDR;
-  _ITRLED   : Pointer                 absolute ITRLED_ADDR;
   _VSCROLL  : Pointer                 absolute VSCROLL_ADDR;
   _ERASEINPUT : Pointer               absolute ERASEINPUT_ADDR;
-  _ISELECT4 : Pointer                 absolute ISELECT4_ADDR;
+  _RADIOBUT : Pointer                 absolute RADIOBUT_ADDR;
   _ARROW    : Pointer                 absolute CARROW_ADDR;
   _WAIT     : Pointer                 absolute CWAIT_ADDR;
+  _CROSS    : Pointer                 absolute CCROSS_ADDR;

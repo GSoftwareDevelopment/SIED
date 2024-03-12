@@ -31,7 +31,7 @@ errorlog() {
 			cat ${TEMPLOG} | grep $1 >> $GREPLOG
 			;;
 		full-log)
-			cat ${TEMPLOG} >> $GREPLOG
+			cat ${TEMPLOG} | grep -v "Note:" >> $GREPLOG >> $GREPLOG
 			;;
 		*)
 			;;

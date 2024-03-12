@@ -20,6 +20,11 @@ const
 {$I 'core/utils.h.inc'}
 
 const
+
+  _IDISK:Array of byte = [
+    $00,$00,$00,$00,$FF,$C0,$00,$81,$C0,$08,$81,$80,$0C,$FF,$C0,$0E,$F3,$C0,$0C,$FF,$C0,$08,$F3,$C0,$00,$F3,$C0,$00,$F3,$C0,$00,$FF,$C0,$00,$00,$00,$00,$00,$00,$07,$FE,$00,$04,$0E,$00,$04,$0C,$80,$07,$FE,$C0,$07,$9E,$E0,$07,$FE,$C0,$07,$9E,$80,$07,$9E,$00,$07,$9E,$00,$07,$FE,$00,$00,$00,$00,$00,$00,$00,$00,$80,$00,$01,$D7,$80,$00,$F7,$80,$00,$77,$80,$00,$F7,$80,$00,$07,$80,$00,$7F,$80,$00,$7F,$80,$00,$40,$80,$00,$3F,$00,$00,$00,$00,$00,$00,$00,$00,$0F,$00,$01,$E7,$00,$01,$CF,$00,$01,$DD,$00,$01,$C8,$00,$01,$E2,$00,$01,$FE,$00,$01,$FE,$00,$01,$02,$00,$00,$FC,$00,$00,$00,$00
+  ];
+
   MAXLISTITEMS = 10;
   LISTZONE = 16;
   ITEMSIZE = 14;
@@ -65,7 +70,7 @@ begin
   registerShortcutKeys(@shortKeys,12);
   setScreenWidth(20);
   fillchar(YSCR[56+8]+4,16,$FF);
-  putImage(_IDISK,0,0,3,48);
+  putImage(@_IDISK,0,0,3,48);
   putImage(_VSCROLL,19,11,1,3);
   putImage(_VSCROLL+2,19,44,1,3);
   putImage(_ERASEINPUT,19,1,1,5);
@@ -102,7 +107,7 @@ begin
     moduleInitialized:=moduleInitialized or $1;
   end;
   fillchar(Pointer(PMG_ADDR+$300+23),50,$FF);
-  HPOSP[2]:=44; PCOL[2]:=$E6; SIZEP[2]:=%11;
+  HPOSP[2]:=44; PCOL[2]:=$E4; SIZEP[2]:=%11;
   clearAllShortcutsKey();
   showDiskDirectory();
   asm

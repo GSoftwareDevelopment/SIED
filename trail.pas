@@ -17,13 +17,13 @@ const
 {$I 'core/utils.h.inc'}
 
 const
-  MAXPATHDEFINITIONS  = 64;
   PATHNAMESIZE  = 28;
 
 var
-  pathListPtr:Array[0..MAXPATHDEFINITIONS] of pointer absolute PATHLISTV_ADDR;
-  pathNamePtr:Array[0..MAXPATHDEFINITIONS] of pointer absolute PATHNAMEV_ADDR;
-  pathNames:Array[0..0] of char absolute PATHNAMES_ADDR;
+  pathListPtr:Array[0..MAXPATHDEFINITIONS] of pointer    absolute PATHLISTV_ADDR;
+  pathNamePtr:Array[0..MAXPATHDEFINITIONS-1] of pointer  absolute PATHNAMEV_ADDR;
+  pathStartPointX:Array[0..MAXPATHDEFINITIONS-1] of byte absolute PATHSTARTX_ADDR;
+  pathStartPointY:Array[0..MAXPATHDEFINITIONS-1] of byte absolute PATHSTARTY_ADDR;
   pathNameSearch:String[PATHNAMESIZE];
 
 procedure showTrailEditor(); forward;
@@ -51,8 +51,11 @@ begin
     moduleInitialized:=moduleInitialized or $2;
   end;
   redrawList:=true; curAction:=-1;
+  fillchar(Pointer(PMG_ADDR+$180+24),48,$F0);
   fillchar(Pointer(PMG_ADDR+$300+23),50,$FF);
-  HPOSP[2]:=44; PCOL[2]:=$E6; SIZEP[2]:=%11;
+  PCOL[2]:=$E4; PCOL[3]:=$E4;
+  SIZEP[2]:=%11; SIZEM:=%11110000;
+  HPOSP[2]:=44; // icon tray
   clearAllShortcutsKey();
   showTrailSelector();
   asm

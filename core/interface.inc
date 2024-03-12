@@ -3,7 +3,11 @@
 var
   __x,__y,__w,__h:Byte;
 
-procedure nullProc(); Begin End;
+procedure nullProc(); Assembler;
+Asm
+  lda #true
+  sta __invertZone
+End;
 
 procedure setZone(n:Shortint; act:Boolean; x,y,w,h:Byte; prc:TZoneProc);
 begin
@@ -13,6 +17,7 @@ begin
   _mzoneX2[n]:=x+w-1; __w:=w;
   _mzoneY2[n]:=y+h-1; __h:=h;
   _mzonePROC[n]:=prc;
+  _mzoneInPROC[n]:=@nullProc;
 End;
 
 procedure clearZone(n:Byte);
@@ -24,6 +29,7 @@ begin
   _mzoneY1[n]:=255;
   _mzoneY2[n]:=255;
   _mzonePROC[n]:=@nullProc;
+  _mzoneInPROC[n]:=@nullProc;
 End;
 
 procedure clearWorkZones();
@@ -80,31 +86,40 @@ begin
   result:=addZoneN(n,__x,__y+__h,__w,__h,prc);
 End;
 
-procedure refreshZone();
-var
-  nzone:Shortint absolute $57;
+procedure callInZone(n:Byte); assembler;
+asm
+  asl @
+  tay
+  lda adr._mzoneInPROC,y
+  sta jaddr
+  lda adr._mzoneInPROC+1,y
+  sta jaddr+1
+  jmp jaddr:$ffff
+end;
 
+procedure refreshZone();
 begin
   if (ozone>=USER_ZONES_BEGIN) then
   begin
     if _mZoneActive[ozone] then
-      invertZone(ozone);
+    begin
+      callInZone(ozone);
+      if __invertZone then invertZone(ozone);
+    end;
     ozone:=-1;
   End;
   if (nzone>=USER_ZONES_BEGIN) then
   begin
     if _mZoneActive[nzone] then
     begin
-      invertZone(nzone);
-      ozone:=nzone;
+      callInZone(nzone);
+      if __invertZone then invertZone(nzone);
     end;
+    ozone:=nzone;
   End;
 End;
 
 procedure setCursorInZone(n:Shortint);
-var
-  nzone:Shortint absolute $57;
-
 begin
   nzone:=-1;
   szone:=n; refreshZone();
@@ -114,8 +129,6 @@ begin
 end;
 
 function checkZones:Boolean;
-var
-  nzone:Shortint absolute $57;
 
   function pressed:Boolean;
   begin
@@ -181,6 +194,7 @@ begin
   End
   else
   begin
+    if ozone<>-1 then callInZone(ozone);
     refreshZone();
     if (ombutton=MBUT_LEFT) then
     begin

@@ -1,4 +1,8 @@
 const
+  _ITRLSEL:Array of byte = [
+    $00,$00,$00,$00,$FF,$00,$01,$FF,$80,$01,$E7,$80,$01,$E7,$80,$01,$81,$80,$01,$81,$80,$01,$E7,$80,$01,$E7,$80,$01,$FF,$80,$00,$FF,$00,$00,$00,$00,$00,$00,$00,$00,$FC,$00,$01,$F8,$00,$01,$F0,$00,$01,$E0,$80,$01,$D1,$80,$01,$DB,$80,$01,$C7,$80,$01,$FF,$80,$01,$FF,$80,$00,$FF,$00,$00,$00,$00,$00,$00,$00,$03,$E0,$00,$07,$F0,$00,$07,$F0,$00,$07,$F0,$40,$07,$F0,$E0,$07,$F1,$C0,$03,$E3,$80,$00,$07,$00,$07,$EA,$00,$07,$EC,$00,$00,$00,$00,$00,$00,$00,$01,$FF,$80,$01,$00,$80,$00,$FF,$00,$00,$A5,$00,$00,$AD,$00,$00,$AD,$00,$00,$AD,$00,$00,$AD,$00,$00,$AD,$00,$00,$FF,$00,$00,$00,$00
+  ];
+
   LISTZONE = 20;
   MSG_SEARCH ='ENTER TRAIL NAME HERE...';
   MSG_NOTFOUND = 'NO ENTRIES FOUND';
@@ -16,6 +20,8 @@ var
   foundItems:shortint;
   i,n:shortint;
   curAction:shortint;
+  curTrailID:Shortint;
+  listNEntry:Array[0..4] of shortint;
 
 //
 function getTrailName(n:Byte):pointer;
@@ -48,15 +54,16 @@ asm
   dta k_E, a(MAIN.keyEdit)
   dta k_R, a(MAIN.keyRename)
   dta k_DELETE, a(MAIN.keyDelete)
+  dta k_CLEAR, a(MAIN.doEraseSearch)
 end;
 
 procedure showTrailSelector();
 begin
-  registerShortcutKeys(@selectorShortKeys,5);
+  registerShortcutKeys(@selectorShortKeys,6);
   setControls(0); // no controls
   setScreenWidth(20);
   fillchar(YSCR[56+8]+4,16,$FF);
-  putImage(_ITRLSEL,0,0,3,48);
+  putImage(@_ITRLSEL,0,0,3,48);
   putImage(_VSCROLL,19,11,1,3);
   putImage(_VSCROLL+2,19,44,1,3);
   putImage(_ERASEINPUT,19,1,1,5);

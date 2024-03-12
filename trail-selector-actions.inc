@@ -12,14 +12,16 @@ var
   name:PString;
 
 begin
-  name:=pathNamePtr[listShift+szone-LISTZONE];
+  n:=listShift+szone-LISTZONE;
+  curTrailID:=listNEntry[n];
+  name:=pathNamePtr[n];
   pathNameSearch:=name; updateSearchField();
 end;
 
 procedure doEraseSearch();
 begin
   pathNameSearch:=''; updateSearchField();
-  refreshList();
+  refreshList(); szone:=13; doSearchPath();
 end;
 
 procedure doPageChange();
@@ -63,9 +65,10 @@ begin
       inc(i);
     end;
     if (i=MAXPATHDEFINITIONS) then exit;
-    p:=getTrailName(n); // find 'i' entry in table of trail names
+    p:=getTrailName(i); // find 'i' entry in table of trail names
     if p<>nil then
     begin
+      curTrailID:=i;
       pathNamePtr[i]:=p;
       pathListPtr[i]:=adr;
       pathListPtr[i+1]:=pointer($A000);
@@ -76,7 +79,10 @@ begin
       p:=@MSG_NAMECREATED;
     end
     else
+    begin
       p:=@MSG_FULLLIST;
+      curTrailID:=-1;
+    end;
   end
   else
     p:=@MSG_DUPLICATEDNAME;
@@ -91,7 +97,7 @@ begin
     setStatus(@MSG_CHOICETRAIL)
   else
   begin
-    unregisterShortcutKeys(@selectorShortKeys,5);
+    unregisterShortcutKeys(@selectorShortKeys,6);
     showTrailEditor();
   end;
 end;

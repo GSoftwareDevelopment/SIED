@@ -86,7 +86,7 @@ validChanges
 CORE=$?
 [[ $ASSETS = 1 ]] && CORE=1;
 [[ $DATA = 1 ]] && CORE=1;
-[[ $CORE = 1 ]] && ../mpc buildlib core.pas -data:D980 -define:DISABLEIOCBCOPY
+[[ $CORE = 1 ]] && ../mpc buildlib core.pas -data:D900 -define:DISABLEIOCBCOPY
 cd ..
 
 validChanges "about*.*"
@@ -101,7 +101,7 @@ validChanges "trail*.*"
 validChanges "scened*.*"
 [[ $? = 1 || $CORE = 1 ]] && ./mpc buildlib scened.pas -define:DISABLEIOCBCOPY
 
-./mpc buildcom SIED.pas -code:8100 -define:DISABLEIOCBCOPY
+./mpc buildcom SIED.pas -code:8080 -define:DISABLEIOCBCOPY
 
 if [ $BUILDDISK = 1 ]; then
 echo "- Build disk image..."

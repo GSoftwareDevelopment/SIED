@@ -1,7 +1,7 @@
 // {$define BASICOFF}
 // {$define ROMOFF}
 // {$define NOROMFONT}
-library core:$DB00;
+library core:$DC00;
 
 const
 {$I '../data/data-mem.inc'}
@@ -33,14 +33,12 @@ exports
   _CONTROLS,
   _ICONS,
   _ICARD,
-  _IDISK,
-  _ITRLSEL,
-  _ITRLED,
   _VSCROLL,
   _ERASEINPUT,
-  _ISELECT4,
+  _RADIOBUT,
   _ARROW,
   _WAIT,
+  _CROSS,
 
 // graph
   putImage,

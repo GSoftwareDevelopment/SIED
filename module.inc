@@ -1,8 +1,3 @@
-// {$I 'about.h.inc'}
-// {$I 'disk.h.inc'}
-// {$I 'trail.h.inc'}
-// {$I 'scened.h.inc'}
-
 var
   curModule:Byte = -128;
   moduleInitialized:Byte absolute $62;
@@ -53,6 +48,7 @@ begin
   if szone=curModule then exit;
   curModule:=szone;
 
+  HPOSM[2]:=0; HPOSM[3]:=0;
   _mzoneActive[0]:=true;
   _mzoneActive[1]:=true;
   _mzoneActive[2]:=true;

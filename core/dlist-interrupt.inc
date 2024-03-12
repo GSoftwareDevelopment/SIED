@@ -40,7 +40,7 @@ dli2: // timeline
 
 dli3: // controls
   pha:txa:pha
-  lda #$E6
+  lda #$E4
   ldx #$E0
   sta wsync
   // sta wsync

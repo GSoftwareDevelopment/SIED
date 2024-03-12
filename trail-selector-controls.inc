@@ -50,16 +50,20 @@ var
 begin
   if redrawList then blankList();
   foundItems:=0;
-  p:=pointer(PATHNAMES_ADDR);
-  while (n<MAXPATHDEFINITIONS) and (i<=5) do
+  p:=pointer(PATHNAMES_ADDR); i:=0;
+  while (n<MAXPATHDEFINITIONS) do
   begin
     if p^>0 then
     begin
       name:=PString(p);
-      if (pathNameSearch[0]=#0) or (findText(pathNameSearch,name)>0) then
+      if (i<5) then
       begin
-        if redrawList and (foundItems<5) then addPathLabel(foundItems,name);
-        inc(foundItems);
+        if (pathNameSearch[0]=#0) or (findText(pathNameSearch,name)>0) then
+        begin
+          if redrawList and (foundItems<5) then addPathLabel(foundItems,name);
+          inc(foundItems);
+          listNEntry[i]:=n; inc(i);
+        end;
       end;
       inc(p,p^+1);
     end;

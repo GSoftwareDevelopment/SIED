@@ -7,30 +7,32 @@ PMG_ADDR            = $2000;                // PMG Base address
 SCREEN_ADDR         = $2400;                // Game screen base address
 EDITOR_ADDR         = $2780;                // Editor screen base address
 
-FONTS_ADDR          = $3000;                // (1329) font tables, font 4x5 1bpp two half, font 4x5 2bpp
-
-ASSETS_ADDR         = FONTS_ADDR    +1329;  // assets base address
+ASSETS_ADDR         = $3000;                // assets base address
 CONTROLS_ADDR       = ASSETS_ADDR   +   0;  // time controls
 ICONS_ADDR          = ASSETS_ADDR   +  24;  // module icons
 ICARD_ADDR          = ASSETS_ADDR   +  42;  // selected module background
-IDISK_ADDR          = ASSETS_ADDR   +  44;  // tray icons for disk module
-ITRLSEL_ADDR        = ASSETS_ADDR   +  46;  // tray icons for trail-selector module
-ITRLED_ADDR         = ASSETS_ADDR   +  48;  // tray icons for trail-editor module
-VSCROLL_ADDR        = ASSETS_ADDR   +  50;
-ERASEINPUT_ADDR     = ASSETS_ADDR   +  52;
-ISELECT4_ADDR       = ASSETS_ADDR   +  54;
-CARROW_ADDR         = ASSETS_ADDR   +  56;
-CWAIT_ADDR          = ASSETS_ADDR   +  58;
+VSCROLL_ADDR        = ASSETS_ADDR   +  44;
+ERASEINPUT_ADDR     = ASSETS_ADDR   +  46;
+RADIOBUT_ADDR       = ASSETS_ADDR   +  48;
+CARROW_ADDR         = ASSETS_ADDR   +  50;
+CWAIT_ADDR          = ASSETS_ADDR   +  52;
+CCROSS_ADDR         = ASSETS_ADDR   +  54;
 
 MODULE_ADDR         = $4000;                // module base address
 
 DLIST_ADDR          = $8000;                // Display List definition
 
-PATHLISTV_ADDR      = $C000;                // Table of path vectors
-PATHNAMEV_ADDR      = $C100;                // Table of path names vectors
+MAXPATHDEFINITIONS  = 63;
+
+PATHLISTV_ADDR      = $C000;                // Table of path vectors ((MAXPATHDEFINITIONS+1)*Pointer)
+PATHNAMEV_ADDR      = $C080;                // Table of path names vectors (MAXPATHDEFINITIONS*Pointer)
+PATHSTARTX_ADDR     = $C100;                // Table of start point X (MAXPATHDEFINITIONS*Byte)
+PATHSTARTY_ADDR     = $C180;                // Table of start point Y (MAXPATHDEFINITIONS*Byte)
 PATHNAMES_ADDR      = $C200;                // Address of path names table
 
 SCREEN_LINES_ADDR   = $D800;                // table of screen lines addresses
-SCKEYVEC_ADDR       = $D900;                // shortcur keyboard vectors
-IZONE_ADDR          = $DA00;
-CORE_LIB            = $DB00;                // core library base address
+IZONE_ADDR          = $DA00;                // interface work tables
+SCKEYVEC_ADDR       = $DB80;                // shortcur keyboard vectors
+CORE_LIB            = $DC00;                // core library base address
+
+FONTS_ADDR          = $F800;                // (1329) font tables, font 4x5 1bpp two half, font 4x5 2bpp
