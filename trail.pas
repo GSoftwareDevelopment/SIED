@@ -45,6 +45,7 @@ begin
   end;
   if (moduleInitialized and $2=0) then
   begin
+    fillchar(pointer($A000),$1000,$00);
     fillchar(pointer(PATHLISTV_ADDR),$1000,$00); // clear pathListPtr, pathNamePtr, pathNames
     for i:=0 to MAXPATHDEFINITIONS-1 do
     begin
@@ -58,7 +59,7 @@ begin
   redrawList:=true; curAction:=-1;
   fillchar(Pointer(PMG_ADDR+$180+24),48,$F0);
   fillchar(Pointer(PMG_ADDR+$300+23),50,$FF);
-  PCOL[2]:=$E4; PCOL[3]:=$E4;
+  PCOL[2]:=$E2; PCOL[3]:=$E2;
   SIZEP[2]:=%11; SIZEM:=%11110000;
   HPOSP[2]:=44; // icon tray
   clearAllShortcutsKey();

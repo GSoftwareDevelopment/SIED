@@ -5,9 +5,9 @@ var
   _w,_h:Byte;
 
 begin
-  _w:=_mzoneX2[i]-_mzoneX1[i];
-  _h:=_mzoneY2[i]-_mzoneY1[i];
-  invert(_mzoneX1[i],_mzoneY1[i],_w,_h);
+  _w:=_mZoneX2[i]-_mZoneX1[i];
+  _h:=_mZoneY2[i]-_mZoneY1[i];
+  invert(_mZoneX1[i],_mZoneY1[i],_w,_h);
 End;
 
 procedure blankZone(i:Shortint);
@@ -15,9 +15,9 @@ var
   _w,_h:Byte;
 
 begin
-  _w:=_mzoneX2[i]-_mzoneX1[i];
-  _h:=_mzoneY2[i]-_mzoneY1[i];
-  blank(_mzoneX1[i],_mzoneY1[i],_w,_h);
+  _w:=_mZoneX2[i]-_mZoneX1[i];
+  _h:=_mZoneY2[i]-_mZoneY1[i];
+  blank(_mZoneX1[i],_mZoneY1[i],_w,_h);
 end;
 
 procedure clearWorkarea();
@@ -47,8 +47,8 @@ begin
   setScreenWidth(40);
   for i:=0 to 2 do
   begin
-    _x:=_mzoneX1[i];
-    if (_mzoneActive[i]) then
+    _x:=_mZoneX1[i];
+    if (_mZoneActive[i]) then
     begin
       if i=n then
       begin
@@ -70,16 +70,16 @@ begin
   b:=1;
   for i:=3 to 8 do
   begin
-    _mzoneActive[i]:=(s and b)<>0;
-    _mZoneProc[i]:=@nullProc;
+    _mZoneActive[i]:=(s and b)<>0;
+    _mZoneCall[i]:=@nullProc;
     b:=b shl 1;
   end;
-  // _mzoneActive[3]:=(s and 1<>0);  // prev
-  // _mzoneActive[4]:=(s and 2<>0);  // play
-  // _mzoneActive[5]:=(s and 4<>0);  // stop
-  // _mzoneActive[6]:=(s and 8<>0);  // next
-  // _mzoneActive[7]:=(s and 16<>0); // insert
-  // _mzoneActive[8]:=(s and 32<>0); // delete
+  // _mZoneActive[3]:=(s and 1<>0);  // prev
+  // _mZoneActive[4]:=(s and 2<>0);  // play
+  // _mZoneActive[5]:=(s and 4<>0);  // stop
+  // _mZoneActive[6]:=(s and 8<>0);  // next
+  // _mZoneActive[7]:=(s and 16<>0); // insert
+  // _mZoneActive[8]:=(s and 32<>0); // delete
 End;
 
 procedure setControl(n:Shortint);
@@ -91,9 +91,9 @@ begin
   setScreenWidth(40);
   for i:=0 to 5 do
   begin
-    if _mzoneActive[i+3] then
+    if _mZoneActive[i+3] then
     begin
-      _x:=_mzoneX1[i+3];
+      _x:=_mZoneX1[i+3];
       if i=n then
         p:=_CONTROLS[i+6]
       else
@@ -135,7 +135,7 @@ begin
   putText(x,y,value);
   result:=addZoneN(-1,x-1,y-1,w+2,7,prc);
   if result<>-1 then
-    _mzoneInPROC[result]:=@inInputZone;
+    _mZoneInCall[result]:=@inInputZone;
 End;
 
 function doInput(var sEdit:String):Shortint;
@@ -177,10 +177,10 @@ begin
   _zone:=szone; // remember zone id call
   if not _mZoneActive[szone] then exit(-3);
   setScreenWidth(20);
-  __x:=_mzoneX1[szone];
-  __y:=_mzoneY1[szone];
-  __w:=(_mzoneX2[szone]-__x)-1;
-  _mzoneInPROC[_zone]:=@inInputEditZone;
+  __x:=_mZoneX1[szone];
+  __y:=_mZoneY1[szone];
+  __w:=(_mZoneX2[szone]-__x)-1;
+  _mZoneInCall[_zone]:=@inInputEditZone;
   inc(__x);
   ln:=byte(sEdit[0]);
   move(sEDIT,value,ln+1);
@@ -250,5 +250,5 @@ begin
     End;
   until (false);
   if _callShortcutKeys=$FF then KEYB:=255;
-  _mzoneInPROC[_zone]:=@inInputZone;
+  _mZoneInCall[_zone]:=@inInputZone;
 End;

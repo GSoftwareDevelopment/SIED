@@ -107,7 +107,7 @@ begin
     moduleInitialized:=moduleInitialized or $1;
   end;
   fillchar(Pointer(PMG_ADDR+$300+23),50,$FF);
-  HPOSP[2]:=44; PCOL[2]:=$E4; SIZEP[2]:=%11;
+  HPOSP[2]:=44; PCOL[2]:=$E2; SIZEP[2]:=%11;
   clearAllShortcutsKey();
   showDiskDirectory();
   asm

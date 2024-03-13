@@ -11,25 +11,25 @@ End;
 
 procedure setZone(n:Shortint; act:Boolean; x,y,w,h:Byte; prc:TZoneProc);
 begin
-  _mzoneActive[n]:=act;
-  _mzoneX1[n]:=x;     __x:=x;
-  _mzoneY1[n]:=y;     __y:=y;
-  _mzoneX2[n]:=x+w-1; __w:=w;
-  _mzoneY2[n]:=y+h-1; __h:=h;
-  _mzonePROC[n]:=prc;
-  _mzoneInPROC[n]:=@nullProc;
+  _mZoneActive[n]:=act;
+  _mZoneX1[n]:=x;     __x:=x;
+  _mZoneY1[n]:=y;     __y:=y;
+  _mZoneX2[n]:=x+w-1; __w:=w;
+  _mZoneY2[n]:=y+h-1; __h:=h;
+  _mZoneCall[n]:=prc;
+  _mZoneInCall[n]:=@nullProc;
 End;
 
 procedure clearZone(n:Byte);
 begin
   // setZone(n,false,255,255,255,255,@nullProc);
-  _mzoneActive[n]:=false;
-  _mzoneX1[n]:=255;
-  _mzoneX2[n]:=255;
-  _mzoneY1[n]:=255;
-  _mzoneY2[n]:=255;
-  _mzonePROC[n]:=@nullProc;
-  _mzoneInPROC[n]:=@nullProc;
+  _mZoneActive[n]:=false;
+  _mZoneX1[n]:=255;
+  _mZoneX2[n]:=255;
+  _mZoneY1[n]:=255;
+  _mZoneY2[n]:=255;
+  _mZoneCall[n]:=@nullProc;
+  _mZoneInCall[n]:=@nullProc;
 End;
 
 procedure clearWorkZones();
@@ -50,7 +50,7 @@ begin
   result:=-1;
   for i:=USER_ZONES_BEGIN to MAX_ZONES do
   begin
-    if _mzoneX1[i]=255 then exit(i);
+    if _mZoneX1[i]=255 then exit(i);
   End;
 End;
 
@@ -90,9 +90,9 @@ procedure callInZone(n:Byte); assembler;
 asm
   asl @
   tay
-  lda adr._mzoneInPROC,y
+  lda adr._mZoneInCall,y
   sta jaddr
-  lda adr._mzoneInPROC+1,y
+  lda adr._mZoneInCall+1,y
   sta jaddr+1
   jmp jaddr:$ffff
 end;
@@ -143,9 +143,9 @@ begin
   nzone:=-1; szone:=-1;
   for i:=0 to MAX_ZONES do
   begin
-    if _mzoneActive[i] then
-      if (mx>=_mzoneX1[i]) and (mx<=_mzoneX2[i]) and
-          (my>=_mzoneY1[i]) and (my<=_mzoneY2[i]) then
+    if _mZoneActive[i] then
+      if (mx>=_mZoneX1[i]) and (mx<=_mZoneX2[i]) and
+          (my>=_mZoneY1[i]) and (my<=_mZoneY2[i]) then
       begin
         nzone:=i; break;
       End;
@@ -168,7 +168,7 @@ begin
           if nzone<3 then  // for module
           begin
             setIcon(-1);
-            putImage(_ICONS[3+nzone],_mzoneX1[nzone],50,3,12);
+            putImage(_ICONS[3+nzone],_mZoneX1[nzone],50,3,12);
           End
           else setControl(nzone-3); // for controls
 
@@ -211,9 +211,9 @@ Asm
   pha
   asl @
   tay
-  lda adr._mzonePROC,y
+  lda adr._mZoneCall,y
   sta jaddr
-  lda adr._mzonePROC+1,y
+  lda adr._mZoneCall+1,y
   sta jaddr+1
   jsr jaddr:$ffff
   pla

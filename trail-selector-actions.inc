@@ -70,13 +70,28 @@ begin
     begin
       curTrailID:=i;
       pathNamePtr[i]:=p;
-      pathListPtr[i]:=adr;
-      poke(adr,0); inc(adr);
-      poke(adr,$88); inc(adr);
-      pathListPtr[i+1]:=adr;
       ln:=byte(pathNameSearch[0])+1;
-      // move(p,pointer(word(p)+ln),$800-ln);
       move(@pathNameSearch,p,ln);
+      pathListPtr[i]:=adr; p:=adr;
+      poke(adr,$F0); inc(adr);
+      poke(adr,$FF); inc(adr);
+      poke(adr,$FF); inc(adr);
+      poke(adr,$FF); inc(adr);
+      poke(adr,$F0); inc(adr);
+      poke(adr,$F1); inc(adr);
+      poke(adr,$F1); inc(adr);
+      poke(adr,$F1); inc(adr);
+      poke(adr,$F1); inc(adr);
+      poke(adr,$F1); inc(adr);
+      poke(adr,$F1); inc(adr);
+      poke(adr,$F0); inc(adr);
+      poke(adr,$FF); inc(adr);
+      poke(adr,$FF); inc(adr);
+      poke(adr,$FF); inc(adr);
+      poke(adr,$80); inc(adr);
+      dpoke(adr,word(p)+1); inc(adr,2);
+      pathListPtr[i+1]:=adr;
+      // move(p,pointer(word(p)+ln),$800-ln);
       listShift:=0; showPathList(0);
       p:=@MSG_NAMECREATED;
     end

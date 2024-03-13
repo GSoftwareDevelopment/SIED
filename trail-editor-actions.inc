@@ -3,9 +3,9 @@ begin
   fillchar(YSCR[56+48],800,0);
   fillchar(Pointer(PMG_ADDR+$300+23),50,$FF);
   HPOSM[2]:=0; HPOSM[3]:=0;
-  _mzoneActive[1]:=true;
+  _mZoneActive[1]:=true;
   setIcon(1);
-  _mzoneActive[1]:=false;
+  _mZoneActive[1]:=false;
   setControls(0);
   clearStatus();
   clearWorkarea();
@@ -32,6 +32,7 @@ begin
   pathStartEdge[curTrailID]:=i;
   pathStartEdgeShift[curTrailID]:=0;
   curSection:=0; sZone:=11; doSwitchPathSection();
+  curTrailLength:=processTrail(PT_CALCLEN+PT_UPDATETIMELINE);
 end;
 
 procedure doRedefineStartPoint();
@@ -43,8 +44,8 @@ procedure doSwitchPathSection();
 
   procedure setGameScreenZone();
   begin
-    addZoneN(31,16,0,24,48,@nullProc);
-    _mzoneInPROC[31]:=@inGameScreen;
+    addZoneN(31,XVIEWPORT div 4,0,24,48,@nullProc);
+    _mZoneInCall[31]:=@inGameScreen;
   end;
 
 begin
@@ -53,6 +54,7 @@ begin
   curSection:=sZone-10;
   updatePathSection();
   setGameScreenZone();
+  TLShift:=0; curTrailLength:=processTrail(%111);
   case curSection of
     0,1: begin // Path Begin
           updateGameScreen();
@@ -60,11 +62,11 @@ begin
           if (curSection=0) or (pathStartEdge[curTrailID]=-128) then
           begin
             addCorrners(@doSetBeginEdge);
-            putText(20,30,'PLEASE DEFINE IT');
-            putText(21,36,'BY CHOICE EDGE')
+            putText((XVIEWPORT div 4)+4,30,'PLEASE DEFINE IT');
+            putText((XVIEWPORT div 4)+5,36,'BY CHOICE EDGE')
           end
           else
-            addButton(21,36,'REDEFINE IT...',@doRedefineStartPoint);
+            addButton((XVIEWPORT div 4)+5,36,'REDEFINE IT...',@doRedefineStartPoint);
         end;
     2: begin // Inner Path
           updateGameScreen();

@@ -15,15 +15,19 @@ const
   _CORNERS:Array of byte = [
     $38,$00,$10,$00,$80,$A0,$80,$00,$01,$05,$01,$00,$00,$10,$00,$38
   ];
-  CORNERSX:Array[0..3] of byte = ( 108, 64,152, 108 );
-  CORNERSY:Array[0..3] of byte = (   0, 23, 23,  44 );
+  _LOOP:Array of byte = [ $A0, $82, $0A, $28 ];
+  _PROCESS:Array of byte = [ $F5, $D7, $5F, $7D ];
+
+  XVIEWPORT = 32;
+  XCORNERS:Array[0..3] of byte = ( XVIEWPORT+44, XVIEWPORT, XVIEWPORT+94, XVIEWPORT+44 );
+  YCORNERS:Array[0..3] of byte = (   0, 23, 23,  44 );
 
   _TOP    =  0;
   _MIDDLE = 24;
   _BOTTOM = 47;
   _LEFT   = -7;
   _CENTER = 39;
-  _RIGHT  = 88;
+  _RIGHT  = 94;
 
   _EDGETOP    = 0;
   _EDGELEFT   = 1;
@@ -37,13 +41,121 @@ const
     'TOP', 'LEFT', 'RIGHT', 'BOTTOM'
   ];
 
+  pbit:Array[0..7] of byte = ( 128,64,32,16,8,4,2,1 );
+
+  P4Mask:Array[0..3] of byte = ( %00111111, %11001111, %11110011, %11111100 );
+  P4Color:Array[0..2,0..3] of byte = (
+    ( %01000000, %00010000, %00000100, %00000001 ),
+    ( %10000000, %00100000, %00001000, %00000010 ),
+    ( %11000000, %00110000, %00001100, %00000011 )
+  );
+
+  TIMELINELENGTH = 128; // 128 pixels= 5s 03f (PAL 1/50)
+
+  PT_CALCLEN          = %001;
+  PT_UPDATETIMELINE   = %010;
+  PT_UPDATEPATH       = %100;
+
 var
   curSection:Shortint;
+  curTrailLength:Smallint;
+  adr:Pointer;
+  TLPtr:pointer;
+  TLPosition:SmallInt;
+  TLShift:SmallInt;
+
+  pathPattern:byte;
+
+  v:Byte;
+  px,py:shortint;
+  dx,dy:shortint;
+  ddx,ddy:shortint;
+  loop:boolean;
+  tm:Byte absolute $14;
+  ntm:Byte;
 
 function getTrailSize():word;
 begin
   result:=word(pathListPtr[curTrailID])-word(pathListPtr[curTrailID+1]);
 end;
+
+// function getTrailLength():Smallint;
+// var
+//   adr:Pointer;
+
+// begin
+//   setCursor(_WAIT);
+//   adr:=TLPtr;
+//   TLPtr:=pathListPtr[curTrailID];
+//   n:=pathStartEdge[curTrailID];
+//   px:=XEDGE[n];
+//   py:=YEDGE[n];
+//   result:=0; ddx:=0; ddy:=0; loop:=false;
+//   ntm:=tm+1;
+//   repeat
+//     if tm=ntm then
+//     begin
+//       ntm:=tm+1;
+//       scr:=YSCR[56+48+16]+8;
+//       for i:=0 to 2 do
+//       begin
+//         fillchar(scr,TIMELINELENGTH div 4,_PROCESS[i]);
+//         inc(scr,40);
+//       end;
+//       asm
+//         ldy adr._PROCESS+0
+//         lda adr._PROCESS+1
+//         sta adr._PROCESS+0
+//         lda adr._PROCESS+2
+//         sta adr._PROCESS+1
+//         lda adr._PROCESS+3
+//         sta adr._PROCESS+2
+//         sty adr._PROCESS+3
+//       end;
+//     end;
+//     v:=peek(TLPtr);
+//     case v of
+//       $80: // TR_JUMP
+//         begin
+//           inc(TLPtr);
+//           TLPtr:=pointer(dpeek(TLPtr));
+//           if (TLPtr<pathListPtr[curTrailID]) or (TLPtr>=pathListPtr[curTrailID+1]) then
+//           begin
+//             result:=word(TLPtr); break;
+//           end;
+//           if loop then
+//           begin
+//             if (ddx=0) and (ddy=0) then result:=-result;
+//             break;
+//           end;
+//           loop:=true;
+//           result:=0;
+//         end;
+//       $88: // TR_STOP
+//         begin
+//           break;
+//         end;
+//       $8F: // TR_KILL
+//         begin
+//           break;
+//         end;
+//     else
+//       if v<>0 then
+//       begin
+//         dx:=v shr 4;  if (dx and %1000)<>0 then dx:=dx or %11110000;
+//         dy:=v and $F; if (dy and %1000)<>0 then dy:=dy or %11110000;
+//         inc(px,dx); inc(py,dy);
+//         if ((px<_LEFT) or (px>_RIGHT)) or ((py<_TOP) or (py>_BOTTOM)) then
+//           break;
+//         inc(ddx,dx); inc(ddy,dy);
+//       end;
+//       inc(TLPtr);
+//       inc(result);
+//     end;
+//   until false;
+//   TLPtr:=adr;
+//   setCursor(_ARROW);
+// end;
 
 // procedure clearSection(); Forward;
 // procedure updatePathSection(); Forward;
@@ -61,8 +173,9 @@ begin
   setControl(-1);
   setStatus('EDIT:');
   putTextC(6,69,pathNameSearch);
-  for i:=56+48+16 to 56+48+18 do fillchar(Pointer(word(YSCR[i])+8),32,%01010101);
+
   putTextC(0,63,'00:00.00');
+  // putTextC(32,63,'00:00.00');
 
   SetScreenWidth(20);
   putImage(@_ITRLED,0,0,3,48);
@@ -79,5 +192,4 @@ begin
   else
     szone:=12;  // show trail path
   doSwitchPathSection();
-
 End;

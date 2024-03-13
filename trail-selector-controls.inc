@@ -39,8 +39,8 @@ end;
 
 procedure updateListScroll();
 begin
-  _mzoneActive[LISTZONE-1]:=(listShift>0);
-  _mzoneActive[LISTZONE+5]:=(listShift+5<foundItems);
+  _mZoneActive[LISTZONE-1]:=(listShift>0);
+  _mZoneActive[LISTZONE+5]:=(listShift+5<foundItems);
 end;
 
 procedure showPathList(start:byte);

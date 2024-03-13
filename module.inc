@@ -49,18 +49,18 @@ begin
   curModule:=szone;
 
   HPOSM[2]:=0; HPOSM[3]:=0;
-  _mzoneActive[0]:=true;
-  _mzoneActive[1]:=true;
-  _mzoneActive[2]:=true;
+  _mZoneActive[0]:=true;
+  _mZoneActive[1]:=true;
+  _mZoneActive[2]:=true;
   fillchar(YSCR[56+48],800,0);
   HPOSP[2]:=0;
   setIcon(szone);
   clearStatus();
   clearWorkarea();
   setControls(0);
-  _mzoneActive[0]:=(szone<>0);
-  _mzoneActive[1]:=(szone<>1);
-  _mzoneActive[2]:=(szone<>2);
+  _mZoneActive[0]:=(szone<>0);
+  _mZoneActive[1]:=(szone<>1);
+  _mZoneActive[2]:=(szone<>2);
   case szone of
     0: loadModule('D:DISK.LIB');
     1: loadModule('D:TRAIL.LIB');
