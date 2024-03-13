@@ -1,7 +1,7 @@
 {$define BASICOFF}
 {$define ROMOFF}
 {$define NOROMFONT}
-{$LIBRARYPATH 'core/bin/'}
+{$LIBRARYPATH 'bin/'}
 
 library pathed:$4000;
 

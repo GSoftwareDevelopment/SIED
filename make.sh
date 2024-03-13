@@ -86,7 +86,10 @@ validChanges
 CORE=$?
 [[ $ASSETS = 1 ]] && CORE=1;
 [[ $DATA = 1 ]] && CORE=1;
+mkdir bin
 [[ $CORE = 1 ]] && ../mpc buildlib core.pas -data:D900 -define:DISABLEIOCBCOPY
+cp bin/*.* ../bin/
+rm -r -d bin
 cd ..
 
 validChanges "about*.*"

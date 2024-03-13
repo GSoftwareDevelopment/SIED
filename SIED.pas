@@ -2,7 +2,7 @@
 {$define ROMOFF}
 {$define NOROMFONT}
 {$UNITPATH './'}
-{$LIBRARYPATH './core/bin/'}
+{$LIBRARYPATH './bin/'}
 {$LIBRARYPATH './bin/'}
 
 program Editor;

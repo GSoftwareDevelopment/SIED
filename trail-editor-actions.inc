@@ -29,8 +29,8 @@ end;
 procedure doSetBeginEdge();
 begin
   i:=sZone-23;
-  pathStartPointX[curTrailID]:=XEDGE[i];
-  pathStartPointY[curTrailID]:=YEDGE[i];
+  pathStartEdge[curTrailID]:=i;
+  pathStartEdgeShift[curTrailID]:=0;
   curSection:=0; sZone:=11; doSwitchPathSection();
 end;
 
@@ -57,14 +57,11 @@ begin
     0,1: begin // Path Begin
           updateGameScreen();
           updateStartPoint();
-          if (curSection=0) or
-             ((pathStartPointX[curTrailID]=-128) and
-              (pathStartPointY[curTrailID]=-128)) then
+          if (curSection=0) or (pathStartEdge[curTrailID]=-128) then
           begin
             addCorrners(@doSetBeginEdge);
             putText(20,30,'PLEASE DEFINE IT');
             putText(21,36,'BY CHOICE EDGE')
-            // invert(21,34,12,6);
           end
           else
             addButton(21,36,'REDEFINE IT...',@doRedefineStartPoint);

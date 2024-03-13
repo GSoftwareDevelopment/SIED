@@ -71,7 +71,9 @@ begin
       curTrailID:=i;
       pathNamePtr[i]:=p;
       pathListPtr[i]:=adr;
-      pathListPtr[i+1]:=pointer($A000);
+      poke(adr,0); inc(adr);
+      poke(adr,$88); inc(adr);
+      pathListPtr[i+1]:=adr;
       ln:=byte(pathNameSearch[0])+1;
       // move(p,pointer(word(p)+ln),$800-ln);
       move(@pathNameSearch,p,ln);

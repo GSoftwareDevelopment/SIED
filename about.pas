@@ -1,4 +1,4 @@
-{$LIBRARYPATH 'core/bin/'}
+{$LIBRARYPATH 'bin/'}
 
 library about:$4000;
 

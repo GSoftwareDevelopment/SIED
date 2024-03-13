@@ -41,13 +41,13 @@ var
   x,y:Byte;
 
 begin
-  for i:=0 to 7 do
+  for i:=0 to 3 do
   begin
     p:=@_CORNERS+ i*4;
     x:=CORNERSX[i];
     y:=CORNERSY[i];
     putSprite(p, x, y,1,4);
-    if (x mod 4=2) then x:=(x div 4)+1 else x:=x div 4;
+    x:=x div 4;
     addZoneN(23+i,x,y,2,4,prc);
   end;
 end;
@@ -65,26 +65,15 @@ begin
   putText(CLEFT-1,CTOP,'CURRENT START:');
   fillchar(YSCR[56+CTOP+6]+10,8,$FF);
   blank(CLEFT,CLINE1,6,11);
-  px:=pathStartPointX[curTrailID];
-  py:=pathStartPointY[curTrailID];
-  if ((px<>-128) and (px<>-128)) then
+  n:=pathStartEdge[curTrailID];
+  if (n<>-128) then
   begin
-    n:=-1;
-    for i:=0 to 7 do
-      if ((px=XEDGE[i]) and (py=YEDGE[i])) then
-      begin
-        n:=i;
-        break;
-      end;
-    if n<>-1 then
-    begin
-      i:=Length(EDGENAME[n]);
-      px:=CLEFT+6-(i shr 1);
-      putText(px,CLINE1,EDGENAME[n]);
-      invert(px-1,CLINE1-1,i+1,6);
-      px:=CORNERSX[n];
-      py:=CORNERSY[n];
-      putSprite((@_CORNERS+ n*4), px, py,1,4);
-    end;
+    i:=Length(EDGENAME[n]);
+    px:=CLEFT+6-(i shr 1);
+    putText(px,CLINE1,EDGENAME[n]);
+    invert(px-1,CLINE1-1,i+1,6);
+    px:=CORNERSX[n];
+    py:=CORNERSY[n];
+    putSprite((@_CORNERS+ n*4), px, py,1,4);
   end;
 end;

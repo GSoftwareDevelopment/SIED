@@ -1,6 +1,6 @@
 {$define BASICOFF}
 {$define ROMOFF}
-{$LIBRARYPATH 'core/bin/'}
+{$LIBRARYPATH 'bin/'}
 
 library trail:$4000;
 
@@ -20,10 +20,10 @@ const
   PATHNAMESIZE  = 28;
 
 var
-  pathListPtr:Array[0..MAXPATHDEFINITIONS] of pointer    absolute PATHLISTV_ADDR;
-  pathNamePtr:Array[0..MAXPATHDEFINITIONS-1] of pointer  absolute PATHNAMEV_ADDR;
-  pathStartPointX:Array[0..MAXPATHDEFINITIONS-1] of byte absolute PATHSTARTX_ADDR;
-  pathStartPointY:Array[0..MAXPATHDEFINITIONS-1] of byte absolute PATHSTARTY_ADDR;
+  pathListPtr:Array[0..MAXPATHDEFINITIONS] of pointer       absolute PATHLISTV_ADDR;
+  pathNamePtr:Array[0..MAXPATHDEFINITIONS-1] of pointer     absolute PATHNAMEV_ADDR;
+  pathStartEdge:Array[0..MAXPATHDEFINITIONS-1] of byte      absolute PATHSTARTX_ADDR;
+  pathStartEdgeShift:Array[0..MAXPATHDEFINITIONS-1] of byte absolute PATHSTARTY_ADDR;
   pathNameSearch:String[PATHNAMESIZE];
 
 procedure showTrailEditor(); forward;
@@ -48,8 +48,8 @@ begin
     fillchar(pointer(PATHLISTV_ADDR),$1000,$00); // clear pathListPtr, pathNamePtr, pathNames
     for i:=0 to MAXPATHDEFINITIONS-1 do
     begin
-      pathStartPointX[i]:=-128;
-      pathStartPointY[i]:=-128;
+      pathStartEdge[i]:=_EDGERIGHT;
+      pathStartEdgeShift[i]:=0;
     end;
     pathListPtr[0]:=pointer($A000);
     pathNameSearch:='TEST_PATH'; doCreate();
