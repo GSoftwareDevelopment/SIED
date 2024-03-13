@@ -20,9 +20,9 @@ end;
 procedure inGameScreen();
 begin
   __invertZone:=false;
-  if ((nZone>=23) and (oZone<23)) then // cursor enter zone
+  if ((nZone=31) and (oZone<>31)) then // cursor enter zone
     setCursor(_CROSS)
-  else if ((nZone<23) and (oZone>=23)) then // cursor leave zone
+  else if ((nZone<>31) and (oZone=31)) then // cursor leave zone
     setCursor(_ARROW);
 end;
 
