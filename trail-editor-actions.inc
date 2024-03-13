@@ -14,20 +14,29 @@ end;
 
 procedure doBack2PathBegin();
 begin
-  szone:=11; doSwitchPathSection();
+  sZone:=11; doSwitchPathSection();
 end;
 
 procedure inGameScreen();
 begin
   __invertZone:=false;
   if ((nZone>=23) and (oZone<23)) then // cursor enter zone
-  begin
-    setCursorShapeAnchor(3,3); setCursorShape(_CROSS);
-  end
+    setCursor(_CROSS)
   else if ((nZone<23) and (oZone>=23)) then // cursor leave zone
-  begin
-    setCursorShapeAnchor(0,0); setCursorShape(_ARROW);
-  end;
+    setCursor(_ARROW);
+end;
+
+procedure doSetBeginEdge();
+begin
+  i:=sZone-23;
+  pathStartPointX[curTrailID]:=XEDGE[i];
+  pathStartPointY[curTrailID]:=YEDGE[i];
+  curSection:=0; sZone:=11; doSwitchPathSection();
+end;
+
+procedure doRedefineStartPoint();
+begin
+  sZone:=10; doSwitchPathSection();
 end;
 
 procedure doSwitchPathSection();
@@ -39,38 +48,31 @@ procedure doSwitchPathSection();
   end;
 
 begin
-  if curSection=(szone-10) then exit;
+  if curSection=(sZone-10) then exit;
   clearSection();
-  curSection:=szone-10;
+  curSection:=sZone-10;
   updatePathSection();
+  setGameScreenZone();
   case curSection of
-    1: begin // Path Begin
+    0,1: begin // Path Begin
           updateGameScreen();
-          putText(21,7,'SELECT A POINT');
-          putText(22,13,'OF BEGINNING');
-          fillchar(YSCR[56+19]+10,8,$FF);
-          addButton(23,30,'EDGE', @doSwitchPathSection);
-          addButton(29,30,'FREE', @doSwitchPathSection);
+          updateStartPoint();
+          if (curSection=0) or
+             ((pathStartPointX[curTrailID]=-128) and
+              (pathStartPointY[curTrailID]=-128)) then
+          begin
+            addCorrners(@doSetBeginEdge);
+            putText(20,30,'PLEASE DEFINE IT');
+            putText(21,36,'BY CHOICE EDGE')
+            // invert(21,34,12,6);
+          end
+          else
+            addButton(21,36,'REDEFINE IT...',@doRedefineStartPoint);
         end;
     2: begin // Inner Path
           updateGameScreen();
-          setGameScreenZone();
         end;
     3: begin // Path Finish
         end;
-    4: begin // Beginning: Edge
-          updateGameScreen();
-          setGameScreenZone();
-          addCorrners(@inGameScreen);
-          addButton(8,1,'<< BACK', @doBack2PathBegin);
-          putText(23,22,'CHOICE EDGE');
-      end;
-    5: begin // Beginning: Free
-          updateGameScreen();
-          setGameScreenZone();
-          addButton(8,1,'<< BACK', @doBack2PathBegin);
-          putText(22,19,'SET POINT IN');
-          putText(22,26,'GAME WORKAREA');
-      end;
   end;
 end;

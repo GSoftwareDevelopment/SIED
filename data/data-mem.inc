@@ -16,7 +16,8 @@ ERASEINPUT_ADDR     = ASSETS_ADDR   +  46;
 RADIOBUT_ADDR       = ASSETS_ADDR   +  48;
 CARROW_ADDR         = ASSETS_ADDR   +  50;
 CWAIT_ADDR          = ASSETS_ADDR   +  52;
-CCROSS_ADDR         = ASSETS_ADDR   +  54;
+CBEAM_ADDR          = ASSETS_ADDR   +  54;
+CCROSS_ADDR         = ASSETS_ADDR   +  56;
 
 MODULE_ADDR         = $4000;                // module base address
 

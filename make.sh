@@ -62,10 +62,10 @@ validChanges() {
   fi
 }
 
-cd asm
-validChanges
-[[ %? = 1 ]] && BUILD="all"
-cd ..
+# cd asm
+# validChanges
+# [[ %? = 1 ]] && BUILD="all"
+# cd ..
 
 cd assets
 validChanges

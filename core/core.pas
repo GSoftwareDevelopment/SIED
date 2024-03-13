@@ -38,6 +38,7 @@ exports
   _RADIOBUT,
   _ARROW,
   _WAIT,
+  _BEAM,
   _CROSS,
 
 // graph
@@ -56,6 +57,7 @@ exports
 // cursor
   setCursorShape,
   setCursorShapeAnchor,
+  setCursor,
   initCursor,
   setCursorPos,
 

@@ -12,9 +12,9 @@ var
   name:PString;
 
 begin
-  n:=listShift+szone-LISTZONE;
+  n:=sZone-LISTZONE;
   curTrailID:=listNEntry[n];
-  name:=pathNamePtr[n];
+  name:=pathNamePtr[curTrailID];
   pathNameSearch:=name; updateSearchField();
 end;
 

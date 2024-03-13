@@ -208,13 +208,19 @@ End;
 procedure callZoneProc(); Assembler;
 Asm
   lda szone
+  pha
   asl @
   tay
   lda adr._mzonePROC,y
   sta jaddr
   lda adr._mzonePROC+1,y
   sta jaddr+1
-  jmp jaddr:$ffff
+  jsr jaddr:$ffff
+  pla
+  cmp nZone
+  bne @exit
+  lda #(-1)
+  sta oZone
 End;
 
 procedure runInterface();

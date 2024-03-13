@@ -16,12 +16,13 @@ WSYNC   = $D40A
 
 dli1: // workarea
   pha
+
+  m@setVDLI DLI3
+
   lda #$E0
   sta wsync
   sta wsync
   sta COLPF4
-
-  m@setVDLI DLI3
 
   pla
   rti

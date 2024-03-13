@@ -34,6 +34,9 @@ _CARROW:
 _CWAIT:
   dta a(CWAIT_DATA)
 
+_CBEAM:
+  dta a(CBEAM_DATA)
+
 _CCROSS:
   dta a(CCROSS_DATA)
 
@@ -61,10 +64,13 @@ RADIOBUT_DATA:
 
 CARROW_DATA:
   ; dta $80, $e0, $f8, $f0, $e0, $c0, $80
-  dta $10, $18, $3c, $3e, $78, $60, $80
+  dta 0,0, $10, $18, $3c, $3e, $78, $60, $80
 
 CWAIT_DATA:
-  dta $ba, $7c, $f6, $ee, $6c, $ba, $44
+  dta 3,3, $ba, $7c, $f6, $ee, $6c, $ba, $44
+
+CBEAM_DATA:
+  dta 3,3, $28, $10, $10, $10, $10, $10, $28
 
 CCROSS_DATA:
-  dta $10, $10, $00, $c6, $00, $10, $10
+  dta 3,3, $10, $10, $00, $c6, $00, $10, $10

@@ -13,10 +13,26 @@ const
     $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF
   ];
   _CORNERS:Array of byte = [
-    $F0,$80,$A0,$80,$0F,$00,$06,$00,$0F,$01,$05,$01,$80,$A0,$A0,$80,$01,$05,$05,$01,$80,$A0,$80,$F0,$00,$06,$00,$0F,$01,$05,$01,$0F
+    $F0,$80,$A0,$80,$38,$00,$10,$00,$0F,$01,$05,$01,$80,$A0,$80,$00,$01,$05,$01,$00,$80,$A0,$80,$F0,$00,$10,$00,$38,$01,$05,$01,$0F
   ];
-  CORNERSX:Array[0..7] of byte = ( 72,106,144, 72,144, 72,106,144 );
+  CORNERSX:Array[0..7] of byte = ( 64,108,152, 64,152, 64,108,152 );
   CORNERSY:Array[0..7] of byte = (  0,  0,  0, 23, 23, 44, 44, 44 );
+
+  _TOP    = 0;
+  _MIDDLE = 24;
+  _BOTTOM = 47;
+  _LEFT   = -7;
+  _CENTER = 39;
+  _RIGHT  = 88;
+
+  XEDGE:Array of shortint = [ _LEFT, _CENTER, _RIGHT, _LEFT, _RIGHT, _LEFT, _CENTER, _RIGHT ];
+  YEDGE:Array of shortint = [ _TOP, _TOP, _TOP, _MIDDLE, _MIDDLE, _BOTTOM, _BOTTOM, _BOTTOM ];
+
+  EDGENAME:Array of string = [
+    'TOP-LEFT',   'TOP-CENTER',   'TOP-RIGHT',
+    'MIDDLE-LEFT',                'MIDDLE-RIGHT',
+    'BOTTOM-LEFT','BOTTOM-CENTER','BOTTOM-RIGHT'
+  ];
 
 var
   curSection:Shortint;

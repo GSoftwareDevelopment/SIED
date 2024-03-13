@@ -112,11 +112,30 @@ begin
 End;
 
 //
+procedure inInputZone();
+begin
+  __invertZone:=true;
+  if (oZone=sZone) then // cursor enter zone
+    setCursor(_BEAM)
+  else if (oZone<>sZone) then // cursor leave zone
+    setCursor(_ARROW);
+end;
+
+procedure inInputEditZone();
+begin
+  __invertZone:=false;
+  if (oZone=sZone) then // cursor enter zone
+    setCursor(_BEAM)
+  else if (oZone<>sZone) then // cursor leave zone
+    setCursor(_ARROW);
+end;
 
 function addInput(x,y,w:Byte; value:PString; prc:TZoneProc):Shortint;
 begin
   putText(x,y,value);
   result:=addZoneN(-1,x-1,y-1,w+2,7,prc);
+  if result<>-1 then
+    _mzoneInPROC[result]:=@inInputZone;
 End;
 
 function doInput(var sEdit:String):Shortint;
@@ -140,7 +159,7 @@ var
 
   procedure drawCursor(n:Boolean);
   begin
-    invert(ch,__y,0,6);
+    invert(__x+cx,__y,0,6);
     isCrs:=n;
   end;
 
@@ -161,14 +180,13 @@ begin
   __x:=_mzoneX1[szone];
   __y:=_mzoneY1[szone];
   __w:=(_mzoneX2[szone]-__x)-1;
-  _mzoneActive[szone]:=false;
+  _mzoneInPROC[_zone]:=@inInputEditZone;
   inc(__x);
   ln:=byte(sEdit[0]);
   move(sEDIT,value,ln+1);
   cx:=Byte(ln); ctm:=Byte(tm+1); isCrs:=false; KEYB:=255;
   firstKey:=true;
   repeat
-    ch:=__x+cx;
     if (tm=ctm) then
     begin
       ctm:=Byte(tm+20);
@@ -217,11 +235,14 @@ begin
         if cx>ln then value[0]:=char(cx);
         refreshValue();
       End;
-      ctm:=Byte(tm); KEYB:=255; firstKey:=false;
+      ctm:=Byte(tm);
+      KEYB:=255;
+      firstKey:=false;
     End;
     checkZones();
     checkShortcutKeyboard(KMOD_CTRL+KMOD_SHIFT);
-    if (mbutton<>MBUT_NONE) or (_callShortcutKeys<>$FF) then
+
+    if (nzone<>_zone) and ((mbutton<>MBUT_NONE) or (_callShortcutKeys<>$FF)) then
     begin
       if isCrs then drawCursor(isCrs);
       storeValue(); result:=_zone xor $FF;
@@ -229,5 +250,5 @@ begin
     End;
   until (false);
   if _callShortcutKeys=$FF then KEYB:=255;
-  _mzoneActive[_zone]:=true;
+  _mzoneInPROC[_zone]:=@inInputZone;
 End;

@@ -1,6 +1,6 @@
 procedure updateSearchField();
 begin
-  blank(9,1,PATHNAMESIZE,5);
+  blank(8,1,PATHNAMESIZE+1,5);
   if pathNameSearch[0]=#0 then
     putText(9,1,MSG_SEARCH)
   else
@@ -31,6 +31,7 @@ procedure blankList();
 begin
   for i:=0 to 4 do
   begin
+    // if nZone=LISTZONE+i then oZone:=-1;
     blank(8,_LISTY[i]-1,PATHNAMESIZE+1,6);
     clearZone(LISTZONE+i);
   end;
@@ -42,27 +43,30 @@ begin
   _mzoneActive[LISTZONE+5]:=(listShift+5<foundItems);
 end;
 
-procedure showPathList(n:byte);
+procedure showPathList(start:byte);
 var
   name:PString;
   p:PByte;
 
 begin
   if redrawList then blankList();
-  foundItems:=0;
-  p:=pointer(PATHNAMES_ADDR); i:=0;
+  foundItems:=0; n:=0;
+  p:=pointer(PATHNAMES_ADDR);
   while (n<MAXPATHDEFINITIONS) do
   begin
     if p^>0 then
     begin
-      name:=PString(p);
-      if (i<5) then
+      if n>=start then
       begin
+        name:=PString(p);
         if (pathNameSearch[0]=#0) or (findText(pathNameSearch,name)>0) then
         begin
           if redrawList and (foundItems<5) then addPathLabel(foundItems,name);
+          if (foundItems<5) then
+          begin
+            listNEntry[foundItems]:=n;
+          end;
           inc(foundItems);
-          listNEntry[i]:=n; inc(i);
         end;
       end;
       inc(p,p^+1);

@@ -46,6 +46,11 @@ begin
   if (moduleInitialized and $2=0) then
   begin
     fillchar(pointer(PATHLISTV_ADDR),$1000,$00); // clear pathListPtr, pathNamePtr, pathNames
+    for i:=0 to MAXPATHDEFINITIONS-1 do
+    begin
+      pathStartPointX[i]:=-128;
+      pathStartPointY[i]:=-128;
+    end;
     pathListPtr[0]:=pointer($A000);
     pathNameSearch:='TEST_PATH'; doCreate();
     moduleInitialized:=moduleInitialized or $2;

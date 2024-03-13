@@ -1,5 +1,6 @@
 procedure clearSection();
 begin
+  wait(1);
   HPOSM[2]:=0; HPOSM[3]:=0;
   for i:=14 to 31 do clearZone(i);
   for i:=56 to 56+47 do fillchar(Pointer(word(YSCR[i])+3),17,0);
@@ -23,7 +24,7 @@ end;
 procedure updatePathSection();
 begin
   case curSection of
-    1,4,5: scr:=@_ISELECT4+24; // Path Begin
+    0,1,4,5: scr:=@_ISELECT4+24; // Path Begin
     2: scr:=@_ISELECT4+12; // Inner Path
     3: scr:=@_ISELECT4+ 0; // Path Finish
   else
@@ -51,7 +52,39 @@ begin
   end;
 end;
 
-procedure showStartingPoint();
-begin
+procedure updateStartPoint();
+const
+  CTOP   = 8;
+  CLINE1 = 17;
+  CLEFT  = 22;
 
+var
+  px,py:Shortint;
+
+begin
+  putText(CLEFT-1,CTOP,'CURRENT START:');
+  fillchar(YSCR[56+CTOP+6]+10,8,$FF);
+  blank(CLEFT,CLINE1,6,11);
+  px:=pathStartPointX[curTrailID];
+  py:=pathStartPointY[curTrailID];
+  if ((px<>-128) and (px<>-128)) then
+  begin
+    n:=-1;
+    for i:=0 to 7 do
+      if ((px=XEDGE[i]) and (py=YEDGE[i])) then
+      begin
+        n:=i;
+        break;
+      end;
+    if n<>-1 then
+    begin
+      i:=Length(EDGENAME[n]);
+      px:=CLEFT+6-(i shr 1);
+      putText(px,CLINE1,EDGENAME[n]);
+      invert(px-1,CLINE1-1,i+1,6);
+      px:=CORNERSX[n];
+      py:=CORNERSY[n];
+      putSprite((@_CORNERS+ n*4), px, py,1,4);
+    end;
+  end;
 end;

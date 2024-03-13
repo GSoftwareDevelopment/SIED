@@ -12,12 +12,6 @@ mpivotY   = $61
   ; and #1
   ; sne:jmp xitvbv
 
-  lda mRefresh
-  beq checkStick
-  lda #0
-  sta mRefresh
-  jmp clrcrs
-
 checkStick:
   lda strig
   eor #$1
@@ -27,7 +21,7 @@ checkStick:
   lda stick
   and #%1111
   eor #%1111
-  beq checkKeys
+  beq checkRefrsh
   tax
 
   and #%1100
@@ -75,58 +69,18 @@ stickVtest:
   spl:inc mdy
   jmp clrcrs
 
-checkKeys:
-;   lda mAllowKeys
-;   beq xit
-
-;   lda SKSTAT
-;   and #%00001000
-;   bne skButton
-;   lda #MBUT_LEFT
-;   sta mbutton
-
-; skButton:
-;   lda KEYB
-;   and #%0011111
-;   cmp #$FF
-;   bne testKeys
+checkRefrsh:
+  lda mRefresh
+  beq xit
+  lda #0
+  sta mRefresh
+  beq clrcrs
 
 xit:
   lda #0
   sta mdx
   sta mdy
   jmp exvbl
-
-; testKeys:
-;   cmp #K_UP
-;   bne @+
-;   ldx #(-4)
-;   stx mdy
-;   bmi clrKey
-
-; @:
-;   cmp #K_DOWN
-;   bne @+
-;   ldx #(+4)
-;   stx mdy
-;   bpl clrKey
-
-; @:
-;   cmp #K_LEFT
-;   bne @+
-;   ldx #(-4)
-;   stx mdx
-;   bmi clrKey
-
-; @:
-;   cmp #K_RIGHT
-;   bne xit
-;   ldx #(+4)
-;   stx mdx
-
-; clrKey:
-;   lda #$ff
-;   sta KEYB
 
 clrcrs:
 // clear old cursor
@@ -142,7 +96,8 @@ lclrcrs:
   dex
   bpl lclrcrs
 
-calccrs:      // calculate new cursor position
+// calculate new cursor position, and boundary check
+calccrs:
   lda mdx
   beq checkMY
   bpl @+
@@ -195,6 +150,7 @@ adddy:
   bcc drawcrs
   lda #120    // stay on bottom edge
   sta _my
+// -- end of boundary check
 
 drawcrs:     // draw new cursor
   ldy #6

@@ -35,7 +35,7 @@ var
 begin
   if dev[1]='D' then
   begin
-    setCursorShapeAnchor(3,3); setCursorShape(_WAIT);
+    setCursor(_WAIT);
     _fn:=dev; move(filemask[1],_fn[Byte(_fn[0])+1],Byte(filemask[0]));
     totalFiles:=0;
     if dirPageBegin>0 then setStatus(MSG_SEEKING) else setStatus(MSG_READING);
@@ -92,5 +92,5 @@ begin
     if IOResult<3 then clearStatus();
   End;
   cls(1);
-  setCursorShapeAnchor(0,0); setCursorShape(_ARROW);
+  setCursor(_ARROW);
 End;

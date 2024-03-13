@@ -17,7 +17,29 @@ Asm
   sta main.mpivotX
   lda y
   sta main.mpivotY
+  lda #1
+  sta mRefresh
 End;
+
+procedure setCursor(cur:Pointer); Register; Assembler;
+asm
+  ldy #0
+  lda (cur),y
+  sta main.mpivotX
+  iny
+  lda (cur),y
+  sta main.mpivotY
+
+  lda cur
+  add #2
+  sta main.CURSORSPR
+  lda cur+1
+  adc #0
+  sta main.CURSORSPR+1
+
+  lda #1
+  sta mRefresh
+end;
 
 procedure setCursorPos(x,y:Byte); Register;
 begin
@@ -33,8 +55,7 @@ begin
   SetIntVec(iVBL,VBLPtr);
   mRefresh:=true;
   _mx:=128; _my:=64;
-  setCursorShape(_ARROW);
-  setCursorShapeAnchor(0,0);
+  setCursor(_ARROW);
   PMBASE:=HI(PMG_ADDR);
   PMCTL:=3;
   GPRIOR:=%00000010;

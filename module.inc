@@ -4,11 +4,11 @@ var
 
 procedure loadModule(FN:PString);
 begin
-  setCursorShapeAnchor(3,3); setCursorShape(_WAIT);
+  setCursor(_WAIT);
   setStatus('LOADING MODULE...');
   XIO($28, 2, 4, $00, FN);
   if IOResult<>1 then setStatus('ERROR LOADING MODULE!');
-  setCursorShapeAnchor(0,0); setCursorShape(_ARROW);
+  setCursor(_ARROW);
 end;
 
 procedure setModule(); forward;

@@ -7,4 +7,5 @@ var
   _RADIOBUT : Pointer                 absolute RADIOBUT_ADDR;
   _ARROW    : Pointer                 absolute CARROW_ADDR;
   _WAIT     : Pointer                 absolute CWAIT_ADDR;
+  _BEAM     : Pointer                 absolute CBEAM_ADDR;
   _CROSS    : Pointer                 absolute CCROSS_ADDR;

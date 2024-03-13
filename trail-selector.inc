@@ -42,7 +42,7 @@ end;
 
 procedure updateSearchField(); forward;
 procedure refreshList(); forward;
-procedure showPathList(n:byte); forward;
+procedure showPathList(start:byte); forward;
 procedure selectorShortKeys(); assembler; forward;
 {$I 'trail-selector-actions.inc'}
 {$I 'trail-selector-controls.inc'}
