@@ -32,11 +32,11 @@ Brak punktu (na liście), tworzy nowy rekord.
 Znalezienie pasującego punktu, zwiększa jego `c` o 1.
 
 Tworzy się mapa powtórzeń punktów.
-Można też sprawić, że będą to unikalne punkty, jeżeli co cykl ścieżki, będą eliminowane te rekordy, które mają zero powtórzeń. Jednak, taka eliminacja musiała by się odbywać dopiero po drugim cyklu, gdyż po pierwszym, wszystkie punkty będą miały 0 lub więcej powtórzeń.
+Można też sprawić, że będą to unikalne punkty. Jeżeli co cykl ścieżki, będą eliminowane te rekordy, które mają zero powtórzeń. Jednak, taka eliminacja musiała by się odbywać dopiero po drugim cyklu, gdyż po pierwszym, wszystkie punkty będą miały 0 lub więcej powtórzeń.
 
-Ponieważ po kroku 28 jest skok bezwarunkowy, można założyć, że po osiągnięciu ostatniego kroku:
+Ponieważ po kroku 28 jest skok bezwarunkowy - w sumie, inne nie występują w silniku, ale może być też skok do innej ścieżki- to można założyć, że po osiągnięciu ostatniego kroku:
 
-- jeżeli unikalne punkty będą miały więcej niż 1 powtórzenie to mamy do czynienia z infinity loop.
+- jeżeli unikalne punkty będą miały więcej niż 1 powtórzenie to mamy do czynienia z nieskończoną pętlą ścieżki.
 
 # Minusy i plusy
 
