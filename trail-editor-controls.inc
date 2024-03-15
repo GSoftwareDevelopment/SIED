@@ -128,12 +128,12 @@ begin
           end;
           if loop then
           begin
-            if (ddx=0) and (ddy=0) then
-            begin
-              if (mode and PT_CALCLEN<>0) then TLPosition:=-TLPosition;
-              break;
-            end
-            else
+            // if (ddx=0) and (ddy=0) then
+            // begin
+            //   if (mode and PT_CALCLEN<>0) then TLPosition:=-TLPosition;
+            //   break;
+            // end
+            // else
               if (mode=PT_CALCLEN) then break;
           end
           else
@@ -175,7 +175,6 @@ begin
         begin
           v:=2; break;
         end;
-        inc(ddx,dx); inc(ddy,dy);
       end
       else
         if (mode and PT_UPDATETIMELINE<>0) and not loop then TLPoint(0);
