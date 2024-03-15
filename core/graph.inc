@@ -1,11 +1,12 @@
 {$I 'graph.var.inc'}
 
 procedure putImage(adr:Pointer; x,y,width,height:Byte); Register; assembler; Asm icl 'asm/put-image.a65' End;
-procedure putSprite(adr:Pointer; x,y:shortint; width,height:shortint); register; keep; assembler; Asm icl 'asm/put-sprite-or.a65' End;
+procedure putSprite(adr:Pointer; x,y,width,height:Byte); Register; assembler; Asm icl 'asm/put-sprite-or.a65' End;
 procedure putSpriteXOR(adr:Pointer; x,y,width,height:Byte); Register; assembler; Asm icl 'asm/put-sprite-xor.a65' End;
 procedure putText(x,y:Shortint; s:PString); Register; assembler; Asm icl 'asm/put-text.a65' End;
 procedure putChar(x,y:Shortint; ch:Char); Register; assembler; Asm icl 'asm/put-char.a65' End;
 procedure putTextC(x,y:Shortint; s:PString); Register; assembler; Asm icl 'asm/put-textc.a65' End;
+procedure putCharC(x,y:Shortint; ch:Char); Register; assembler; Asm icl 'asm/put-charc.a65' End;
 
 procedure invert(x,y,w,h:Shortint); Register; assembler; Asm icl 'asm/invert.a65' End;
 procedure blank(x,y,w,h:Shortint); Register; assembler; Asm icl 'asm/blank.a65' End;

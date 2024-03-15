@@ -53,14 +53,16 @@ begin
       pathStartEdgeShift[i]:=0;
     end;
     pathListPtr[0]:=pointer($A000);
-    pathNameSearch:='TEST_PATH'; doCreate();
+    pathNameSearch:='WAVE'; doCreate();
     moduleInitialized:=moduleInitialized or $2;
   end;
   redrawList:=true; curAction:=-1;
-  fillchar(Pointer(PMG_ADDR+$180+24),48,$F0);
+  fillchar(Pointer(PMG_ADDR+$180+24),48,%11110000);
+  fillchar(Pointer(PMG_ADDR+$180+24+65),7,$02);
   fillchar(Pointer(PMG_ADDR+$300+23),50,$FF);
+  fillchar(Pointer(PMG_ADDR+$380+23),50,$3F);
   PCOL[2]:=$E2; PCOL[3]:=$E2;
-  SIZEP[2]:=%11; SIZEM:=%11110000;
+  SIZEP[2]:=%11; SIZEP[3]:=%11; SIZEM:=%11110000;
   HPOSP[2]:=44; // icon tray
   clearAllShortcutsKey();
   showTrailSelector();

@@ -33,6 +33,8 @@ PATHNAMES_ADDR      = $C200;                // Address of path names table
 
 SCREEN_LINES_ADDR   = $D800;                // table of screen lines addresses
 IZONE_ADDR          = $DA00;                // interface work tables
+ITIMER_ADDR         = $DB20;                // interface timers
+
 SCKEYVEC_ADDR       = $DB80;                // shortcur keyboard vectors
 CORE_LIB            = $DC00;                // core library base address
 

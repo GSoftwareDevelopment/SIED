@@ -1,0 +1,61 @@
+  txa:pha
+
+// putchar
+//  if activePage=1 then inc(y,56);
+  lda y
+  ldy activePage
+  beq skPage
+  add #56
+skPage:
+
+//  y*2 -> index for YSCR
+  asl @
+  tay
+
+//  scr:=Pointer(YSCR[y]+x);
+
+calcSCR:
+  lda adr.YSCR,y
+  add x
+  sta scr
+  lda adr.YSCR+1,y
+  adc #0
+  sta scr+1
+
+  clc
+//
+// --
+//
+
+lputchar:
+  lda ch            // get string char
+  and #127          // only char #0…#127
+  tay
+  lda adr._asc2int,y
+
+  asl @
+  tay
+  lda adr.AFONTC,y   // get font address
+  sta adr
+  lda adr.AFONTC+1,y
+  sta adr+1
+
+  ldx #0
+  ldy #0
+
+lln:
+lbyte:
+  lda adr:$2000,x
+  ora (scr),y
+  sta (scr),y
+
+  tya
+  adc #40
+  tay
+
+  inx
+  cpx #5
+  bne lln
+
+exPutImg:
+  pla:tax

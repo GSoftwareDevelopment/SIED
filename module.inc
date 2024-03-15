@@ -48,7 +48,10 @@ begin
   if szone=curModule then exit;
   curModule:=szone;
 
-  HPOSM[2]:=0; HPOSM[3]:=0;
+  initTimers();
+
+  for i:=0 to 3 do HPOSM[i]:=0;
+  HPOSP[3]:=0;
   _mZoneActive[0]:=true;
   _mZoneActive[1]:=true;
   _mZoneActive[2]:=true;

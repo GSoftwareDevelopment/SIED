@@ -84,7 +84,7 @@ End;
 
 procedure setControl(n:Shortint);
 var
-  _x:Byte;
+  _x,_y:Byte;
   p:Pointer;
 
 begin
@@ -94,11 +94,12 @@ begin
     if _mZoneActive[i+3] then
     begin
       _x:=_mZoneX1[i+3];
+      _y:=_mZoneY1[i+3];
       if i=n then
         p:=_CONTROLS[i+6]
       else
         p:=_CONTROLS[i];
-      putImage(p,_x,YCONTROLS,3,8);
+      putImage(p,_x,_y,3,8);
     end;
   End;
 End;

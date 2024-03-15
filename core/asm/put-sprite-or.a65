@@ -12,16 +12,6 @@ skPage:
   tay
 
   lda x
-;   bpl positiveX
-; negativeX:
-;   ora #%111
-;   sec
-;   ror @
-;   ror @
-;   ror @
-;   bmi calcScr ; always jump
-
-positiveX:
   lsr @
   lsr @
   lsr @

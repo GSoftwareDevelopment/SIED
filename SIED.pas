@@ -18,6 +18,7 @@ const
 {$I 'core/assets.h.inc'}
 {$I 'core/keyboard.h.inc'}
 {$I 'core/graph.h.inc'}
+{$I 'core/timers.h.inc'}
 {$I 'core/interface.h.inc'}
 {$I 'core/controls.h.inc'}
 
@@ -73,6 +74,7 @@ begin
   wait(1);
   initShortcutKeyboard();
   // interface init
+  initTimers();
   initInterface();
 End;
 

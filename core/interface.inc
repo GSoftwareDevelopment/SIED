@@ -223,10 +223,13 @@ Asm
   sta oZone
 End;
 
+//
+
 procedure runInterface();
 begin
   while (true) do
   begin
+    checkTimers();
     if checkShortcutKeyboard(0) then callShortcutKeyboard();
     if checkZones() then callZoneProc();
   End;

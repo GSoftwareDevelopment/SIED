@@ -25,6 +25,7 @@ procedure setIcon(n:Shortint); Forward;
 procedure setControl(n:Shortint); Forward;
 
 {$I 'keyboard.inc'}
+{$I 'timers.inc'}
 {$I 'interface.inc'}
 {$I 'controls.inc'}
 
@@ -48,6 +49,7 @@ exports
   putText,
   putChar,
   putTextC,
+  putCharC,
   invert,
   blank,
   SetScreenWidth,
@@ -78,6 +80,13 @@ exports
   checkZones,
   callZoneProc,
   runInterface,
+
+// timers
+  clearTimer,
+  initTimers,
+  setTimerN,
+  setTimer,
+  checkTimers,
 
 // controls
   invertZone,
