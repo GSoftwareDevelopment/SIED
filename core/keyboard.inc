@@ -64,12 +64,12 @@ lreg:
   and #$3F
   asl @
   tax
-  iny
   lda #<__noShortcurKey  ; get LSB of address
   sta adr.__SCKeyVec,x
-  iny
   lda #>__noShortcurKey  ; get MSB of address
   sta adr.__SCKeyVec+1,x
+  iny
+  iny
   iny
   dec count
   jmp lreg

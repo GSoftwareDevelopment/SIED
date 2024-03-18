@@ -77,6 +77,7 @@ begin
   End
   else
   begin
+    setScreenWidth(20);
     for j:=0 to MAXLISTITEMS-1 do
     begin
       blank(_DIRFILEX[j]-1,_DIRFILEY[j]-1,ITEMSIZE,6);

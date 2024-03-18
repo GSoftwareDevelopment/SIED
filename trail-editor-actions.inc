@@ -11,6 +11,7 @@ begin
   setControls(0);
   clearStatus();
   clearWorkarea();
+  unregisterShortcutKeys(@shortKeys,SK_COUNT);
   showTrailSelector();
 end;
 
@@ -22,10 +23,18 @@ end;
 procedure inGameScreen();
 begin
   __invertZone:=false;
-  if ((nZone=ZONE_VIEWPORT) and (oZone<>ZONE_VIEWPORT)) then // cursor enter zone
-    setCursor(_CROSS)
-  else if ((nZone<>ZONE_VIEWPORT) and (oZone=ZONE_VIEWPORT)) then // cursor leave zone
+  if ((nZone<>ZONE_VIEWPORT) and (oZone=ZONE_VIEWPORT)) then // cursor leave zone
+  begin
+    cursorInViewPort:=false;
     setCursor(_ARROW);
+  end;
+end;
+
+procedure doEditPath(); Keep;
+begin
+  cursorInViewPort:=true;
+  setCursor(_CROSS);
+  setCursorPos(XVIEWPORT+8+curPX,curPY);
 end;
 
 procedure inTimeLine();
@@ -37,45 +46,6 @@ begin
     setCursor(_ARROW);
 end;
 
-procedure updateTimeLineTime();
-var
-  min,sec,frm,bcd:Byte;
-  s:string[8];
-
-  function BIN2BCD(bin:Byte):Byte; Assembler;
-  asm
-    lda #0
-    sta result+0
-
-loop8Bits:
-    ldy #{sed}
-    asl bin
-    adc result+0
-    sta result+0
-    iny
-    bne loop8Bits+1
-    cld
-  end;
-
-begin
-  frm:=curTLPos mod FPS;
-  sec:=curTLPos div FPS;
-  min:=sec div 60;
-  // setScreenWidth(40);
-  for i:=56+63 to 56+67 do fillchar(YSCR[i],8,0);
-  s:='  :  .  ';
-  bcd:=bin2bcd(min);
-  s[1]:=char(48+bcd shr 4);
-  s[2]:=char(48+bcd and $f);
-  bcd:=bin2bcd(sec);
-  s[4]:=char(48+bcd shr 4);
-  s[5]:=char(48+bcd and $f);
-  bcd:=bin2bcd(frm);
-  s[7]:=char(48+bcd shr 4);
-  s[8]:=char(48+bcd and $f);
-  putTextC(0,63,s);
-end;
-
 procedure doSetTimeLinePos();
 begin
   curTLPos:=_mx-48-XTIMELINE-TLShift;
@@ -84,17 +54,37 @@ begin
   updateTimeLineTime();
 end;
 
-procedure doTLPrevEvent();
+procedure doTLPrevEvent(); Keep;
 begin
-  if curTLPos>0 then dec(curTLPos);
+  if (_modKey=0) then
+  begin
+    if curTLPos>0 then dec(curTLPos)
+  end
+  else
+  if (_modKey=KMOD_SHIFT) then
+  begin
+    if (curTLPos-FPS)>0 then dec(curTLPos,FPS) else curTLPos:=0;
+  end
+  else
+  if _modKey=KMOD_CTRL then curTLPos:=0;
   HPOSM[0]:=48+XTIMELINE+curTLPos-TLShift;
   updateTimeLineTime();
   if oZone=3 then begin setControl(-1); oZone:=-1; end;
 end;
 
-procedure doTLNextEvent();
+procedure doTLNextEvent(); Keep;
 begin
-  if curTLPos<curTrailLength then inc(curTLPos);
+  if (_modKey=0) then
+  begin
+    if curTLPos<curTrailLength then inc(curTLPos);
+  end
+  else
+  if (_modKey=KMOD_SHIFT) then
+  begin
+    if (curTLPos+FPS)<curTrailLength then inc(curTLPos,FPS) else curTLPos:=curTrailLength;
+  end
+  else
+  if _modKey=KMOD_CTRL then curTLPos:=curTrailLength;
   HPOSM[0]:=48+XTIMELINE+curTLPos-TLShift;
   updateTimeLineTime();
   if oZone=6 then begin setControl(-1); oZone:=-1; end;
@@ -125,29 +115,34 @@ begin
   inc(b); if b>5 then b:=0;
   loopPattern:=ANIM[b];
   processTrail(PT_KEEPCURSOR+PT_UPDATEPATH);
-  activePage:=0;
-  setScreenWidth(16);
-  putSpriteXOR(@_OBJECT,8+curPX,4+curPY,1,7);
-  activePage:=1;
+  // setCursorPos(XVIEWPORT+8+curPX,curPY);
+  if not cursorInViewport then
+  begin
+    activePage:=0;
+    setScreenWidth(16);
+    putSpriteXOR(@_OBJECT,8+curPX,4+curPY,1,7);
+    activePage:=1;
+  end;
   updateGameScreen();
+  updateStepInfo();
   animTimer:=setTimer(PATH_ANIM_TIME,@onTimerAnim);
 end;
 
 procedure doSwitchPathSection();
 begin
   if curSection=(sZone-10) then exit;
+  KEYB:=$FF;  // Prevent a previous key click from overriding
   clearSection();
   curSection:=sZone-10;
+  unregisterShortcutKeys(@shortKeys,SK_COUNT);
   updatePathSection();
-  addZoneN(ZONE_VIEWPORT,XVIEWPORT div 4,0,26,48,@nullProc);
-  _mZoneInCall[ZONE_VIEWPORT]:=@inGameScreen;
+  clearZone(ZONE_VIEWPORT);
   clearGameScreen();
   clearTimer(animTimer);
   updateTimeLineTime();
   case curSection of
     0,1: showPathBegin();
     2: showPathInner();
-    3: begin // Path Finish
-        end;
+    3: showPathFinish();
   end;
 end;

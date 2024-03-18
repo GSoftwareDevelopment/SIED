@@ -18,14 +18,21 @@ var
 
   v:Byte;
   px,py:shortint;
-  ocurPY:shortint;
   curPx,curPy:shortint;
   dx,dy:shortint;
   curDx,curDy:shortint;
+
+  _curPx,_curPy:shortint;
+  _curDx,_curDy:shortint;
+
   ddx,ddy:shortint;
   loop:boolean;
   tm:Byte absolute $14;
   ntm:Byte;
+
+  min,sec,frm,bcd:Byte;
+  s:string[8];
+  cursorInViewPort:Boolean;
 
 //
 //
@@ -70,15 +77,42 @@ begin
   end;
 end;
 
+function BIN2BCD(bin:Byte):Byte; Assembler;
+asm
+  lda #0
+  sta result+0
+
+loop8Bits:
+  ldy #{sed}
+  asl bin
+  adc result+0
+  sta result+0
+  iny
+  bne loop8Bits+1
+  cld
+end;
+
 //
 //
 //
 
+const
+  SK_COUNT = 3;
+procedure shortKeys(); Assembler; Forward;
+
 procedure doSwitchPathSection(); Forward;
 procedure showPathBegin(); Forward;
 procedure showPathInner(); Forward;
+procedure showPathFinish(); Forward;
 {$I 'trail-editor-controls.inc'}
 {$I 'trail-editor-actions.inc'}
+
+procedure shortKeys(); Assembler;
+asm
+  dta k_COMMA,a(MAIN.doTLPrevEvent)
+  dta k_DOT,  a(MAIN.doTLNextEvent)
+  dta k_V,    a(MAIN.doEditPath)
+end;
 
 procedure showPathBegin();
 begin
@@ -96,20 +130,35 @@ end;
 
 procedure showPathInner();
 begin
+
+  putImage(@_ITRLTL,18,0,2,48);
+   addZone(36,0,4,12,@nullProc); // Add point
+  addZoneV(@nullProc);           // Delete point
+  addZoneV(@nullProc);           // horizontal mirror
+  addZoneV(@nullProc);           // ?
+
   updateGameScreen();
-  putText(36,1,'0123');
+
+  _curPx:=-128; _curPy:=-128;
+  _curDx:=-128; _curDy:=-128;
+
   addZoneN(ZONE_TIMELINE,8,65,32,7,@doSetTimeLinePos);
   _mZoneInCall[ZONE_TIMELINE]:=@inTimeLine;
+
+  addZoneN(ZONE_VIEWPORT,XVIEWPORT div 4,0,26,48,@doEditPath);
+  _mZoneInCall[ZONE_VIEWPORT]:=@inGameScreen;
+
   HPOSP[3]:=180;
   HPOSM[0]:=48+XTIMELINE+curTLPos-TLShift;
   trailPattern:=%111111111111111111111111;
     loopPattern:=%100100100100100100100100;
   curTrailLength:=processTrail(PT_CALCLEN+PT_UPDATETIMELINE);
   onTimerAnim();
-  _mZoneCall[3]:=@doTLPrevEvent;
-  _mZoneCall[6]:=@doTLNextEvent;
-  addShortcutKey(k_COMMA,@doTLPrevEvent);
-  addShortcutKey(k_DOT,@doTLNextEvent);
+  registerShortcutKeys(@shortKeys,SK_COUNT);
+end;
+
+procedure showPathFinish();
+begin
 end;
 
 //
@@ -124,8 +173,6 @@ begin
   setControl(-1);
   setStatus('EDIT:');
   putTextC(6,69,pathNameSearch);
-
-  // putTextC(0,63,'00:00.00');
 
   SetScreenWidth(20);
   putImage(@_ITRLED,0,0,3,48);

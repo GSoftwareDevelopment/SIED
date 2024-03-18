@@ -4,6 +4,8 @@ Powyższy rysunek przedstawia hipotetyczną ścieżkę o nieskończonej pętli. 
 
 Obiekt może poruszać się bardzo podobnym torem, gdzie dolna część ścieżki może być np. węższa o kilka pikseli w efekcie cała ścieżka będzie się lekko przesuwała, aż osiągnie brzeg ekranu i skończy swój bieg "naturalnie".
 
+
+
 Dlaczego? Ponieważ dane dt. poruszania się obiektów są względne, tzn. podawana jest wartość przesunięcia `dx` i `dy` (w wartościach od -7…+7 w każdej osi) w każdym kroku. Stąd, przy skoku pomiędzy pkt. 28, a 5 może dojść do innego (niż na rysunku) przesunięcia, np. w lewo i w efekcie cały ruch będzie "spieprzał" w lewo 🙂
 
 Problem pojawia się, gdy tak się nie dzieje.

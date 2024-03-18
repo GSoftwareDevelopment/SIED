@@ -87,6 +87,69 @@ begin
   end;
 end;
 
+procedure updateCoord(x,y,v:Shortint);
+begin
+  s:='  ';
+  if v>=0 then bcd:=bin2bcd(v)
+  else
+  begin s[1]:='-'; bcd:=bin2bcd(-v); end;
+  if bcd>$10 then s[1]:=char(48+bcd shr 4);
+  s[2]:=char(48+bcd and $f);
+  // blank(x*2,y,3,4);
+  putTextC(x,y,s);
+end;
+
+procedure updateTimeLineTime();
+begin
+  frm:=curTLPos mod FPS;
+  sec:=curTLPos div FPS;
+  min:=sec div 60;
+  for i:=56+63 to 56+67 do fillchar(YSCR[i],8,0);
+  s:='  :  .  ';
+  bcd:=bin2bcd(min);
+  s[1]:=char(48+bcd shr 4);
+  s[2]:=char(48+bcd and $f);
+  bcd:=bin2bcd(sec);
+  s[4]:=char(48+bcd shr 4);
+  s[5]:=char(48+bcd and $f);
+  bcd:=bin2bcd(frm);
+  s[7]:=char(48+bcd shr 4);
+  s[8]:=char(48+bcd and $f);
+  putTextC(0,63,s);
+end;
+
+procedure updateStepInfo();
+var
+  _x,_y:Byte;
+
+begin
+  if cursorInViewPort then
+  begin
+    _x:=_mx-56-XVIEWPORT; _y:=_my-24;
+    if  ((curPX<>_curPX) or (curPY<>_curPY)) and
+        ((curPX<>_x) or (curPY<>_y)) then
+    begin
+      setCursorPos(XVIEWPORT+8+curPX,curPY);
+      curPX:=_x; curPY:=_y;
+    end;
+  end;
+  setScreenWidth(40);
+  if (curPX<>_curPX) or (curPY<>_curPY) then
+  begin
+    putImage(@_ICOORD,11,48,8,6);
+    updateCoord(14,48,curPX); updateCoord(17,48,curPY);
+    _curPX:=curPX; _curPY:=curPY;
+  end;
+
+  if (curDX<>_curDX) or (curDY<>_curDY) then
+  begin
+    putImage(@_ICOORD+48,19,48,8,6);
+    updateCoord(21,48,curDX); updateCoord(24,48,curDY);
+    _curDX:=curDX; _curDY:=curDY;
+  end;
+  setScreenWidth(20);
+end;
+
 function processTrail(mode:Byte):Smallint;
 var
   w,pathPattern:longint;
@@ -128,13 +191,7 @@ begin
           end;
           if loop then
           begin
-            // if (ddx=0) and (ddy=0) then
-            // begin
-            //   if (mode and PT_CALCLEN<>0) then TLPosition:=-TLPosition;
-            //   break;
-            // end
-            // else
-              if (mode=PT_CALCLEN) then break;
+            if (mode=PT_CALCLEN) then break;
           end
           else
             pathPattern:=loopPattern;
@@ -149,11 +206,7 @@ begin
           v:=3; break;
         end;
     else
-      if TLPosition=curTLPos then
-      begin
-        curPx:=px; curPy:=py;
-        curDx:=0;  curDy:=0;
-      end;
+      dx:=0; dy:=0;
       if (mode and PT_UPDATEPATH<>0) then
       begin
         w:=pathPattern and 1;
@@ -161,23 +214,24 @@ begin
         pathPattern:=pathPattern shr 1;
         if w<>0 then pathPattern:=pathPattern or $800000;
       end;
+      dx:=v shr 4;  if (dx and %1000)<>0 then dx:=dx or %11110000;
+      dy:=v and $F; if (dy and %1000)<>0 then dy:=dy or %11110000;
+      if TLPosition=curTLPos then
+      begin
+        curPx:=px; curPy:=py;
+        curDx:=dx; curDy:=dy;
+      end;
+      inc(px,dx); inc(py,dy);
       if v<>0 then
       begin
         if (mode and PT_UPDATETIMELINE<>0) and not loop then TLPoint(1);
-        dx:=v shr 4;  if (dx and %1000)<>0 then dx:=dx or %11110000;
-        dy:=v and $F; if (dy and %1000)<>0 then dy:=dy or %11110000;
-        if TLPosition=curTLPos then
-        begin
-          curDx:=dx; curDy:=dy;
-        end;
-        inc(px,dx); inc(py,dy);
-        if ((px<_LEFT) or (px>_RIGHT)) or ((py<_TOP) or (py>_BOTTOM)) then
-        begin
-          v:=2; break;
-        end;
       end
       else
         if (mode and PT_UPDATETIMELINE<>0) and not loop then TLPoint(0);
+      if ((px<_LEFT) or (px>_RIGHT)) or ((py<_TOP) or (py>_BOTTOM)) then
+      begin
+        v:=2; break;
+      end;
       inc(adr);
       inc(TLPosition);
     end;

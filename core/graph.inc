@@ -16,6 +16,7 @@ Asm
   sta MAIN.PUTIMAGE._LNWIDTH
   sta MAIN.PUTSPRITE._LNWIDTH1
   sta MAIN.PUTSPRITE._LNWIDTH2
+  sta MAIN.BLANK._LNWIDTH1
 End;
 
 procedure clearPage(page:Byte); Register; Assembler;
