@@ -2,9 +2,10 @@
 {$define ROMOFF}
 {$define NOROMFONT}
 {$LIBRARYPATH 'bin/'}
+{$UNITPATH 'units/'}
 
 library disk:$4000;
-uses cio;
+uses cio,rle;
 
 const
 {$I 'data/data-mem.inc'}
@@ -30,10 +31,15 @@ const
   ITEMSIZE = 14;
   MSG_READING = 'READING DIRECTORY...';
   MSG_SEEKING = 'SEEKING...';
+  MSG_SAVE = 'SAVEING...';
+  MSG_LOAD = 'LOADING...';
+  MSG_LOAD_SUCCESS = 'LOADED SUCCESSFULLY';
   MSG_IOERR   = 'I/O ERROR $00';
   _HEX:array of char = '0123456789ABCDEF';
   _DIRFILEX:Array of Byte = [  9,  9,  9,  9,  9, 24, 24, 24, 24, 24 ];
   _DIRFILEY:Array of Byte = [ 13, 20, 27, 34, 41, 13, 20, 27, 34, 41 ];
+
+  RLEBUFFERSIZE = 1024;
 
 var
   dev:string[4] absolute $04C0; //3f00;
@@ -43,7 +49,9 @@ var
   dirName:Array[0..MAXLISTITEMS-1] of string[12];
   dirPageBegin:smallint;
 
+  rlebuf:Array[0..RLEBUFFERSIZE-1] of byte absolute $7000;
 //
+procedure showIOError(); Forward;
 procedure readDirectory(); Forward;
 procedure updateFileNameField(); Forward;
 {$I 'disk-actions.inc'}
@@ -77,8 +85,8 @@ begin
   addZoneN(LISTZONE-1,38,10,2,5,@doPrevPageDir);
   addZoneN(LISTZONE+MAXLISTITEMS,38,43,2,5,@doNextPageDir);
 
-  addZoneN(9 ,0,0 ,6,12,@nullProc);
-  addZoneN(10,0,12,6,12,@nullProc);
+  addZoneN(9 ,0,0 ,6,12,@doSaveToDisk);
+  addZoneN(10,0,12,6,12,@doLoadFromDisk);
   addZoneN(11,0,24,6,12,@nullProc);
   addZoneN(12,0,36,6,12,@nullProc);
   putText(9,1,'DEV');

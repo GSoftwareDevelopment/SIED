@@ -4,6 +4,7 @@
 {$UNITPATH './'}
 {$LIBRARYPATH './bin/'}
 {$LIBRARYPATH './bin/'}
+// {$DEFINE PRELOAD_DATA}
 
 program Editor;
 uses cio;
@@ -11,6 +12,9 @@ uses cio;
 const
 {$I 'data/data-mem.inc'}
 {$R 'data/data.rc'}
+{$IFDEF PRELOAD_DATA}
+{$R 'data/preload.rc'}
+{$ENDIF}
 {$R 'libs.rc'}
 
 {$I 'core/pmg.var.inc'}
@@ -59,6 +63,7 @@ begin
   for i:=0 to 47 do YSCR[56+i]:=Pointer(EDITOR_ADDR+i*20);
   for i:=0 to 23 do YSCR[56+48+i]:=Pointer(EDITOR_ADDR+(20*48)+i*40);
   fillchar(Pointer(PMG_ADDR+$180),$E00,0); // clear PMG, SCREEN & EDITOR area at once
+  fillchar(pointer(CARD_ADDR),$3000,$00); // clear CARD & Swap area
   ActivePage:=1;
   initCursor(@myVBL);
   Asm sei; End;

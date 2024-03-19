@@ -45,7 +45,6 @@ begin
   end;
   if (moduleInitialized and $2=0) then
   begin
-    fillchar(pointer($A000),$1000,$00);
     fillchar(pointer(PATHLISTV_ADDR),$1000,$00); // clear pathListPtr, pathNamePtr, pathNames
     for i:=0 to MAXPATHDEFINITIONS-1 do
     begin
@@ -53,7 +52,6 @@ begin
       pathStartEdgeShift[i]:=0;
     end;
     pathListPtr[0]:=pointer($A000);
-    pathNameSearch:='WAVE'; doCreate();
     moduleInitialized:=moduleInitialized or $2;
   end;
   redrawList:=true; curAction:=-1;

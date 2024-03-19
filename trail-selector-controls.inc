@@ -1,5 +1,6 @@
 procedure updateSearchField();
 begin
+  setScreenWidth(20);
   blank(8,1,PATHNAMESIZE+1,5);
   if pathNameSearch[0]=#0 then
     putText(9,1,MSG_SEARCH)
@@ -49,6 +50,7 @@ var
   p:PByte;
 
 begin
+  setScreenWidth(20);
   if redrawList then blankList();
   foundItems:=0; n:=0;
   p:=pointer(PATHNAMES_ADDR);

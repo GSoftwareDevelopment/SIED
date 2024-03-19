@@ -25,6 +25,8 @@ DLIST_ADDR          = $8000;                // Display List definition
 
 MAXPATHDEFINITIONS  = 63;
 
+CARD_ADDR           = $A000;
+
 PATHLISTV_ADDR      = $C000;                // Table of path vectors ((MAXPATHDEFINITIONS+1)*Pointer)
 PATHNAMEV_ADDR      = $C080;                // Table of path names vectors (MAXPATHDEFINITIONS*Pointer)
 PATHSTARTX_ADDR     = $C100;                // Table of start point X (MAXPATHDEFINITIONS*Byte)

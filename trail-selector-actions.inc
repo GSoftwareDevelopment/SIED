@@ -111,10 +111,10 @@ begin
 // check for exist name in list
   redrawList:=false; showPathList(0);
   if foundItems=0 then
-    setStatus(@MSG_CHOICETRAIL)
+    setStatus(@MSG_EDIT_NOTRAIL)
   else
   begin
-    unregisterShortcutKeys(@selectorShortKeys,6);
+    unregisterShortcutKeys(@selectorShortKeys,9);
     showTrailEditor();
   end;
 end;
@@ -141,6 +141,10 @@ begin
       11: doName();
       12: doDelete();
     end;
+  end
+  else
+  begin
+    setStatus(MSG_CERD_NOTRAIL);
   end;
 end;
 
@@ -177,4 +181,44 @@ procedure keyDelete(); Keep;
 begin
   if (_modKey<>(KMOD_CTRL+KMOD_SHIFT)) then exit;
   toZone(12); doSetAction();
+end;
+
+procedure keySelectPath(); Keep;
+const
+  MIN=LISTZONE;
+  MAX=LISTZONE+4;
+  STEP=5;
+
+var
+  modKey:Byte;
+  czone:shortint;
+
+begin
+  if _modKey<>0 then exit;
+  KEYB:=KEYB and $3F;
+  czone:=ozone;
+  if (czone<MIN) or (czone>MAX) then
+    setCursorInZone(MIN)
+  else
+  begin
+    case KEYB of
+      k_UP: if czone>MIN then
+              dec(czone)
+            else // page change
+            if _mZoneActive[LISTZONE-1] then
+            begin
+              sZone:=LISTZONE-1; doPageChange();
+              czone:=MAX; ozone:=-1;
+            end;
+      k_DOWN: if czone<MAX then
+                inc(czone)
+              else
+              if _mZoneActive[LISTZONE+5] then
+              begin
+                sZone:=LISTZONE+5; doPageChange();
+                czone:=MIN; ozone:=-1;
+              end;
+    end;
+    setCursorInZone(czone);
+  end;
 end;

@@ -1,3 +1,11 @@
+procedure showIOError();
+begin
+  _fn:=MSG_IOERR;
+  _fn[12]:=_HEX[IOResult shr 4];
+  _fn[13]:=_HEX[IOResult and 15];
+  setStatus(_fn);
+End;
+
 procedure updateFileNameField();
 begin
   blank(25,1,12,5);
@@ -69,12 +77,7 @@ begin
   else
     IOResult:=160;
   if IOResult>3 then
-  begin
-    _fn:=MSG_IOERR;
-    n:=IOResult shr 4; _fn[12]:=_HEX[n];
-    n:=IOResult and 15; _fn[13]:=_HEX[n];
-    setStatus(_fn);
-  End
+    showIOError()
   else
   begin
     setScreenWidth(20);

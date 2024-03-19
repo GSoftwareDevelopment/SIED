@@ -75,7 +75,11 @@ End;
 
 procedure initModules();
 begin
+{$IFDEF PRELOAD_DATA}
+  moduleInitialized:=$02;
+{$ELSE}
   moduleInitialized:=0;
+{$ENDIF}
   setZone(0,false,28,49,3,15,@setModule);
   setZone(1,false,32,49,3,15,@setModule);
   setZone(2,false,36,49,3,15,@setModule);

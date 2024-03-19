@@ -9,7 +9,8 @@ const
   MSG_NAMECREATED = 'NEW ENTRY IS CREATED';
   MSG_DUPLICATEDNAME = 'DUPLICATED TRAIL NAME';
   MSG_FULLLIST = 'LIST IS FULL!';
-  MSG_CHOICETRAIL = 'FIRST SELECT TRAIL';
+  MSG_EDIT_NOTRAIL = 'NO TRAIL SELECTED';
+  MSG_CERD_NOTRAIL = 'TRAIL NAME NOT GIVEN';
   HELP_ACTION : Array of String = ['CREATE','EDIT','RENAME','SEARCH','DELETE'];
   _ACTIONY: Array[0..3] of Shortint = ( 0,12,24,36 );
   _LISTY:Array[0..4] of shortint = (13,20,27,34,41);
@@ -49,17 +50,21 @@ procedure selectorShortKeys(); assembler; forward;
 
 procedure selectorShortKeys(); assembler;
 asm
-  dta k_N, a(MAIN.keyName)
-  dta k_C, a(MAIN.keyCreate)
-  dta k_E, a(MAIN.keyEdit)
-  dta k_R, a(MAIN.keyRename)
+  dta k_N,      a(MAIN.keyName)
+  dta k_C,      a(MAIN.keyCreate)
+  dta k_E,      a(MAIN.keyEdit)
+  dta k_R,      a(MAIN.keyRename)
   dta k_DELETE, a(MAIN.keyDelete)
-  dta k_CLEAR, a(MAIN.doEraseSearch)
+  dta k_CLEAR,  a(MAIN.doEraseSearch)
+  dta k_UP,     a(MAIN.keySelectPath)
+  dta k_DOWN,   a(MAIN.keySelectPath)
+  dta k_RETURN, a(MAIN.doSelectPath)
 end;
 
 procedure showTrailSelector();
 begin
-  registerShortcutKeys(@selectorShortKeys,6);
+  clearStatus();
+  registerShortcutKeys(@selectorShortKeys,9);
   setControls(0); // no controls
   setScreenWidth(20);
   fillchar(YSCR[56+8]+4,16,$FF);

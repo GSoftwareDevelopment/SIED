@@ -49,6 +49,73 @@ begin
   readDirectory();
 End;
 
+procedure doSaveToDisk();
+var
+  src:Pointer;
+  blockSize:Word;
+
+begin
+  setCursor(_WAIT);
+  setStatus(MSG_SAVE);
+  fillchar(@_fn,21,$9b);
+  _fn:=dev; move(fn[1],_fn[Byte(_fn[0])+1],Byte(fn[0]));
+
+  opn(1,8,0,_fn);
+  if IOResult=1 then
+  begin
+    src:=pointer(CARD_ADDR);
+    repeat
+      blockSize:=RLECompress(src,@rlebuf,RLEBUFFERSIZE);
+      BPut(1,@blockSize,2);
+      BPut(1,@rlebuf,blockSize);
+      inc(src,RLEBUFFERSIZE);
+    until word(src)=$D000;
+  end;
+  if IOResult<>1 then
+  begin
+    showIOError();
+    cls(1);
+  end
+  else
+  begin
+    cls(1);
+    readDirectory();
+  end;
+end;
+
+procedure doLoadFromDisk();
+var
+  dst:Pointer;
+  blockSize:Word;
+  moduleInitialized:Byte absolute $62;
+
+begin
+  setCursor(_WAIT);
+  setStatus(MSG_LOAD);
+  fillchar(@_fn,21,$9b);
+  _fn:=dev; move(fn[1],_fn[Byte(_fn[0])+1],Byte(fn[0]));
+
+  opn(1,4,0,_fn);
+  if IOResult=1 then
+  begin
+    dst:=pointer(CARD_ADDR);
+    repeat
+      BGet(1,@blockSize,2);
+      BGet(1,@rlebuf,blockSize);
+      blockSize:=RLEDecompress(@rlebuf,dst,blockSize);
+      inc(dst,blockSize);
+    until word(dst)=$d000;
+  end;
+  if IOResult<>3 then
+    showIOError()
+  else
+  begin
+    setStatus(MSG_LOAD_SUCCESS);
+    moduleInitialized:=moduleInitialized or $2; // prevent trail module initialize
+  end;
+  cls(1);
+  setCursor(_ARROW);
+end;
 //
 
 procedure keyDevice(); Keep;
@@ -66,13 +133,13 @@ end;
 procedure keyLoad(); Keep;
 begin
   if _modKey<>KMOD_CTRL then exit;
-  setCursorInZone(10);
+  setCursorInZone(10); doLoadFromDisk();
 end;
 
 procedure keySave(); Keep;
 begin
   if _modKey<>KMOD_CTRL then exit;
-  setCursorInZone(9);
+  setCursorInZone(9); doSaveToDisk();
 end;
 
 procedure keyExport(); Keep;

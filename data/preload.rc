@@ -1,0 +1,2 @@
+CARD_ADDR         rcdata 'data/a000.mem'
+PATHLISTV_ADDR    rcdata 'data/c000.mem'

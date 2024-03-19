@@ -23,8 +23,8 @@ calcSCR:
 //
 // --
 //
-  clc
 lputchar:
+  clc
   lda w
   bmi exPutImg
   lda x
