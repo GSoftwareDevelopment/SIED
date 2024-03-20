@@ -151,20 +151,28 @@ asm
 
   lda #$FF
   sta KEYB
+  lda #$00
+  sta _modKey
 @:
 
   lda czone
-  cmp nZone
+  cmp nzone
   bne @exit
-  cmp oZone
-  beq @+
-clroZone:
   lda #(-1)
-  sta oZone
-  bmi @exit
-@:
-  lda nZone
-  cmp oZone
-  beq clroZone
+  sta nzone
+
+//   lda czone
+//   cmp nZone
+//   bne @exit
+//   cmp oZone
+//   beq @+
+// clroZone:
+//   lda #(-1)
+//   sta oZone
+//   bmi @exit
+// @:
+//   lda nZone
+//   cmp oZone
+//   beq clroZone
 
 end;

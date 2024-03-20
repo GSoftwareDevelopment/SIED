@@ -11,7 +11,8 @@ begin
   setControls(0);
   clearStatus();
   clearWorkarea();
-  unregisterShortcutKeys(@shortKeys,SK_COUNT);
+  unregisterShortcutKeys(@globalShortKeys,SK_GLOBAL_COUNT);
+  unregisterShortcutKeys(@innerPathShortKeys,SK_INNER_COUNT);
   showTrailSelector();
 end;
 
@@ -27,14 +28,8 @@ begin
   begin
     cursorInViewPort:=false;
     setCursor(_ARROW);
+    curTool:=0; updateCurrentTool();
   end;
-end;
-
-procedure doEditPath(); Keep;
-begin
-  cursorInViewPort:=true;
-  setCursor(_CROSS);
-  setCursorPos(XVIEWPORT+8+curPX,curPY);
 end;
 
 procedure inTimeLine();
@@ -69,7 +64,8 @@ begin
   if _modKey=KMOD_CTRL then curTLPos:=0;
   HPOSM[0]:=48+XTIMELINE+curTLPos-TLShift;
   updateTimeLineTime();
-  if oZone=3 then begin setControl(-1); oZone:=-1; end;
+  if oZone=3 then
+  begin setControl(-1); oZone:=-1; end;
 end;
 
 procedure doTLNextEvent(); Keep;
@@ -87,7 +83,8 @@ begin
   if _modKey=KMOD_CTRL then curTLPos:=curTrailLength;
   HPOSM[0]:=48+XTIMELINE+curTLPos-TLShift;
   updateTimeLineTime();
-  if oZone=6 then begin setControl(-1); oZone:=-1; end;
+  if oZone=6 then
+  begin setControl(-1); oZone:=-1; end;
 end;
 
 procedure doSetBeginEdge();
@@ -134,7 +131,7 @@ begin
   KEYB:=$FF;  // Prevent a previous key click from overriding
   clearSection();
   curSection:=sZone-10;
-  unregisterShortcutKeys(@shortKeys,SK_COUNT);
+  unregisterShortcutKeys(@innerPathShortKeys,SK_INNER_COUNT);
   updatePathSection();
   clearZone(ZONE_VIEWPORT);
   clearGameScreen();
@@ -145,4 +142,58 @@ begin
     2: showPathInner();
     3: showPathFinish();
   end;
+end;
+
+procedure keySwitch2BeginPath(); Keep;
+begin
+  if _modKey<>KMOD_CTRL then exit;
+  setCursorInZone(11); doSwitchPathSection();
+end;
+procedure keySwitch2InnerPath(); Keep;
+begin
+  if _modKey<>KMOD_CTRL then exit;
+  setCursorInZone(12); doSwitchPathSection();
+end;
+procedure keySwitch2FinishPath(); Keep;
+begin
+  if _modKey<>KMOD_CTRL then exit;
+  setCursorInZone(13); doSwitchPathSection();
+end;
+
+//
+//
+//
+
+procedure doExitEditMode(); Keep;
+begin
+  if (_modKey=(KMOD_CTRL+KMOD_SHIFT)) then doBack2Selector();
+  if cursorInViewPort then
+  begin
+    cursorInViewPort:=false;
+    setCursor(_ARROW);
+    curTool:=0; updateCurrentTool();
+  end;
+end;
+
+procedure doEditPath(); Keep;
+begin
+  cursorInViewPort:=true;
+  setCursor(_CROSS);
+  setCursorPos(XVIEWPORT+8+curPX,curPY);
+  updateCurrentTool();
+end;
+
+procedure doMovePoint();
+begin
+  sZone:=14; doEditPath();
+end;
+
+procedure doAddPoint();
+begin
+  sZone:=15; doEditPath();
+end;
+
+procedure doDeletePoint();
+begin
+  sZone:=16; doEditPath();
 end;

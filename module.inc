@@ -83,12 +83,12 @@ begin
   setZone(0,false,28,49,3,15,@setModule);
   setZone(1,false,32,49,3,15,@setModule);
   setZone(2,false,36,49,3,15,@setModule);
-   addZoneN(3,1,YCONTROLS,3,7,@nullProc);   // previous
+   addZoneN(3,1,YCONTROLS,3,8,@nullProc);   // previous
   addZoneHN(4,@nullProc);                   // play
   addZoneHN(5,@nullProc);                   // stop
   addZoneHN(6,@nullProc);                   // next
 
-   addZoneN(7,15,YCONTROLS,3,7,@nullProc);  // insert
+   addZoneN(7,15,YCONTROLS,3,8,@nullProc);  // insert
   addZoneHN(8,@nullProc);                   // delete
 
   szone:=-1; setModule();

@@ -174,48 +174,46 @@ const
 
 var
   modKey:Byte;
-  czone:shortint;
 
 begin
   if _modKey<>0 then exit;
   KEYB:=KEYB and $3F;
-  czone:=ozone;
-  if (czone<MIN) or (czone>MAX) then
+  if (cZone<MIN) or (cZone>MAX) then
     setCursorInZone(MIN)
   else
   begin
     case KEYB of
-      k_UP: if czone>MIN then
-              dec(czone)
+      k_UP: if cZone>MIN then
+              dec(cZone)
             else // page change
             if _mZoneActive[LISTZONE-1] then
             begin
               doPrevPageDir();
-              czone:=MAX; ozone:=-1;
+              cZone:=MAX; ozone:=-1;
             end;
-      k_DOWN: if czone<MAX then
-                inc(czone)
+      k_DOWN: if cZone<MAX then
+                inc(cZone)
               else
               if _mZoneActive[LISTZONE+MAXLISTITEMS] then
               begin
                 doNextPageDir();
-                czone:=MIN; ozone:=-1;
+                cZone:=MIN; ozone:=-1;
               end;
-      k_LEFT: if czone-5>=MIN then
-                dec(czone,STEP)
+      k_LEFT: if cZone-5>=MIN then
+                dec(cZone,STEP)
               else
               if _mZoneActive[LISTZONE-1] then
               begin
                 doPrevPageDir(); ozone:=-1;
               end;
-      k_RIGHT: if czone+5<=MAX then
-                inc(czone,STEP)
+      k_RIGHT: if cZone+5<=MAX then
+                inc(cZone,STEP)
               else
               if _mZoneActive[LISTZONE+MAXLISTITEMS] then
               begin
                 doNextPageDir(); ozone:=-1;
               end;
     end;
-    setCursorInZone(czone);
+    setCursorInZone(cZone);
   end;
 end;

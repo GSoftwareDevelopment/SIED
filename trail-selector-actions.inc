@@ -13,7 +13,7 @@ var
   name:PString;
 
 begin
-  n:=sZone-LISTZONE;
+  n:=cZone-LISTZONE;
   curTrailID:=listNEntry[n];
   name:=pathNamePtr[curTrailID];
   pathNameSearch:=name; updateSearchField();
@@ -193,34 +193,34 @@ const
 
 var
   modKey:Byte;
-  czone:shortint;
+  // czone:shortint;
 
 begin
   if _modKey<>0 then exit;
   KEYB:=KEYB and $3F;
-  czone:=ozone;
-  if (czone<MIN) or (czone>MAX) then
+  // czone:=ozone;
+  if (cZone<MIN) or (cZone>MAX) then
     setCursorInZone(MIN)
   else
   begin
     case KEYB of
-      k_UP: if czone>MIN then
-              dec(czone)
+      k_UP: if cZone>MIN then
+              dec(cZone)
             else // page change
             if _mZoneActive[LISTZONE-1] then
             begin
               sZone:=LISTZONE-1; doPageChange();
-              czone:=MAX; ozone:=-1;
+              cZone:=MAX; ozone:=-1;
             end;
-      k_DOWN: if czone<MAX then
-                inc(czone)
+      k_DOWN: if cZone<MAX then
+                inc(cZone)
               else
               if _mZoneActive[LISTZONE+5] then
               begin
                 sZone:=LISTZONE+5; doPageChange();
-                czone:=MIN; ozone:=-1;
+                cZone:=MIN; ozone:=-1;
               end;
     end;
-    setCursorInZone(czone);
+    setCursorInZone(cZone);
   end;
 end;

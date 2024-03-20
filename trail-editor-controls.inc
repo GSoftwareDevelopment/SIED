@@ -57,6 +57,10 @@ begin
   end;
 end;
 
+//
+//
+//
+
 procedure updateStartPoint(mode:Byte);
 const
   CTOP   = 8;
@@ -86,6 +90,10 @@ begin
     putSprite((@_CORNERS+ n*5), px, py,1,5);
   end;
 end;
+
+//
+//
+//
 
 procedure updateCoord(x,y,v:Shortint);
 begin
@@ -246,4 +254,23 @@ begin
     end;
 
   if (mode and PT_KEEPCURSOR=0) then setCursor(_ARROW);
+end;
+
+//
+//
+//
+
+procedure updateCurrentTool();
+begin
+  curTool:=sZone-13;
+  case curTool of
+    1: scr:=@_ITOOL+36; // Path Begin
+    2: scr:=@_ITOOL+24; // Inner Path
+    3: scr:=@_ITOOL+12; // Path Finish
+  else
+    // nothing
+    fillchar(Pointer(PMG_ADDR+$380+23),50,$3F);
+    exit;
+  end;
+  move(scr,Pointer(PMG_ADDR+$380+24),48);
 end;

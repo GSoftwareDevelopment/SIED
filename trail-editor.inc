@@ -34,6 +34,7 @@ var
   s:string[8];
   cursorInViewPort:Boolean;
 
+  curTool:Byte;
 //
 //
 //
@@ -97,8 +98,11 @@ end;
 //
 
 const
-  SK_COUNT = 3;
-procedure shortKeys(); Assembler; Forward;
+  SK_INNER_COUNT = 6;
+  SK_GLOBAL_COUNT = 3;
+
+procedure globalShortKeys(); assembler; Forward;
+procedure innerPathShortKeys(); Assembler; Forward;
 
 procedure doSwitchPathSection(); Forward;
 procedure showPathBegin(); Forward;
@@ -107,11 +111,21 @@ procedure showPathFinish(); Forward;
 {$I 'trail-editor-controls.inc'}
 {$I 'trail-editor-actions.inc'}
 
-procedure shortKeys(); Assembler;
+procedure globalShortKeys(); assembler;
 asm
-  dta k_COMMA,a(MAIN.doTLPrevEvent)
-  dta k_DOT,  a(MAIN.doTLNextEvent)
-  dta k_V,    a(MAIN.doEditPath)
+  dta k_B,        a(MAIN.keySwitch2BeginPath)
+  dta k_I,        a(MAIN.keySwitch2InnerPath)
+  dta k_F,        a(MAIN.keySwitch2FinishPath)
+end;
+
+procedure innerPathShortKeys(); Assembler;
+asm
+  dta k_COMMA,    a(MAIN.doTLPrevEvent)
+  dta k_DOT,      a(MAIN.doTLNextEvent)
+  dta k_RETURN,   a(MAIN.doMovePoint)
+  dta k_INSERT,   a(MAIN.doAddPoint)
+  dta k_DELETE,   a(MAIN.doDeletePoint)
+  dta k_ESC,      a(MAIN.doExitEditMode)
 end;
 
 procedure showPathBegin();
@@ -132,10 +146,10 @@ procedure showPathInner();
 begin
 
   putImage(@_ITRLTL,18,0,2,48);
-   addZone(36,0,4,12,@nullProc); // Add point
-  addZoneV(@nullProc);           // Delete point
-  addZoneV(@nullProc);           // horizontal mirror
-  addZoneV(@nullProc);           // ?
+   addZone(36,0,4,12,@doMovePoint);
+  addZoneV(@doAddPoint);            // Add point
+  addZoneV(@doDeletePoint);         // Delete point
+  addZoneV(@nullProc);              // More...
 
   updateGameScreen();
 
@@ -154,7 +168,7 @@ begin
     loopPattern:=%100100100100100100100100;
   curTrailLength:=processTrail(PT_CALCLEN+PT_UPDATETIMELINE);
   onTimerAnim();
-  registerShortcutKeys(@shortKeys,SK_COUNT);
+  registerShortcutKeys(@innerPathShortKeys,SK_INNER_COUNT);
 end;
 
 procedure showPathFinish();
@@ -183,6 +197,9 @@ begin
   addZoneV(@doSwitchPathSection);           // Path
   addZoneV(@doSwitchPathSection);           // Finish trail
 
+  _mZoneCall[3]:=@doTLPrevEvent;
+  _mZoneCall[6]:=@doTLNextEvent;
+
   curSection:=-1;
   if getTrailSize=0 then
     szone:=11   // show Begin path
@@ -191,4 +208,5 @@ begin
 
   TLShift:=0; curTLPos:=0;
   doSwitchPathSection();
+  registerShortcutKeys(@globalShortKeys,SK_GLOBAL_COUNT);
 End;

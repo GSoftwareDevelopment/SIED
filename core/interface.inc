@@ -119,7 +119,7 @@ End;
 function setCursorInZone(n:Shortint):boolean;
 begin
   result:=false;
-  nzone:=-1; czone:=-1;
+  nzone:=-1; czone:=n;
   szone:=n; refreshZone();
   if not _mZoneActive[n] then exit;
   czone:=n;
