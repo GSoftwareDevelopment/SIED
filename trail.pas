@@ -59,7 +59,7 @@ begin
   fillchar(Pointer(PMG_ADDR+$180+24+65),7,$02);
   fillchar(Pointer(PMG_ADDR+$300+23),50,$FF);
   fillchar(Pointer(PMG_ADDR+$380+23),50,$3F);
-  PCOL[2]:=$E2; PCOL[3]:=$E2;
+  PCOL[2]:=BASE_COLOR+$02; PCOL[3]:=BASE_COLOR+$02;
   SIZEP[2]:=%11; SIZEP[3]:=%11; SIZEM:=%11110000;
   HPOSP[2]:=44; // icon tray
   clearAllShortcutsKey();

@@ -34,7 +34,9 @@ End;
 procedure doEraseFileName(); Keep;
 begin
   fn:=''; updateFileNameField();
-  szone:=14; doFilename();
+  czone:=14; // must be set as call zone
+  szone:=14; // must be set as select zone
+  doFilename();
 end;
 
 procedure doPrevPageDir();
@@ -154,15 +156,15 @@ begin
   setCursorInZone(12);
 end;
 
-procedure keyPrevPageDir(); Keep;
-begin
-  setCursorInZone(LISTZONE-1); doPrevPageDir();
-end;
+// procedure keyPrevPageDir(); Keep;
+// begin
+//   setCursorInZone(LISTZONE-1); doPrevPageDir();
+// end;
 
-procedure keyNextPageDir(); Keep;
-begin
-  setCursorInZone(LISTZONE+MAXLISTITEMS); doNextPageDir();
-end;
+// procedure keyNextPageDir(); Keep;
+// begin
+//   setCursorInZone(LISTZONE+MAXLISTITEMS); doNextPageDir();
+// end;
 
 procedure keySelectFile(); Keep;
 const

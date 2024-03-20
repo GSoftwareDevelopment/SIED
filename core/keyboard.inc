@@ -152,4 +152,19 @@ asm
   lda #$FF
   sta KEYB
 @:
+
+  lda czone
+  cmp nZone
+  bne @exit
+  cmp oZone
+  beq @+
+clroZone:
+  lda #(-1)
+  sta oZone
+  bmi @exit
+@:
+  lda nZone
+  cmp oZone
+  beq clroZone
+
 end;

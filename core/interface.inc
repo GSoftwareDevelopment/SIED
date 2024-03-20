@@ -3,11 +3,7 @@
 var
   __x,__y,__w,__h:Byte;
 
-procedure nullProc(); Assembler;
-Asm
-  lda #true
-  sta __invertZone
-End;
+procedure nullProc(); Assembler; asm end;
 
 procedure setZone(n:Shortint; act:Boolean; x,y,w,h:Byte; prc:TZoneProc);
 begin
@@ -17,19 +13,20 @@ begin
   _mZoneX2[n]:=x+w-1; __w:=w;
   _mZoneY2[n]:=y+h-1; __h:=h;
   _mZoneCall[n]:=prc;
-  _mZoneInCall[n]:=@nullProc;
+  _mZoneInCall[n]:=@doHintZone;
+  // _mZoneHint[n]:=nil;
 End;
 
 procedure clearZone(n:Byte);
 begin
-  // setZone(n,false,255,255,255,255,@nullProc);
   _mZoneActive[n]:=false;
   _mZoneX1[n]:=255;
   _mZoneX2[n]:=255;
   _mZoneY1[n]:=255;
   _mZoneY2[n]:=255;
   _mZoneCall[n]:=@nullProc;
-  _mZoneInCall[n]:=@nullProc;
+  _mZoneInCall[n]:=@doHintZone;
+  // _mZoneHint[n]:=nil;
 End;
 
 procedure clearWorkZones();
@@ -104,7 +101,7 @@ begin
     if _mZoneActive[ozone] then
     begin
       callInZone(ozone);
-      if __invertZone then invertZone(ozone);
+      if allowInverZone then invertZone(ozone);
     end;
     ozone:=-1;
   End;
@@ -113,19 +110,22 @@ begin
     if _mZoneActive[nzone] then
     begin
       callInZone(nzone);
-      if __invertZone then invertZone(nzone);
+      if allowInverZone then invertZone(nzone);
     end;
     ozone:=nzone;
   End;
 End;
 
-procedure setCursorInZone(n:Shortint);
+function setCursorInZone(n:Shortint):boolean;
 begin
-  nzone:=-1;
+  result:=false;
+  nzone:=-1; czone:=-1;
   szone:=n; refreshZone();
   if not _mZoneActive[n] then exit;
+  czone:=n;
   i:=_mZoneX2[n] shl 2; inc(i,2);
   setCursorPos(i,_mZoneY2[n]-1);
+  result:=true;
 end;
 
 function checkZones:Boolean;
@@ -194,7 +194,7 @@ begin
   End
   else
   begin
-    if ozone<>-1 then callInZone(ozone);
+    // if ozone<>-1 then callInZone(ozone);
     refreshZone();
     if (ombutton=MBUT_LEFT) then
     begin
@@ -208,19 +208,31 @@ End;
 procedure callZoneProc(); Assembler;
 Asm
   lda szone
-  pha
+  sta czone
+
   asl @
   tay
+
   lda adr._mZoneCall,y
   sta jaddr
   lda adr._mZoneCall+1,y
   sta jaddr+1
+
   jsr jaddr:$ffff
-  pla
+
+  lda czone
   cmp nZone
   bne @exit
+  cmp oZone
+  beq @+
+clroZone:
   lda #(-1)
   sta oZone
+  bmi @exit
+@:
+  lda nZone
+  cmp oZone
+  beq clroZone
 End;
 
 //

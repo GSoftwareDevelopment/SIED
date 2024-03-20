@@ -5,6 +5,7 @@ procedure blankZone(i:Shortint); external 'core';
 procedure clearWorkarea(); external 'core';
 procedure clearStatus(); external 'core';
 procedure setStatus(s:PString); external 'core';
+procedure doHintZone(); external 'core';
 procedure setIcon(n:Shortint); external 'core';
 procedure setControls(s:Byte); external 'core';
 procedure setControl(n:Shortint); external 'core';

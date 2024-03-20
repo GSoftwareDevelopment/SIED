@@ -69,7 +69,7 @@ begin
   Asm sei; End;
   setIntVec(iDLI,@myDLI);
   SDLST:=pointer(DLIST_ADDR);
-  PFCOL0:=$EA; PFCOL1:=$00; PFCOL2:=$0F; PFCOL4:=$e0;
+  PFCOL0:=(BASE_COLOR+$0A); PFCOL1:=BASE_COLOR+$00; PFCOL2:=BASE_COLOR+$0F; PFCOL4:=(BASE_COLOR+$00);
   // keyboard init
   KEYDEFP:=Pointer(SCAN2ASC_ADDR);
   KRPDEL:=10; KEYREP:=2;

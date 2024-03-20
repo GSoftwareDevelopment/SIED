@@ -4,13 +4,13 @@ const
 
 var
     mRefresh:Boolean  absolute $5c;
-         _mx:Byte     absolute $52;
-         _my:Byte     absolute $53;
-        _omy:Byte     absolute $63;
-          mx:Shortint absolute $55;
-          my:Shortint absolute $54;
-         mdx:Shortint absolute $5b;
-         mdy:Shortint absolute $5a;
+        _omy:Byte     absolute $53;
+         _mx:Byte     absolute $54;
+         _my:Byte     absolute $55;
+          mx:Shortint absolute $56;
+          my:Shortint absolute $57;
+         mdx:Shortint absolute $5a;
+         mdy:Shortint absolute $5b;
        stick:Byte     absolute $278;
      mbutton:Byte     absolute $4a;
     ombutton:Byte     absolute $4b;

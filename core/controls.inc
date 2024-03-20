@@ -38,6 +38,20 @@ begin
   putTextC(0,69,s);
 End;
 
+procedure doHintZone(); Keep;
+begin
+  allowInverZone:=true;
+  // if (nZone=oZone) then // cursor enter zone
+  // begin
+  //   if _mZoneHint[nZone]<>nil then
+  //     setStatus(_mZoneHint[nZone]);
+  // end
+  // else if (nZone<>oZone) then // cursor leave zone
+  // begin
+  //   clearStatus();
+  // end;
+end;
+
 procedure setIcon(n:Shortint);
 var
   _x:Byte;
@@ -115,7 +129,7 @@ End;
 //
 procedure inInputZone();
 begin
-  __invertZone:=true;
+  allowInverZone:=true;
   if (oZone=sZone) then // cursor enter zone
     setCursor(_BEAM)
   else if (oZone<>sZone) then // cursor leave zone
@@ -124,7 +138,7 @@ end;
 
 procedure inInputEditZone();
 begin
-  __invertZone:=false;
+  allowInverZone:=false;
   if (oZone=sZone) then // cursor enter zone
     setCursor(_BEAM)
   else if (oZone<>sZone) then // cursor leave zone
@@ -193,6 +207,17 @@ begin
       ctm:=Byte(tm+20);
       drawCursor(not isCrs);
     End;
+
+    checkShortcutKeyboard(KMOD_CTRL+KMOD_SHIFT);
+    checkZones();
+
+    if (nzone<>_zone) and ((mbutton<>MBUT_NONE) or (_callShortcutKeys<>$FF)) then
+    begin
+      if isCrs then drawCursor(isCrs);
+      storeValue(); result:=_zone xor $FF;
+      break;
+    End;
+
     if KEYB<>255 then
     begin
       if isCrs then drawCursor(false);
@@ -239,15 +264,6 @@ begin
       ctm:=Byte(tm);
       KEYB:=255;
       firstKey:=false;
-    End;
-    checkZones();
-    checkShortcutKeyboard(KMOD_CTRL+KMOD_SHIFT);
-
-    if (nzone<>_zone) and ((mbutton<>MBUT_NONE) or (_callShortcutKeys<>$FF)) then
-    begin
-      if isCrs then drawCursor(isCrs);
-      storeValue(); result:=_zone xor $FF;
-      break;
     End;
   until (false);
   if _callShortcutKeys=$FF then KEYB:=255;

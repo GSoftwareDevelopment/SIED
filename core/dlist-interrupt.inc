@@ -19,7 +19,7 @@ dli1: // workarea
 
   m@setVDLI DLI3
 
-  lda #$E0
+  lda #(BASE_COLOR+$00)
   sta wsync
   sta wsync
   sta COLPF4
@@ -29,7 +29,7 @@ dli1: // workarea
 
 dli2: // timeline
   pha
-  lda #$00
+  lda #(BASE_COLOR+$00)
   sta wsync
   // sta wsync
   sta COLPF4
@@ -41,8 +41,8 @@ dli2: // timeline
 
 dli3: // controls
   pha:txa:pha
-  lda #$E4
-  ldx #$E0
+  lda #(BASE_COLOR+$04)
+  ldx #(BASE_COLOR+$00)
   sta wsync
   // sta wsync
   sta COLPF4
@@ -54,8 +54,8 @@ dli3: // controls
 
 dli4: // status
   pha:txa:pha
-  lda #$04
-  ldx #$0f
+  lda #(BASE_COLOR+$04)
+  ldx #(BASE_COLOR+$0f)
   sta wsync
   sta COLPF4
   stx COLPF1

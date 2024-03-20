@@ -22,7 +22,7 @@ end;
 
 procedure inGameScreen();
 begin
-  __invertZone:=false;
+  allowInverZone:=false;
   if ((nZone<>ZONE_VIEWPORT) and (oZone=ZONE_VIEWPORT)) then // cursor leave zone
   begin
     cursorInViewPort:=false;
@@ -39,7 +39,7 @@ end;
 
 procedure inTimeLine();
 begin
-  __invertZone:=false;
+  allowInverZone:=false;
   if ((nZone=ZONE_TIMELINE) and (oZone<>ZONE_TIMELINE)) then // cursor enter zone
     setCursor(@_TLSELECT)
   else if ((nZone<>ZONE_TIMELINE) and (oZone=ZONE_TIMELINE)) then // cursor leave zone

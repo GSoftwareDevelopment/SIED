@@ -1,10 +1,11 @@
 procedure doSearchPath();
 begin
-  if doInput(pathNameSearch) and 64=0 then
-  begin
+  // if doInput(pathNameSearch) and 64=0 then
+  // begin
+  doInput(pathNameSearch);
     updateSearchField();
     refreshList();
-  end;
+  // end;
 end;
 
 procedure doSelectPath();
@@ -21,7 +22,10 @@ end;
 procedure doEraseSearch();
 begin
   pathNameSearch:=''; updateSearchField();
-  refreshList(); szone:=13; doSearchPath();
+  refreshList();
+  czone:=13;  // must be set as call zone
+  szone:=13;  // must be set as select zone
+  doSearchPath();
 end;
 
 procedure doPageChange();
@@ -148,39 +152,37 @@ begin
   end;
 end;
 
-procedure toZone(n:byte);
-begin
-  szone:=n; setCursorInZone(n);
-end;
-
 procedure keyName(); Keep;
 begin
   if (_modKey<>(KMOD_CTRL)) then exit;
-  toZone(13); keyb:=$FF; doSearchPath();
+  if setCursorInZone(13) then
+  begin
+    keyb:=$FF; doSearchPath();
+  end;
 end;
 
 procedure keyCreate(); Keep;
 begin
   if (_modKey<>(KMOD_CTRL)) then exit;
-  toZone(9); doSetAction();
+  if setCursorInZone(9) then doSetAction();
 end;
 
 procedure keyEdit(); Keep;
 begin
   if (_modKey<>(KMOD_CTRL)) then exit;
-  toZone(10); doSetAction();
+  if setCursorInZone(10) then doSetAction();
 end;
 
 procedure keyRename(); Keep;
 begin
   if (_modKey<>(KMOD_CTRL)) then exit;
-  toZone(11); doSetAction();
+  if setCursorInZone(11) then doSetAction();
 end;
 
 procedure keyDelete(); Keep;
 begin
   if (_modKey<>(KMOD_CTRL+KMOD_SHIFT)) then exit;
-  toZone(12); doSetAction();
+  if setCursorInZone(12) then doSetAction();
 end;
 
 procedure keySelectPath(); Keep;

@@ -17,15 +17,15 @@ var
 //
 //
 //
-
-{$I 'cursor.inc'}
 {$I 'graph.inc'}
+{$I 'cursor.inc'}
+{$I 'keyboard.inc'}
+{$I 'timers.inc'}
+
 procedure invertZone(i:Shortint); Forward;
 procedure setIcon(n:Shortint); Forward;
 procedure setControl(n:Shortint); Forward;
-
-{$I 'keyboard.inc'}
-{$I 'timers.inc'}
+procedure doHintZone(); Forward; Keep;
 {$I 'interface.inc'}
 {$I 'controls.inc'}
 
@@ -93,6 +93,7 @@ exports
   blankZone,
   clearWorkarea,
   clearStatus,
+  doHintZone,
   setStatus,
   setIcon,
   setControls,

@@ -1,3 +1,4 @@
+BASE_COLOR          = $e0;
 MAX_SPRITE          = 15;                   // max 16 enemys on screen
 MAX_GROUP           = 7;                    // max 8 groups
 
@@ -18,6 +19,9 @@ CARROW_ADDR         = ASSETS_ADDR   +  50;
 CWAIT_ADDR          = ASSETS_ADDR   +  52;
 CBEAM_ADDR          = ASSETS_ADDR   +  54;
 CCROSS_ADDR         = ASSETS_ADDR   +  56;
+
+RLEBUFFER_ADDR      = $3C00;
+RLEBUFFERSIZE       = 1024;
 
 MODULE_ADDR         = $4000;                // module base address
 

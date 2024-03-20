@@ -39,8 +39,6 @@ const
   _DIRFILEX:Array of Byte = [  9,  9,  9,  9,  9, 24, 24, 24, 24, 24 ];
   _DIRFILEY:Array of Byte = [ 13, 20, 27, 34, 41, 13, 20, 27, 34, 41 ];
 
-  RLEBUFFERSIZE = 1024;
-
 var
   dev:string[4] absolute $04C0; //3f00;
   fn:string[16] absolute $04C5; //3f05;
@@ -49,7 +47,7 @@ var
   dirName:Array[0..MAXLISTITEMS-1] of string[12];
   dirPageBegin:smallint;
 
-  rlebuf:Array[0..RLEBUFFERSIZE-1] of byte absolute $7000;
+  rlebuf:Array[0..RLEBUFFERSIZE-1] of byte absolute RLEBUFFER_ADDR;
 //
 procedure showIOError(); Forward;
 procedure readDirectory(); Forward;
@@ -115,7 +113,7 @@ begin
     moduleInitialized:=moduleInitialized or $1;
   end;
   fillchar(Pointer(PMG_ADDR+$300+23),50,$FF);
-  HPOSP[2]:=44; PCOL[2]:=$E2; SIZEP[2]:=%11;
+  HPOSP[2]:=44; PCOL[2]:=BASE_COLOR+$02; SIZEP[2]:=%11;
   clearAllShortcutsKey();
   showDiskDirectory();
   asm
