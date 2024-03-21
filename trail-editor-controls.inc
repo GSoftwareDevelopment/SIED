@@ -127,20 +127,7 @@ begin
 end;
 
 procedure updateStepInfo();
-var
-  _x,_y:Byte;
-
 begin
-  if cursorInViewPort then
-  begin
-    _x:=_mx-56-XVIEWPORT; _y:=_my-24;
-    if  ((curPX<>_curPX) or (curPY<>_curPY)) and
-        ((curPX<>_x) or (curPY<>_y)) then
-    begin
-      setCursorPos(XVIEWPORT+8+curPX,curPY);
-      curPX:=_x; curPY:=_y;
-    end;
-  end;
   setScreenWidth(40);
   if (curPX<>_curPX) or (curPY<>_curPY) then
   begin
@@ -168,15 +155,12 @@ begin
   pathPattern:=trailPattern;
   if (mode and PT_UPDATETIMELINE<>0) then
   begin
-    TLPtr:=YSCR[56+48+15]+(XTIMELINE div 4);
-    fillchar(TLPtr,TIMELINELENGTH div 4,$aa);
-    inc(TLPtr,40);
-    for i:=0 to 2 do
+    TLPtr:=pointer(TLSCR_ADDR);
+    for i:=0 to 4 do
     begin
-      fillchar(TLPtr,TIMELINELENGTH div 4,_LOOP[i]);
-      inc(TLPtr,40);
+      fillchar(TLPtr,TIMELINE_SIZEB,_LOOP[i]);
+      inc(TLPtr,TIMELINE_SIZEB);
     end;
-    fillchar(TLPtr,TIMELINELENGTH div 4,$aa);
   end;
   scr:=YSCR[56+48+16]+8;
   if (mode and PT_KEEPCURSOR=0) then setCursor(_WAIT);
@@ -188,7 +172,7 @@ begin
   repeat
     v:=peek(adr);
     case v of
-      $80: // TR_JUMP
+      TR_JUMP:
         begin
           inc(adr);
           adr:=pointer(dpeek(adr));
@@ -197,24 +181,25 @@ begin
             if (mode and PT_CALCLEN<>0) then TLPosition:=smallint(adr);
             break;
           end;
-          if loop then
-          begin
-            if (mode=PT_CALCLEN) then break;
-          end
-          else
+          if (mode=PT_CALCLEN) then break;
+          if not loop then
             pathPattern:=loopPattern;
           loop:=true;
         end;
-      $88: // TR_STOP
+      TR_STOP:
         begin
           v:=0; break;
         end;
-      $8F: // TR_KILL
+      TR_KILL:
         begin
           v:=3; break;
         end;
     else
       dx:=0; dy:=0;
+      dx:=v shr 4;  if (dx and %1000)<>0 then dx:=dx or %11110000;
+      dy:=v and $F; if (dy and %1000)<>0 then dy:=dy or %11110000;
+      inc(px,dx); inc(py,dy);
+
       if (mode and PT_UPDATEPATH<>0) then
       begin
         w:=pathPattern and 1;
@@ -222,14 +207,13 @@ begin
         pathPattern:=pathPattern shr 1;
         if w<>0 then pathPattern:=pathPattern or $800000;
       end;
-      dx:=v shr 4;  if (dx and %1000)<>0 then dx:=dx or %11110000;
-      dy:=v and $F; if (dy and %1000)<>0 then dy:=dy or %11110000;
+
       if TLPosition=curTLPos then
       begin
         curPx:=px; curPy:=py;
         curDx:=dx; curDy:=dy;
       end;
-      inc(px,dx); inc(py,dy);
+
       if v<>0 then
       begin
         if (mode and PT_UPDATETIMELINE<>0) and not loop then TLPoint(1);
@@ -248,10 +232,20 @@ begin
   if ((mode and PT_CALCLEN<>0)) then result:=TLPosition;
 
   if (mode and PT_UPDATETIMELINE)<>0 then
+  begin
     while TLPosition<160 do
     begin
       inc(TLPosition); TLPoint(v);
     end;
+    TLPtr:=pointer(TLSCR_ADDR);
+    scr:=YSCR[56+48+15]+(XTIMELINE div 4);
+    for i:=0 to 4 do
+    begin
+      move(TLPtr,scr,TIMELINE_SIZEB);
+      inc(TLPtr,TIMELINE_SIZEB);
+      inc(scr,40);
+    end;
+  end;
 
   if (mode and PT_KEEPCURSOR=0) then setCursor(_ARROW);
 end;
@@ -262,11 +256,11 @@ end;
 
 procedure updateCurrentTool();
 begin
-  curTool:=cZone-13;
+  curTool:=curZone-13;
   case curTool of
-    1: scr:=@_ITOOL+36; // Path Begin
-    2: scr:=@_ITOOL+24; // Inner Path
-    3: scr:=@_ITOOL+12; // Path Finish
+    TOOL_MOVEPOINT: scr:=@_ITOOL+36;
+    TOOL_ADDPOINT : scr:=@_ITOOL+24;
+    TOOL_DELPOINT : scr:=@_ITOOL+12;
   else
     // nothingclear
     fillchar(Pointer(PMG_ADDR+$380+23),50,$3F);

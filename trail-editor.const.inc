@@ -33,9 +33,9 @@ const
     $7C,$38,$10,$00,$00,$80,$C0,$E0,$C0,$80,$01,$03,$07,$03,$01,$00,$00,$10,$38,$7C
   ];
   _TLSELECT:Array of byte = [ 3,3, $10,$10,$92,$54,$92,$10,$10 ];
+  _TLSTOP:Array of byte = [ 3,3, $38,$44,$8A,$92,$A2,$44,$38 ];
 
-  // _LOOP:Array of byte = [ $A0, $82, $0A, $28 ];
-  _LOOP:Array of byte = [ $F5, $D7, $5F, $7D ];
+  _LOOP:Array of byte = [ $AA, $F5, $D7, $5F, $AA ];
 
   ZONE_VIEWPORT = 30;
   ZONE_EDGE     = 26;
@@ -71,8 +71,10 @@ const
     ( %11000000, %00110000, %00001100, %00000011 )
   );
 
+  TLSCR_ADDR      = $7F00;
   XTIMELINE       = 32;
   TIMELINELENGTH  = 128; // 128 pixels= 5s 03f (PAL 1/50)
+  TIMELINE_SIZEB  = TIMELINELENGTH div 4;
   ZONE_TIMELINE   = 31;
 
   PATH_ANIM_TIME = 5;
@@ -92,6 +94,10 @@ const
     // %100110011001100110011001
   );
 
+  TR_JUMP = $80;
+  TR_STOP = $88;
+  TR_KILL = $8F;
+
   PT_CALCLEN          = %0001;
   PT_UPDATETIMELINE   = %0010;
   PT_UPDATEPATH       = %0100;
@@ -99,3 +105,7 @@ const
 
   SP_ONLYPOINT        = 0;
   SP_DESCRIPTION      = 1;
+
+  TOOL_MOVEPOINT      = 1;
+  TOOL_ADDPOINT       = 2;
+  TOOL_DELPOINT       = 3;

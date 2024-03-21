@@ -18,13 +18,13 @@ end;
 
 procedure doBack2PathBegin();
 begin
-  sZone:=11; doSwitchPathSection();
+  selZone:=11; doSwitchPathSection();
 end;
 
 procedure inGameScreen();
 begin
   allowInverZone:=false;
-  if ((nZone<>ZONE_VIEWPORT) and (oZone=ZONE_VIEWPORT)) then // cursor leave zone
+  if ((nowZone<>ZONE_VIEWPORT) and (oldZone=ZONE_VIEWPORT)) then // cursor leave zone
   begin
     cursorInViewPort:=false;
     setCursor(_ARROW);
@@ -35,16 +35,16 @@ end;
 procedure inTimeLine();
 begin
   allowInverZone:=false;
-  if ((nZone=ZONE_TIMELINE) and (oZone<>ZONE_TIMELINE)) then // cursor enter zone
+  if ((nowZone=ZONE_TIMELINE) and (oldZone<>ZONE_TIMELINE)) then // cursor enter zone
     setCursor(@_TLSELECT)
-  else if ((nZone<>ZONE_TIMELINE) and (oZone=ZONE_TIMELINE)) then // cursor leave zone
+  else if ((nowZone<>ZONE_TIMELINE) and (oldZone=ZONE_TIMELINE)) then // cursor leave zone
     setCursor(_ARROW);
 end;
 
 procedure doSetTimeLinePos();
 begin
   curTLPos:=_mx-48-XTIMELINE-TLShift;
-  if curTLPos>curTrailLength then curTLPos:=curTrailLength;
+  if curTLPos>trailLength then curTLPos:=trailLength;
   HPOSM[0]:=48+XTIMELINE+curTLPos-TLShift;
   updateTimeLineTime();
 end;
@@ -64,41 +64,39 @@ begin
   if _modKey=KMOD_CTRL then curTLPos:=0;
   HPOSM[0]:=48+XTIMELINE+curTLPos-TLShift;
   updateTimeLineTime();
-  if oZone=3 then
-  begin setControl(-1); oZone:=-1; end;
+  if curZone=nowZone then begin setControl(-1); oldZone:=-1; end;
 end;
 
 procedure doTLNextEvent(); Keep;
 begin
   if (_modKey=0) then
   begin
-    if curTLPos<curTrailLength then inc(curTLPos);
+    if curTLPos<totalTrailLength then inc(curTLPos);
   end
   else
   if (_modKey=KMOD_SHIFT) then
   begin
-    if (curTLPos+FPS)<curTrailLength then inc(curTLPos,FPS) else curTLPos:=curTrailLength;
+    if (curTLPos+FPS)<totalTrailLength then inc(curTLPos,FPS) else curTLPos:=totalTrailLength;
   end
   else
-  if _modKey=KMOD_CTRL then curTLPos:=curTrailLength;
+  if _modKey=KMOD_CTRL then curTLPos:=totalTrailLength;
   HPOSM[0]:=48+XTIMELINE+curTLPos-TLShift;
   updateTimeLineTime();
-  if oZone=6 then
-  begin setControl(-1); oZone:=-1; end;
+  if curZone=nowZone then begin setControl(-1); oldZone:=-1; end;
 end;
 
 procedure doSetBeginEdge();
 begin
-  i:=sZone-ZONE_EDGE;
+  i:=selZone-ZONE_EDGE;
   pathStartEdge[curTrailID]:=i;
   pathStartEdgeShift[curTrailID]:=0;
-  curSection:=0; sZone:=11; doSwitchPathSection();
-  curTrailLength:=processTrail(PT_CALCLEN+PT_UPDATETIMELINE);
+  curSection:=0; selZone:=11; doSwitchPathSection();
+  trailLength:=processTrail(PT_CALCLEN+PT_UPDATETIMELINE);
 end;
 
 procedure doRedefineStartPoint();
 begin
-  sZone:=10; doSwitchPathSection();
+  selZone:=10; doSwitchPathSection();
 end;
 
 CONST
@@ -107,18 +105,26 @@ CONST
 procedure onTimerAnim();
 var
   b:byte=0;
+  _x,_y:Byte;
 
 begin
   inc(b); if b>5 then b:=0;
   loopPattern:=ANIM[b];
   processTrail(PT_KEEPCURSOR+PT_UPDATEPATH);
-  // setCursorPos(XVIEWPORT+8+curPX,curPY);
   if not cursorInViewport then
   begin
     activePage:=0;
     setScreenWidth(16);
     putSpriteXOR(@_OBJECT,8+curPX,4+curPY,1,7);
     activePage:=1;
+  end
+  else
+  begin
+    if (curTLPos>=trailLength) and (curTool=1) then
+      setCursor(@_TLSTOP)
+    else
+      setCursor(_CROSS);
+    setCursorPos(XVIEWPORT+8+curPX,curPY);
   end;
   updateGameScreen();
   updateStepInfo();
@@ -127,10 +133,10 @@ end;
 
 procedure doSwitchPathSection();
 begin
-  if curSection=(sZone-10) then exit;
+  if curSection=(selZone-10) then exit;
   KEYB:=$FF;  // Prevent a previous key click from overriding
   clearSection();
-  curSection:=sZone-10;
+  curSection:=selZone-10;
   unregisterShortcutKeys(@innerPathShortKeys,SK_INNER_COUNT);
   updatePathSection();
   clearZone(ZONE_VIEWPORT);
@@ -175,22 +181,48 @@ begin
   begin
     cursorInViewPort:=false;
     setCursor(_ARROW);
-    curTool:=0; updateCurrentTool();
+    curZone:=17; updateCurrentTool();
   end;
 end;
 
 procedure doEditPath(n:shortint); Keep;
 begin
-  if (sZone<14) or (sZone>16) then cZone:=n;
+  if (selZone<14) or (selZone>16) then curZone:=n;
   cursorInViewPort:=true;
-  setCursor(_CROSS);
-  setCursorPos(XVIEWPORT+8+curPX,curPY);
   updateCurrentTool();
+  unregisterToolShortKeys();
 end;
 
-procedure doMovePoint();
+procedure doMovePoint(); Keep;
+var
+  b:Byte;
+
 begin
-  doEditPath(14);
+  if curTool<>TOOL_MOVEPOINT then
+  begin
+    doEditPath(14); registerToolShortKeys(@movePointShortKeys,SK_MOVEPOINT_COUNT);
+  end
+  else
+  begin
+    case KEYB of
+      K_UP:     if curDY>-7 then dec(curDY);
+      K_DOWN:   if curDY<7  then inc(curDY);
+      K_LEFT:   if curDX>-7 then dec(curDX);
+      K_RIGHT:  if curDX<7  then inc(curDX);
+    end;
+    if curTLPos<=trailLength then
+    begin
+      adr:=pathListPtr[curTrailID]+curTLPos;
+      b:=peek(adr);
+      if (b<>TR_JUMP) and (b<>TR_STOP) and (b<>TR_KILL) then
+      begin
+        b:=(curDX shl 4) + (curDY and $F);
+        poke(adr,b);
+        trailLength:=processTrail(PT_CALCLEN);
+        totalTrailLength:=processTrail(PT_CALCLEN+PT_UPDATETIMELINE+PT_KEEPCURSOR);
+      end;
+    end;
+  end;
 end;
 
 procedure doAddPoint();

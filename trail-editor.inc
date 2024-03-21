@@ -5,7 +5,8 @@
 
 var
   curSection:Shortint;
-  curTrailLength:Smallint;
+  trailLength:Smallint;
+  totalTrailLength:Smallint;
   adr:Pointer;
   TLPtr:pointer;
   TLPosition:SmallInt;
@@ -35,6 +36,24 @@ var
   cursorInViewPort:Boolean;
 
   curTool:Byte;
+  curTOOL_SK:Pointer;
+  curTOOL_SK_COUNT:Byte;
+
+procedure registerToolShortKeys(SK:Pointer; count:Byte);
+begin
+  curTOOL_SK:=SK; curTOOL_SK_COUNT:=count;
+  registerShortcutKeys(SK,count);
+end;
+
+procedure unregisterToolShortKeys();
+begin
+  if (curTOOL_SK<>nil) or (curTOOL_SK_COUNT<>0) then
+  begin
+    unregisterShortcutKeys(curTOOL_SK,curTOOL_SK_COUNT);
+    curTOOL_SK:=nil; curTOOL_SK_COUNT:=0;
+  end;
+end;
+
 //
 //
 //
@@ -68,11 +87,12 @@ begin
   pos:=TLPosition-TLShift;
   if (pos>=0) and (pos<TIMELINELENGTH) then
   begin
-    TLPtr:=YSCR[56+48+16]+(XTIMELINE div 4)+pos shr 2;
+    // TLPtr:=YSCR[56+48+16]+(XTIMELINE div 4)+pos shr 2;
+    TLPtr:=Pointer(TLSCR_ADDR+TIMELINE_SIZEB+pos shr 2);
     bit:=pos and 3;
     m:=P4Mask[bit]; if c>0 then b:=P4Color[c-1][bit] else b:=0;
-    poke(TLPtr,(peek(TLPtr) and m) or b); inc(TLPtr,40);
-    poke(TLPtr,(peek(TLPtr) and m) or b); inc(TLPtr,40);
+    poke(TLPtr,(peek(TLPtr) and m) or b); inc(TLPtr,TIMELINE_SIZEB);
+    poke(TLPtr,(peek(TLPtr) and m) or b); inc(TLPtr,TIMELINE_SIZEB);
     poke(TLPtr,(peek(TLPtr) and m) or b);
     if bit=3 then inc(TLPtr);
   end;
@@ -98,9 +118,11 @@ end;
 //
 
 const
-  SK_INNER_COUNT = 6;
-  SK_GLOBAL_COUNT = 3;
+  SK_INNER_COUNT      = 6;
+  SK_GLOBAL_COUNT     = 3;
+  SK_MOVEPOINT_COUNT  = 4;
 
+procedure movePointShortKeys(); Assembler; Forward; Keep;
 procedure globalShortKeys(); assembler; Forward;
 procedure innerPathShortKeys(); Assembler; Forward;
 
@@ -122,10 +144,18 @@ procedure innerPathShortKeys(); Assembler;
 asm
   dta k_COMMA,    a(MAIN.doTLPrevEvent)
   dta k_DOT,      a(MAIN.doTLNextEvent)
-  dta k_RETURN,   a(MAIN.doMovePoint)
+  dta k_SPACE,    a(MAIN.doMovePoint)
   dta k_INSERT,   a(MAIN.doAddPoint)
   dta k_DELETE,   a(MAIN.doDeletePoint)
   dta k_ESC,      a(MAIN.doExitEditMode)
+end;
+
+procedure movePointShortKeys(); Assembler; Keep;
+asm
+  dta K_UP,       a(MAIN.doMovePoint)
+  dta K_DOWN,     a(MAIN.doMovePoint)
+  dta K_LEFT,     a(MAIN.doMovePoint)
+  dta K_RIGHT,    a(MAIN.doMovePoint)
 end;
 
 procedure showPathBegin();
@@ -164,9 +194,13 @@ begin
 
   HPOSP[3]:=180;
   HPOSM[0]:=48+XTIMELINE+curTLPos-TLShift;
+
+  curTool:=0; updateCurrentTool();
+
   trailPattern:=%111111111111111111111111;
     loopPattern:=%100100100100100100100100;
-  curTrailLength:=processTrail(PT_CALCLEN+PT_UPDATETIMELINE);
+  trailLength:=processTrail(PT_CALCLEN);
+  totalTrailLength:=processTrail(PT_CALCLEN+PT_UPDATETIMELINE);
   onTimerAnim();
   registerShortcutKeys(@innerPathShortKeys,SK_INNER_COUNT);
 end;
@@ -202,11 +236,12 @@ begin
 
   curSection:=-1;
   if getTrailSize=0 then
-    szone:=11   // show Begin path
+    selZone:=11   // show Begin path
   else
-    szone:=12;  // show trail path
+    selZone:=12;  // show trail path
 
   TLShift:=0; curTLPos:=0;
   doSwitchPathSection();
+  curTOOL_SK:=nil; curTOOL_SK_COUNT:=0;
   registerShortcutKeys(@globalShortKeys,SK_GLOBAL_COUNT);
 End;

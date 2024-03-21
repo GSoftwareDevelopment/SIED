@@ -37,7 +37,7 @@ End;
 
 procedure initInterface();
 begin
-  szone:=-1; ozone:=-1; ombutton:=MBUT_NONE;
+  selZone:=-1; oldZone:=-1; curZone:=-1; ombutton:=MBUT_NONE;
   for i:=0 to MAX_ZONES do
     clearZone(i);
 End;
@@ -96,33 +96,34 @@ end;
 
 procedure refreshZone();
 begin
-  if (ozone>=USER_ZONES_BEGIN) then
+  if (oldZone>=USER_ZONES_BEGIN) then
   begin
-    if _mZoneActive[ozone] then
+    if _mZoneActive[oldZone] then
     begin
-      callInZone(ozone);
-      if allowInverZone then invertZone(ozone);
+      callInZone(oldZone);
+      if allowInverZone then invertZone(oldZone);
     end;
-    ozone:=-1;
+    oldZone:=-1;
   End;
-  if (nzone>=USER_ZONES_BEGIN) then
+  if (nowZone>=USER_ZONES_BEGIN) then
   begin
-    if _mZoneActive[nzone] then
+    if _mZoneActive[nowZone] then
     begin
-      callInZone(nzone);
-      if allowInverZone then invertZone(nzone);
+      callInZone(nowZone);
+      if allowInverZone then invertZone(nowZone);
     end;
-    ozone:=nzone;
+    oldZone:=nowZone;
   End;
 End;
 
 function setCursorInZone(n:Shortint):boolean;
 begin
   result:=false;
-  nzone:=-1; czone:=n;
-  szone:=n; refreshZone();
+  nowZone:=-1;
+  curZone:=n; selZone:=n;
+  refreshZone();
   if not _mZoneActive[n] then exit;
-  czone:=n;
+  curZone:=n;
   i:=_mZoneX2[n] shl 2; inc(i,2);
   setCursorPos(i,_mZoneY2[n]-1);
   result:=true;
@@ -132,47 +133,47 @@ function checkZones:Boolean;
 
   function pressed:Boolean;
   begin
-    szone:=nzone;
-    nzone:=-1;
+    selZone:=nowZone;
+    nowZone:=-1;
     ombutton:=MBUT_NONE;
     result:=true;
   End;
 
 begin
   result:=false;
-  nzone:=-1; szone:=-1;
+  nowZone:=-1; selZone:=-1;
   for i:=0 to MAX_ZONES do
   begin
     if _mZoneActive[i] then
       if (mx>=_mZoneX1[i]) and (mx<=_mZoneX2[i]) and
           (my>=_mZoneY1[i]) and (my<=_mZoneY2[i]) then
       begin
-        nzone:=i; break;
+        nowZone:=i; break;
       End;
   End;
 
-  if nzone<>-1 then // take action only when the cursor is in the zone
+  if nowZone<>-1 then // take action only when the cursor is in the zone
   begin
-    if nzone<USER_ZONES_BEGIN then
+    if nowZone<USER_ZONES_BEGIN then
     begin // global zone
       refreshZone();
       if (mbutton=MBUT_NONE) then
       begin // trigger free
-        if (ombutton=MBUT_LEFT) and (nzone=ozone) then
+        if (ombutton=MBUT_LEFT) and (nowZone=oldZone) then
           result:=pressed(); // action after release trigger
       End
       else
       begin // trigger pressed
-        if (nzone<>ozone) then
+        if (nowZone<>oldZone) then
         begin // action when trigger is pressed
-          if nzone<3 then  // for module
+          if nowZone<3 then  // for module
           begin
             setIcon(-1);
-            putImage(_ICONS[3+nzone],_mZoneX1[nzone],50,3,12);
+            putImage(_ICONS[3+nowZone],_mZoneX1[nowZone],50,3,12);
           End
-          else setControl(nzone-3); // for controls
+          else setControl(nowZone-3); // for controls
 
-          ozone:=nzone;
+          oldZone:=nowZone;
           ombutton:=MBUT_LEFT;
         End;
       End;
@@ -182,11 +183,11 @@ begin
       if (mbutton=MBUT_NONE) then
       begin
         if (ombutton=MBUT_LEFT) then result:=pressed();
-        if nzone<>ozone then refreshZone();
+        if nowZone<>oldZone then refreshZone();
       End
       else
       begin
-        nzone:=-1;
+        nowZone:=-1;
         refreshZone();
         ombutton:=MBUT_LEFT;
       End;
@@ -194,12 +195,12 @@ begin
   End
   else
   begin
-    // if ozone<>-1 then callInZone(ozone);
+    // if oldZone<>-1 then callInZone(oldZone);
     refreshZone();
     if (ombutton=MBUT_LEFT) then
     begin
       setIcon(-1); setControl(-1);
-      ozone:=-1;
+      oldZone:=-1;
       ombutton:=MBUT_NONE;
     End;
   End;
@@ -207,8 +208,8 @@ End;
 
 procedure callZoneProc(); Assembler;
 Asm
-  lda szone
-  sta czone
+  lda selZone
+  sta curZone
 
   asl @
   tay
@@ -220,18 +221,18 @@ Asm
 
   jsr jaddr:$ffff
 
-  lda czone
-  cmp nZone
+  lda curZone
+  cmp nowZone
   bne @exit
-  cmp oZone
+  cmp oldZone
   beq @+
 clroZone:
   lda #(-1)
-  sta oZone
+  sta oldZone
   bmi @exit
 @:
-  lda nZone
-  cmp oZone
+  lda nowZone
+  cmp oldZone
   beq clroZone
 End;
 

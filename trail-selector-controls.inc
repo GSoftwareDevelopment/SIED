@@ -32,7 +32,7 @@ procedure blankList();
 begin
   for i:=0 to 4 do
   begin
-    // if nZone=LISTZONE+i then oZone:=-1;
+    // if nowZone=LISTZONE+i then oldZone:=-1;
     blank(8,_LISTY[i]-1,PATHNAMESIZE+1,6);
     clearZone(LISTZONE+i);
   end;

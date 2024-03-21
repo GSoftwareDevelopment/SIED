@@ -15,18 +15,11 @@ begin
 End;
 
 procedure doChoiceFile(); Keep;
-var
-  zone:shortint absolute $3e;
-
 begin
-  if KEYB=255 then
-    zone:=szone
-  else
-    zone:=ozone;
-  case zone of
+  case curZone of
     LISTZONE..LISTZONE+MAXLISTITEMS-1:
     begin
-      fn:=dirName[zone-LISTZONE]; updateFileNameField();
+      fn:=dirName[curZone-LISTZONE]; updateFileNameField();
     End;
   End;
 End;
@@ -34,8 +27,8 @@ End;
 procedure doEraseFileName(); Keep;
 begin
   fn:=''; updateFileNameField();
-  czone:=14; // must be set as call zone
-  szone:=14; // must be set as select zone
+  curZone:=14; // must be set as call zone
+  selZone:=14; // must be set as select zone
   doFilename();
 end;
 
@@ -178,42 +171,42 @@ var
 begin
   if _modKey<>0 then exit;
   KEYB:=KEYB and $3F;
-  if (cZone<MIN) or (cZone>MAX) then
+  if (curZone<MIN) or (curZone>MAX) then
     setCursorInZone(MIN)
   else
   begin
     case KEYB of
-      k_UP: if cZone>MIN then
-              dec(cZone)
+      k_UP: if curZone>MIN then
+              dec(curZone)
             else // page change
             if _mZoneActive[LISTZONE-1] then
             begin
               doPrevPageDir();
-              cZone:=MAX; ozone:=-1;
+              curZone:=MAX; oldZone:=-1;
             end;
-      k_DOWN: if cZone<MAX then
-                inc(cZone)
+      k_DOWN: if curZone<MAX then
+                inc(curZone)
               else
               if _mZoneActive[LISTZONE+MAXLISTITEMS] then
               begin
                 doNextPageDir();
-                cZone:=MIN; ozone:=-1;
+                curZone:=MIN; oldZone:=-1;
               end;
-      k_LEFT: if cZone-5>=MIN then
-                dec(cZone,STEP)
+      k_LEFT: if curZone-5>=MIN then
+                dec(curZone,STEP)
               else
               if _mZoneActive[LISTZONE-1] then
               begin
-                doPrevPageDir(); ozone:=-1;
+                doPrevPageDir(); oldZone:=-1;
               end;
-      k_RIGHT: if cZone+5<=MAX then
-                inc(cZone,STEP)
+      k_RIGHT: if curZone+5<=MAX then
+                inc(curZone,STEP)
               else
               if _mZoneActive[LISTZONE+MAXLISTITEMS] then
               begin
-                doNextPageDir(); ozone:=-1;
+                doNextPageDir(); oldZone:=-1;
               end;
     end;
-    setCursorInZone(cZone);
+    setCursorInZone(curZone);
   end;
 end;

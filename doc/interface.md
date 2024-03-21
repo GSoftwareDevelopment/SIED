@@ -12,16 +12,18 @@ type
   TZoneProc = procedure();
 
 var
-  _mZoneActive:Array[0..MAX_ZONES] of Boolean absolute $500;
-  _mZoneX1:array[0..MAX_ZONES] of Byte absolute $520;
-  _mZoneY1:array[0..MAX_ZONES] of Byte absolute $540;
-  _mZoneX2:array[0..MAX_ZONES] of Byte absolute $560;
-  _mZoneY2:array[0..MAX_ZONES] of Byte absolute $580;
-  _mZoneCall:Array[0..MAX_ZONES] of TZoneProc absolute $5a0;
+  _mZoneActive:Array[0..MAX_ZONES] of Boolean;
+  _mZoneX1:array[0..MAX_ZONES] of Byte;
+  _mZoneY1:array[0..MAX_ZONES] of Byte;
+  _mZoneX2:array[0..MAX_ZONES] of Byte;
+  _mZoneY2:array[0..MAX_ZONES] of Byte;
+  _mZoneCall:Array[0..MAX_ZONES] of TZoneProc;
 
 var
-  szone:Shortint absolute $50;
-  ozone:Shortint absolute $51;
+  selZone:Shortint;
+  oldZone:Shortint;
+  nowZone:Shortint;
+  curZone:Shortint;
 ```
 
 ## Methods
@@ -92,14 +94,14 @@ Podobnie jak `addZoneV` z możlwioścą ustalenia numeru strefy.
 Funkcja poolingu dla kursora i stref.
 Zwraca `true`, jeśli strefa została naciśnięta.
 
-W zmiennej `szone`, po detekcji naciśnięcia, będzie znajdował się numer naciśniętej strefy, do momentu następnego wywołania funkcji.
+W zmiennej `selZone`, po detekcji naciśnięcia, będzie znajdował się numer naciśniętej strefy, do momentu następnego wywołania funkcji.
 
 Obsługuje graficznie strefy panelu kontrolnego!
 
 ### procedure callZoneProc();
 
 Wywołanie przypisanej procedury dla strefy.
-W zmiennej `szone` musi być umieszczony numer strefy
+W zmiennej `selZone` musi być umieszczony numer strefy
 
 ### procedure runInterface();
 

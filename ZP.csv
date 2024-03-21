@@ -9,9 +9,9 @@
 "$5a","cursor.inc","mdy",
 "$5c","cursor.inc","mRefresh",
 "$5d","cursor.inc","mAllowKeys",
-"$50","interface.inc","szone",
-"$51","interface.inc","ozone",
-"$57","interface.inc","nzone",
+"$50","interface.inc","selZone",
+"$51","interface.inc","oldZone",
+"$57","interface.inc","nowZone",
 
 "$fa","put-text.inc","putText.sptr",
 "$3e","SIED.pas","i",

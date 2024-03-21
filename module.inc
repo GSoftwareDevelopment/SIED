@@ -13,27 +13,22 @@ end;
 
 procedure setModule(); forward;
 
-procedure toZone(n:byte);
-begin
-  szone:=n; setCursorInZone(n);
-end;
-
 procedure keyDisk(); Keep;
 begin
   if _modKey<>(KMOD_CTRL+KMOD_SHIFT) then exit;
-  toZone(0); setModule();
+  setCursorInZone(0); setModule();
 end;
 
 procedure keyTrailEd();Keep;
 begin
   if _modKey<>(KMOD_CTRL+KMOD_SHIFT) then exit;
-  toZone(1); setModule();
+  setCursorInZone(1); setModule();
 end;
 
 procedure keyScenarioEd();Keep;
 begin
   if _modKey<>(KMOD_CTRL+KMOD_SHIFT) then exit;
-  toZone(2); setModule();
+  setCursorInZone(2); setModule();
 end;
 
 procedure shortKeys(); Assembler;
@@ -45,8 +40,8 @@ end;
 
 procedure setModule();
 begin
-  if szone=curModule then exit;
-  curModule:=szone;
+  if curZone=curModule then exit;
+  curModule:=curZone;
 
   initTimers();
 
@@ -57,14 +52,14 @@ begin
   _mZoneActive[2]:=true;
   fillchar(YSCR[56+48],800,0);
   HPOSP[2]:=0;
-  setIcon(szone);
+  setIcon(curZone);
   clearStatus();
   clearWorkarea();
   setControls(0);
-  _mZoneActive[0]:=(szone<>0);
-  _mZoneActive[1]:=(szone<>1);
-  _mZoneActive[2]:=(szone<>2);
-  case szone of
+  _mZoneActive[0]:=(curZone<>0);
+  _mZoneActive[1]:=(curZone<>1);
+  _mZoneActive[2]:=(curZone<>2);
+  case curZone of
     0: loadModule('D:DISK.LIB');
     1: loadModule('D:TRAIL.LIB');
     2: loadModule('D:SCENED.LIB');
@@ -91,5 +86,5 @@ begin
    addZoneN(7,15,YCONTROLS,3,8,@nullProc);  // insert
   addZoneHN(8,@nullProc);                   // delete
 
-  szone:=-1; setModule();
+  curZone:=-1; setModule();
 End;

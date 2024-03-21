@@ -16,8 +16,8 @@ var
   _mZoneHint:Array[0..MAX_ZONES] of PString       absolute IZONE_ADDR+$120;
 
 var
-  szone:Shortint absolute $6B;
-  ozone:Shortint absolute $6C;
-  nzone:Shortint absolute $6D;
-  czone:Shortint absolute $6E;
+  selZone:Shortint absolute $6B;
+  oldZone:Shortint absolute $6C;
+  nowZone:Shortint absolute $6D;
+  curZone:Shortint absolute $6E;
   allowInverZone:Boolean absolute $6F;

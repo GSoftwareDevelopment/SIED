@@ -142,6 +142,8 @@ asm
 
   lda #$FF
   sta _callShortcutKeys
+  lda #(-1)
+  sta selZone
 
   jsr keyJump:$FFFF
 
@@ -155,24 +157,28 @@ asm
   sta _modKey
 @:
 
-  lda czone
-  cmp nzone
-  bne @exit
+  lda curZone
+  cmp nowZone
+  bne @+
   lda #(-1)
-  sta nzone
+  sta oldZone
+  bmi @exit
+@:
+  lda nowZone
+  sta oldZone
 
-//   lda czone
-//   cmp nZone
+//   lda curZone
+//   cmp nowZone
 //   bne @exit
-//   cmp oZone
+//   cmp oldZone
 //   beq @+
 // clroZone:
 //   lda #(-1)
-//   sta oZone
+//   sta oldZone
 //   bmi @exit
 // @:
-//   lda nZone
-//   cmp oZone
+//   lda nowZone
+//   cmp oldZone
 //   beq clroZone
 
 end;

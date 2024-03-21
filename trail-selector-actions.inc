@@ -13,7 +13,7 @@ var
   name:PString;
 
 begin
-  n:=cZone-LISTZONE;
+  n:=curZone-LISTZONE;
   curTrailID:=listNEntry[n];
   name:=pathNamePtr[curTrailID];
   pathNameSearch:=name; updateSearchField();
@@ -24,14 +24,14 @@ begin
   pathNameSearch:=''; updateSearchField();
   refreshList();
   // setCursorInZone(13);
-  czone:=13;  // must be set as call zone
-  szone:=13;  // must be set as select zone
+  curZone:=13;  // must be set as call zone
+  selZone:=13;  // must be set as select zone
   doSearchPath();
 end;
 
 procedure doPageChange();
 begin
-  if szone-LISTZONE>=0 then
+  if selZone-LISTZONE>=0 then
   begin
     if listShift<(MAXPATHDEFINITIONS-10) then
       inc(listShift,5)
@@ -140,7 +140,7 @@ procedure doSetAction();
 begin
   if byte(pathNameSearch[0])>0 then
   begin
-    case szone of
+    case selZone of
       9 : doCreate();
       10: doEdit();
       11: doName();
@@ -194,34 +194,34 @@ const
 
 var
   modKey:Byte;
-  // czone:shortint;
+  // curZone:shortint;
 
 begin
   if _modKey<>0 then exit;
   KEYB:=KEYB and $3F;
-  // czone:=ozone;
-  if (cZone<MIN) or (cZone>MAX) then
+  // curZone:=oldZone;
+  if (curZone<MIN) or (curZone>MAX) then
     setCursorInZone(MIN)
   else
   begin
     case KEYB of
-      k_UP: if cZone>MIN then
-              dec(cZone)
+      k_UP: if curZone>MIN then
+              dec(curZone)
             else // page change
             if _mZoneActive[LISTZONE-1] then
             begin
-              sZone:=LISTZONE-1; doPageChange();
-              cZone:=MAX; ozone:=-1;
+              selZone:=LISTZONE-1; doPageChange();
+              curZone:=MAX; oldZone:=-1;
             end;
-      k_DOWN: if cZone<MAX then
-                inc(cZone)
+      k_DOWN: if curZone<MAX then
+                inc(curZone)
               else
               if _mZoneActive[LISTZONE+5] then
               begin
-                sZone:=LISTZONE+5; doPageChange();
-                cZone:=MIN; ozone:=-1;
+                selZone:=LISTZONE+5; doPageChange();
+                curZone:=MIN; oldZone:=-1;
               end;
     end;
-    setCursorInZone(cZone);
+    setCursorInZone(curZone);
   end;
 end;

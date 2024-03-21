@@ -40,13 +40,13 @@ End;
 
 procedure doHintZone(); Keep;
 begin
-  allowInverZone:=true;
-  // if (nZone=oZone) then // cursor enter zone
+  allowInverZone:=(selZone=nowZone) or (oldZone<>nowZone);
+  // if (nowZone=oldZone) then // cursor enter zone
   // begin
-  //   if _mZoneHint[nZone]<>nil then
-  //     setStatus(_mZoneHint[nZone]);
+  //   if _mZoneHint[nowZone]<>nil then
+  //     setStatus(_mZoneHint[nowZone]);
   // end
-  // else if (nZone<>oZone) then // cursor leave zone
+  // else if (nowZone<>oldZone) then // cursor leave zone
   // begin
   //   clearStatus();
   // end;
@@ -130,18 +130,18 @@ End;
 procedure inInputZone();
 begin
   allowInverZone:=true;
-  if (oZone=sZone) then // cursor enter zone
+  if (oldZone=selZone) then // cursor enter zone
     setCursor(_BEAM)
-  else if (oZone<>sZone) then // cursor leave zone
+  else if (oldZone<>selZone) then // cursor leave zone
     setCursor(_ARROW);
 end;
 
 procedure inInputEditZone();
 begin
   allowInverZone:=false;
-  if (oZone=sZone) then // cursor enter zone
+  if (oldZone=selZone) then // cursor enter zone
     setCursor(_BEAM)
-  else if (oZone<>sZone) then // cursor leave zone
+  else if (oldZone<>selZone) then // cursor leave zone
     setCursor(_ARROW);
 end;
 
@@ -155,7 +155,7 @@ End;
 
 function doInput(var sEdit:String):Shortint;
 var
-  // cZone:Shortint;
+  // curZone:Shortint;
   cx:Shortint;
   ch,ln:Byte;
   ctm:Byte;
@@ -190,13 +190,13 @@ var
   end;
 
 begin
-  // cZone:=szone; // remember zone id call
-  if not _mZoneActive[szone] then exit(-3);
+  // curZone:=selZone; // remember zone id call
+  if not _mZoneActive[selZone] then exit(-3);
   setScreenWidth(20);
-  __x:=_mZoneX1[szone];
-  __y:=_mZoneY1[szone];
-  __w:=(_mZoneX2[szone]-__x)-1;
-  _mZoneInCall[cZone]:=@inInputEditZone;
+  __x:=_mZoneX1[selZone];
+  __y:=_mZoneY1[selZone];
+  __w:=(_mZoneX2[selZone]-__x)-1;
+  _mZoneInCall[curZone]:=@inInputEditZone;
   inc(__x);
   ln:=byte(sEdit[0]);
   move(sEDIT,value,ln+1);
@@ -211,7 +211,7 @@ begin
 
     // checkShortcutKeyboard(0); // (KMOD_CTRL+KMOD_SHIFT);
     checkZones();
-    if (nzone<>cZone) and (mbutton<>MBUT_NONE) then
+    if (nowZone<>curZone) and (mbutton<>MBUT_NONE) then
     begin
       _exit:=true; break;
     end;
@@ -234,7 +234,7 @@ begin
         case KEYB of
           K_ESC:
           begin
-            blankZone(cZone); putText(__x,__y+1,sEdit);
+            blankZone(curZone); putText(__x,__y+1,sEdit);
             result:=-128; break;
           End;
           K_RETURN:
@@ -242,10 +242,10 @@ begin
             if value<>sEDIT then
             begin
               storeValue();
-              result:=cZone;
+              result:=curZone;
             end
             else
-              result:=cZone or 64;
+              result:=curZone or 64;
             break;
           End;
           K_DELETE:
@@ -287,9 +287,9 @@ begin
   until (false);
   if _exit then
   begin
-    storeValue(); result:=cZone xor $FF;
+    storeValue(); result:=curZone xor $FF;
   End;
 
   if _callShortcutKeys=$FF then KEYB:=255;
-  _mZoneInCall[cZone]:=@inInputZone;
+  _mZoneInCall[curZone]:=@inInputZone;
 End;
