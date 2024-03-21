@@ -262,13 +262,13 @@ end;
 
 procedure updateCurrentTool();
 begin
-  curTool:=sZone-13;
+  curTool:=cZone-13;
   case curTool of
     1: scr:=@_ITOOL+36; // Path Begin
     2: scr:=@_ITOOL+24; // Inner Path
     3: scr:=@_ITOOL+12; // Path Finish
   else
-    // nothing
+    // nothingclear
     fillchar(Pointer(PMG_ADDR+$380+23),50,$3F);
     exit;
   end;

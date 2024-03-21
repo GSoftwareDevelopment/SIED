@@ -144,20 +144,24 @@ begin
   end;
 end;
 
-procedure keySwitch2BeginPath(); Keep;
+procedure keySwitchPathSection(n:shortint); Keep;
 begin
   if _modKey<>KMOD_CTRL then exit;
-  setCursorInZone(11); doSwitchPathSection();
+  setCursorInZone(n);
+  doSwitchPathSection();
+end;
+
+procedure keySwitch2BeginPath(); Keep;
+begin
+  keySwitchPathSection(11);
 end;
 procedure keySwitch2InnerPath(); Keep;
 begin
-  if _modKey<>KMOD_CTRL then exit;
-  setCursorInZone(12); doSwitchPathSection();
+  keySwitchPathSection(12);
 end;
 procedure keySwitch2FinishPath(); Keep;
 begin
-  if _modKey<>KMOD_CTRL then exit;
-  setCursorInZone(13); doSwitchPathSection();
+  keySwitchPathSection(13);
 end;
 
 //
@@ -175,8 +179,9 @@ begin
   end;
 end;
 
-procedure doEditPath(); Keep;
+procedure doEditPath(n:shortint); Keep;
 begin
+  if (sZone<14) or (sZone>16) then cZone:=n;
   cursorInViewPort:=true;
   setCursor(_CROSS);
   setCursorPos(XVIEWPORT+8+curPX,curPY);
@@ -185,15 +190,15 @@ end;
 
 procedure doMovePoint();
 begin
-  sZone:=14; doEditPath();
+  doEditPath(14);
 end;
 
 procedure doAddPoint();
 begin
-  sZone:=15; doEditPath();
+  doEditPath(15);
 end;
 
 procedure doDeletePoint();
 begin
-  sZone:=16; doEditPath();
+  doEditPath(16);
 end;

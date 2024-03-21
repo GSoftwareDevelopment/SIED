@@ -155,13 +155,14 @@ End;
 
 function doInput(var sEdit:String):Shortint;
 var
-  _zone:Shortint;
+  // cZone:Shortint;
   cx:Shortint;
   ch,ln:Byte;
   ctm:Byte;
   isCrs:Boolean;
   firstKey:Boolean;
   value:String[40] absolute $400;
+  _exit:Boolean;
 
   procedure refreshValue();
   begin
@@ -189,18 +190,18 @@ var
   end;
 
 begin
-  _zone:=szone; // remember zone id call
+  // cZone:=szone; // remember zone id call
   if not _mZoneActive[szone] then exit(-3);
   setScreenWidth(20);
   __x:=_mZoneX1[szone];
   __y:=_mZoneY1[szone];
   __w:=(_mZoneX2[szone]-__x)-1;
-  _mZoneInCall[_zone]:=@inInputEditZone;
+  _mZoneInCall[cZone]:=@inInputEditZone;
   inc(__x);
   ln:=byte(sEdit[0]);
   move(sEDIT,value,ln+1);
   cx:=Byte(ln); ctm:=Byte(tm+1); isCrs:=false; KEYB:=255;
-  firstKey:=true;
+  firstKey:=true; _exit:=false;
   repeat
     if (tm=ctm) then
     begin
@@ -208,64 +209,87 @@ begin
       drawCursor(not isCrs);
     End;
 
-    checkShortcutKeyboard(KMOD_CTRL+KMOD_SHIFT);
+    // checkShortcutKeyboard(0); // (KMOD_CTRL+KMOD_SHIFT);
     checkZones();
-
-    if (nzone<>_zone) and ((mbutton<>MBUT_NONE) or (_callShortcutKeys<>$FF)) then
+    if (nzone<>cZone) and (mbutton<>MBUT_NONE) then
     begin
-      if isCrs then drawCursor(isCrs);
-      storeValue(); result:=_zone xor $FF;
-      break;
-    End;
+      _exit:=true; break;
+    end;
 
-    if KEYB<>255 then
+    if (KEYB<>255) then
     begin
       if isCrs then drawCursor(false);
-      case KEYB of
-        K_ESC:
-        begin
-          blankZone(_zone); putText(__x,__y+1,sEdit);
-          result:=-128; break;
-        End;
-        K_RETURN:
-        begin
-          if value<>sEDIT then
-          begin
-            storeValue();
-            result:=_zone;
-          end
-          else
-            result:=_zone or 64;
-          break;
-        End;
-        KMOD_CTRL+K_LEFT: if cx>0 then dec(cx);
-        KMOD_CTRL+K_RIGHT: if cx<ln then inc(cx);
-        K_DELETE:
-        begin
-          if firstKey then
-            clearValue()
-          else
-          begin
-            if cx=ln then value[0]:=char(ln-1);
-            value[cx]:=#0;
-            if cx>0 then dec(cx);
-          end;
-          refreshValue();
-        End;
+      allowShortcutKeys:=true;
+      _modKey:=KEYB and (KMOD_CTRL+KMOD_SHIFT);
+      KEYB:=KEYB and $3f;
+      if _modKey=KMOD_CTRL then
+      begin
+        case KEYB of
+          K_LEFT:  if cx>0  then begin dec(cx); allowShortcutKeys:=false; end;
+          K_RIGHT: if cx<ln then begin inc(cx); allowShortcutKeys:=false; end;
+        end;
+      end
       else
-        if firstKey then clearValue();
-        ch:=keyscan2asc(KEYB);
-        if (ch>95) then dec(ch,32);
-        if (cx<__w) then inc(cx);
-        value[cx]:=char(ch);
-        if cx>ln then value[0]:=char(cx);
-        refreshValue();
-      End;
+      begin
+        case KEYB of
+          K_ESC:
+          begin
+            blankZone(cZone); putText(__x,__y+1,sEdit);
+            result:=-128; break;
+          End;
+          K_RETURN:
+          begin
+            if value<>sEDIT then
+            begin
+              storeValue();
+              result:=cZone;
+            end
+            else
+              result:=cZone or 64;
+            break;
+          End;
+          K_DELETE:
+          begin
+            allowShortcutKeys:=false;
+            if firstKey then
+              clearValue()
+            else
+            begin
+              if cx=ln then value[0]:=char(ln-1);
+              value[cx]:=#0;
+              if cx>0 then dec(cx);
+            end;
+            refreshValue();
+          End;
+        else
+          if (_modKey=0) or (_modKey=KMOD_SHIFT) then
+          begin
+            if _modKey=KMOD_SHIFT then inc(KEYB,KMOD_SHIFT);
+            if firstKey then clearValue();
+            ch:=keyscan2asc(KEYB);
+            if (ch>95) then dec(ch,32);
+            if (cx<__w) then inc(cx);
+            value[cx]:=char(ch);
+            if cx>ln then value[0]:=char(cx);
+            refreshValue();
+            allowShortcutKeys:=false;
+          end;
+        End;
+      end;
+      if checkShortcutKeyboard(KMOD_CTRL+KMOD_SHIFT) then
+      begin
+        _exit:=true; break;
+      end;
       ctm:=Byte(tm);
       KEYB:=255;
       firstKey:=false;
     End;
   until (false);
+  if _exit then
+  begin
+    storeValue(); result:=cZone xor $FF;
+  End;
+
   if _callShortcutKeys=$FF then KEYB:=255;
-  _mZoneInCall[_zone]:=@inInputZone;
+  _mZoneInCall[cZone]:=@inInputZone;
 End;

@@ -23,6 +23,7 @@ procedure doEraseSearch();
 begin
   pathNameSearch:=''; updateSearchField();
   refreshList();
+  // setCursorInZone(13);
   czone:=13;  // must be set as call zone
   szone:=13;  // must be set as select zone
   doSearchPath();
