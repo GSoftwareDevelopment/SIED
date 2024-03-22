@@ -102,7 +102,7 @@ var
 begin
   inc(b); if b>5 then b:=0;
   loopPattern:=PATHANIM[b];
-  processTrail(PT_KEEPCURSOR+PT_UPDATEPATH);
+  processTrail(PT_UPDATEPATH);
   if not cursorInViewport then
   begin
     activePage:=0;
