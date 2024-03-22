@@ -68,9 +68,10 @@ var
   bit:byte;
 
 begin
+  if (y<0) or (y>47) then exit;
   bit:=x and 7; x:=(8+x) shr 3;
   scr:=YSCR[4+y]+x;
-  bit:=pbit[bit];
+  bit:=PBIT[bit];
   if c=0 then
     poke(scr,peek(scr) and not bit)
   else
@@ -87,14 +88,12 @@ begin
   pos:=TLPosition-TLShift;
   if (pos>=0) and (pos<TIMELINELENGTH) then
   begin
-    // TLPtr:=YSCR[56+48+16]+(XTIMELINE div 4)+pos shr 2;
-    TLPtr:=Pointer(TLSCR_ADDR+TIMELINE_SIZEB+pos shr 2);
+    TLPtr:=Pointer(TLBUF_ADDR+TIMELINE_SIZEB+pos shr 2);
     bit:=pos and 3;
-    m:=P4Mask[bit]; if c>0 then b:=P4Color[c-1][bit] else b:=0;
+    m:=P4MASK[bit]; if c>0 then b:=P4COLOR[c-1][bit] else b:=0;
     poke(TLPtr,(peek(TLPtr) and m) or b); inc(TLPtr,TIMELINE_SIZEB);
     poke(TLPtr,(peek(TLPtr) and m) or b); inc(TLPtr,TIMELINE_SIZEB);
     poke(TLPtr,(peek(TLPtr) and m) or b);
-    if bit=3 then inc(TLPtr);
   end;
 end;
 
@@ -144,7 +143,7 @@ procedure innerPathShortKeys(); Assembler;
 asm
   dta k_COMMA,    a(MAIN.doTLPrevEvent)
   dta k_DOT,      a(MAIN.doTLNextEvent)
-  dta k_SPACE,    a(MAIN.doMovePoint)
+  dta K_RETURN,   a(MAIN.doMovePoint)
   dta k_INSERT,   a(MAIN.doAddPoint)
   dta k_DELETE,   a(MAIN.doDeletePoint)
   dta k_ESC,      a(MAIN.doExitEditMode)
@@ -161,27 +160,25 @@ end;
 procedure showPathBegin();
 begin
   updateGameScreen();
-  updateStartPoint(SP_DESCRIPTION);
-  if (curSection=0) or (pathStartEdge[curTrailID]=-128) then
-  begin
-    addEdges(@doSetBeginEdge);
-    putText((XVIEWPORT div 4)+5,30,'PLEASE DEFINE IT');
-    putText((XVIEWPORT div 4)+6,36,'BY CHOICE EDGE')
-  end
-  else
-    addButton((XVIEWPORT div 4)+6,36,'REDEFINE IT...',@doRedefineStartPoint);
+
+  putImage(@_RT_EDGES,18,0,2,48);
+   addZone(36,0,4,12,@doSetBeginEdge);  // Top
+  addZoneV(@doSetBeginEdge);            // Right
+  addZoneV(@doSetBeginEdge);            // Bottom
+  addZoneV(@doSetBeginEdge);            // Left
+
+  HPOSP[3]:=180; updateStartPoint();
 end;
 
 procedure showPathInner();
 begin
+  updateGameScreen();
 
-  putImage(@_ITRLTL,18,0,2,48);
+  putImage(@_LT_TOOLS,18,0,2,48);
    addZone(36,0,4,12,@doMovePoint);
   addZoneV(@doAddPoint);            // Add point
   addZoneV(@doDeletePoint);         // Delete point
   addZoneV(@nullProc);              // More...
-
-  updateGameScreen();
 
   _curPx:=-128; _curPy:=-128;
   _curDx:=-128; _curDy:=-128;
@@ -189,19 +186,13 @@ begin
   addZoneN(ZONE_TIMELINE,8,65,32,7,@doSetTimeLinePos);
   _mZoneInCall[ZONE_TIMELINE]:=@inTimeLine;
 
-  addZoneN(ZONE_VIEWPORT,XVIEWPORT div 4,0,26,48,@doEditPath);
+  addZoneN(ZONE_VIEWPORT,XVIEWPORT div 4,0,26,48,@doMovePoint); // @enterEditPath);
   _mZoneInCall[ZONE_VIEWPORT]:=@inGameScreen;
 
-  HPOSP[3]:=180;
   HPOSM[0]:=48+XTIMELINE+curTLPos-TLShift;
 
-  curTool:=0; updateCurrentTool();
+  HPOSP[3]:=180; curTool:=0; updateCurrentTool();
 
-  trailPattern:=%111111111111111111111111;
-    loopPattern:=%100100100100100100100100;
-  trailLength:=processTrail(PT_CALCLEN);
-  totalTrailLength:=processTrail(PT_CALCLEN+PT_UPDATETIMELINE);
-  onTimerAnim();
   registerShortcutKeys(@innerPathShortKeys,SK_INNER_COUNT);
 end;
 
@@ -223,7 +214,7 @@ begin
   putTextC(6,69,pathNameSearch);
 
   SetScreenWidth(20);
-  putImage(@_ITRLED,0,0,3,48);
+  putImage(@_LT_SECTIONS,0,0,3,48);
 
    addZone(0,0,3,12,@doBack2Selector);      // Back to trail selector
   addZoneH(@nullProc);                      // Options

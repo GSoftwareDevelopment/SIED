@@ -28,7 +28,7 @@ begin
   begin
     cursorInViewPort:=false;
     setCursor(_ARROW);
-    curTool:=0; updateCurrentTool();
+    curZone:=-1; updateCurrentTool();
   end;
 end;
 
@@ -87,20 +87,12 @@ end;
 
 procedure doSetBeginEdge();
 begin
-  i:=selZone-ZONE_EDGE;
+  i:=selZone-14;
   pathStartEdge[curTrailID]:=i;
   pathStartEdgeShift[curTrailID]:=0;
-  curSection:=0; selZone:=11; doSwitchPathSection();
+  updateStartPoint();
   trailLength:=processTrail(PT_CALCLEN+PT_UPDATETIMELINE);
 end;
-
-procedure doRedefineStartPoint();
-begin
-  selZone:=10; doSwitchPathSection();
-end;
-
-CONST
-  _OBJECT:Array[0..6] of byte = ( $F8,$F0,$F0,$F8,$9C,$08,$00 );
 
 procedure onTimerAnim();
 var
@@ -109,26 +101,49 @@ var
 
 begin
   inc(b); if b>5 then b:=0;
-  loopPattern:=ANIM[b];
+  loopPattern:=PATHANIM[b];
   processTrail(PT_KEEPCURSOR+PT_UPDATEPATH);
   if not cursorInViewport then
   begin
     activePage:=0;
     setScreenWidth(16);
-    putSpriteXOR(@_OBJECT,8+curPX,4+curPY,1,7);
+    case curSection of
+      1: begin
+        n:=pathStartEdge[curTrailID];
+        if (n<>-128) then
+        begin
+          px:=_XEDGE[n];
+          py:=_YEDGE[n];
+          adr:=@_EDGES+ n*5;
+        end;
+      end;
+      2: begin
+          px:=8+curPX; py:=4+curPY; adr:=@_IPOINTARROW;
+          if px>_RIGHT then begin dec(px,7); inc(adr,5); end;
+          if py>_BOTTOM then begin dec(py,4); inc(adr,10); end;
+        end;
+    end;
+    putSpriteXOR(adr,px,py,1,5);
     activePage:=1;
   end
   else
   begin
-    if (curTLPos>=trailLength) and (curTool=1) then
-      setCursor(@_TLSTOP)
+    if (curTLPos>=trailLength) and (curTool<>TOOL_ADDPOINT) then
+      setCursor(@_STOP)
     else
       setCursor(_CROSS);
-    setCursorPos(XVIEWPORT+8+curPX,curPY);
+
+    _x:=_mx-56-XVIEWPORT; _y:=_my-24;
+    if  ((curPX<>_curPX) or (curPY<>_curPY)) and
+        ((curPX<>_x) or (curPY<>_y)) then
+    begin
+      setCursorPos(XVIEWPORT+8+curPX,curPY);
+      curPX:=_x; curPY:=_y;
+    end;
   end;
   updateGameScreen();
   updateStepInfo();
-  animTimer:=setTimer(PATH_ANIM_TIME,@onTimerAnim);
+  animTimer:=setTimer(PATH_ANIM_REFRESH,@onTimerAnim);
 end;
 
 procedure doSwitchPathSection();
@@ -144,9 +159,17 @@ begin
   clearTimer(animTimer);
   updateTimeLineTime();
   case curSection of
-    0,1: showPathBegin();
+    1: showPathBegin();
     2: showPathInner();
     3: showPathFinish();
+  end;
+  if curSection<>3 then
+  begin
+    trailPattern:=%111111111111111111111111;
+    loopPattern:=%100100100100100100100100;
+    trailLength:=processTrail(PT_CALCLEN);
+    totalTrailLength:=processTrail(PT_CALCLEN+PT_UPDATETIMELINE);
+    onTimerAnim();
   end;
 end;
 
@@ -176,21 +199,27 @@ end;
 
 procedure doExitEditMode(); Keep;
 begin
-  if (_modKey=(KMOD_CTRL+KMOD_SHIFT)) then doBack2Selector();
-  if cursorInViewPort then
+  if (_modKey=(KMOD_CTRL+KMOD_SHIFT)) then
   begin
-    cursorInViewPort:=false;
-    setCursor(_ARROW);
-    curZone:=17; updateCurrentTool();
-  end;
+    doBack2Selector();
+  end
+  else
+    if cursorInViewPort then
+    begin
+      cursorInViewPort:=false;
+      setCursor(_ARROW);
+      curZone:=17; updateCurrentTool();
+    end;
 end;
 
-procedure doEditPath(n:shortint); Keep;
+procedure enterEditPath(n:shortint); Keep;
 begin
   if (selZone<14) or (selZone>16) then curZone:=n;
   cursorInViewPort:=true;
   updateCurrentTool();
   unregisterToolShortKeys();
+  setCursorPos(XVIEWPORT+8+curPX,curPY);
+  curZone:=30; // if (nowZone=oldZone) then begin curZone:=30; end;
 end;
 
 procedure doMovePoint(); Keep;
@@ -200,7 +229,7 @@ var
 begin
   if curTool<>TOOL_MOVEPOINT then
   begin
-    doEditPath(14); registerToolShortKeys(@movePointShortKeys,SK_MOVEPOINT_COUNT);
+    enterEditPath(14); registerToolShortKeys(@movePointShortKeys,SK_MOVEPOINT_COUNT);
   end
   else
   begin
@@ -219,7 +248,7 @@ begin
         b:=(curDX shl 4) + (curDY and $F);
         poke(adr,b);
         trailLength:=processTrail(PT_CALCLEN);
-        totalTrailLength:=processTrail(PT_CALCLEN+PT_UPDATETIMELINE+PT_KEEPCURSOR);
+        totalTrailLength:=processTrail(PT_CALCLEN+PT_UPDATETIMELINE);
       end;
     end;
   end;
@@ -227,10 +256,10 @@ end;
 
 procedure doAddPoint();
 begin
-  doEditPath(15);
+  enterEditPath(15);
 end;
 
 procedure doDeletePoint();
 begin
-  doEditPath(16);
+  enterEditPath(16);
 end;

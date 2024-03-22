@@ -32,9 +32,9 @@ end;
 procedure updatePathSection();
 begin
   case curSection of
-    0,1: scr:=@_ISELECT4+24; // Path Begin
-    2: scr:=@_ISELECT4+12; // Inner Path
-    3: scr:=@_ISELECT4+ 0; // Path Finish
+    1: scr:=@_TRAYLEFT+24; // Path Begin
+    2: scr:=@_TRAYLEFT+12; // Inner Path
+    3: scr:=@_TRAYLEFT+ 0; // Path Finish
   else
     // nothing
     fillchar(Pointer(PMG_ADDR+$300+23),50,$FF);
@@ -43,52 +43,24 @@ begin
   move(scr,Pointer(PMG_ADDR+$300+24),48);
 end;
 
-procedure addEdges(prc:TZoneProc);
+//
+//
+//
+
+procedure updateStartPoint();
 begin
-  SetScreenWidth(20);
-  for i:=0 to 3 do
-  begin
-    adr:=@_CORNERS+ (i*5);
-    px:=XCORNERS[i];
-    py:=YCORNERS[i];
-    putSprite(adr, px, py, 1, 5);
-    px:=byte(px) div 4;
-    addZoneN(ZONE_EDGE+i, px, py, 2, 5,prc);
-  end;
-end;
-
-//
-//
-//
-
-procedure updateStartPoint(mode:Byte);
-const
-  CTOP   = 8;
-  CLINE1 = 17;
-  CLEFT  = (XVIEWPORT div 4)+7;
-
-begin
-  if mode=SP_DESCRIPTION then
-  begin
-    setScreenWidth(20);
-    putText(CLEFT-1,CTOP,'CURRENT START:');
-    fillchar(YSCR[56+CTOP+6]+(XVIEWPORT div 8)+2,9,$FF);
-  end;
   n:=pathStartEdge[curTrailID];
-  if (n<>-128) then
-  begin
-    if mode=SP_DESCRIPTION then
-    begin
-      i:=Length(EDGENAME[n]);
-      px:=CLEFT+5-(i shr 1);
-      blank(px-1,CLINE1-1,i+1,6);
-      putText(px,CLINE1,EDGENAME[n]);
-      invert(px-1,CLINE1-1,i+1,6);
-    end;
-    px:=XCORNERS[n];
-    py:=YCORNERS[n];
-    putSprite((@_CORNERS+ n*5), px, py,1,5);
+  case n of
+    EDGE_TOP    : scr:=@_TRAYRIGHT+36;
+    EDGE_LEFT   : scr:=@_TRAYRIGHT+24;
+    EDGE_RIGHT  : scr:=@_TRAYRIGHT+12;
+    EDGE_BOTTOM : scr:=@_TRAYRIGHT+0;
+  else
+    // nothingclear
+    fillchar(Pointer(PMG_ADDR+$380+23),50,$3F);
+    exit;
   end;
+  move(scr,Pointer(PMG_ADDR+$380+24),48);
 end;
 
 //
@@ -155,19 +127,17 @@ begin
   pathPattern:=trailPattern;
   if (mode and PT_UPDATETIMELINE<>0) then
   begin
-    TLPtr:=pointer(TLSCR_ADDR);
+    TLPtr:=pointer(TLBUF_ADDR);
     for i:=0 to 4 do
     begin
-      fillchar(TLPtr,TIMELINE_SIZEB,_LOOP[i]);
+      fillchar(TLPtr,TIMELINE_SIZEB,_TLLOOP[i]);
       inc(TLPtr,TIMELINE_SIZEB);
     end;
   end;
-  scr:=YSCR[56+48+16]+8;
-  if (mode and PT_KEEPCURSOR=0) then setCursor(_WAIT);
+  // if (mode and PT_KEEPCURSOR=0) then setCursor(_WAIT);
   adr:=pathListPtr[curTrailID];
   n:=pathStartEdge[curTrailID];
-  px:=XEDGE[n];
-  py:=YEDGE[n];
+  px:=XEDGE[n]; py:=YEDGE[n];
   TLPosition:=0; ddx:=0; ddy:=0; loop:=false;
   repeat
     v:=peek(adr);
@@ -199,11 +169,15 @@ begin
       dx:=v shr 4;  if (dx and %1000)<>0 then dx:=dx or %11110000;
       dy:=v and $F; if (dy and %1000)<>0 then dy:=dy or %11110000;
       inc(px,dx); inc(py,dy);
+      if ((px<_LEFT) or (px>_RIGHT)) or ((py<_TOP) or (py>_BOTTOM)) then
+      begin
+        v:=2; break;
+      end;
 
       if (mode and PT_UPDATEPATH<>0) then
       begin
         w:=pathPattern and 1;
-        point(px,py,byte(w<>0));
+        point(px,py,w);
         pathPattern:=pathPattern shr 1;
         if w<>0 then pathPattern:=pathPattern or $800000;
       end;
@@ -214,16 +188,11 @@ begin
         curDx:=dx; curDy:=dy;
       end;
 
-      if v<>0 then
+      if (not loop) and (mode and PT_UPDATETIMELINE<>0) then
       begin
-        if (mode and PT_UPDATETIMELINE<>0) and not loop then TLPoint(1);
-      end
-      else
-        if (mode and PT_UPDATETIMELINE<>0) and not loop then TLPoint(0);
-      if ((px<_LEFT) or (px>_RIGHT)) or ((py<_TOP) or (py>_BOTTOM)) then
-      begin
-        v:=2; break;
+        TLPoint(byte(v<>0));
       end;
+
       inc(adr);
       inc(TLPosition);
     end;
@@ -235,9 +204,9 @@ begin
   begin
     while TLPosition<160 do
     begin
-      inc(TLPosition); TLPoint(v);
+      TLPoint(v); inc(TLPosition);
     end;
-    TLPtr:=pointer(TLSCR_ADDR);
+    TLPtr:=pointer(TLBUF_ADDR);
     scr:=YSCR[56+48+15]+(XTIMELINE div 4);
     for i:=0 to 4 do
     begin
@@ -247,7 +216,7 @@ begin
     end;
   end;
 
-  if (mode and PT_KEEPCURSOR=0) then setCursor(_ARROW);
+  // if (mode and PT_KEEPCURSOR=0) then setCursor(_ARROW);
 end;
 
 //
@@ -258,9 +227,9 @@ procedure updateCurrentTool();
 begin
   curTool:=curZone-13;
   case curTool of
-    TOOL_MOVEPOINT: scr:=@_ITOOL+36;
-    TOOL_ADDPOINT : scr:=@_ITOOL+24;
-    TOOL_DELPOINT : scr:=@_ITOOL+12;
+    TOOL_MOVEPOINT: scr:=@_TRAYRIGHT+36;
+    TOOL_ADDPOINT : scr:=@_TRAYRIGHT+24;
+    TOOL_DELPOINT : scr:=@_TRAYRIGHT+12;
   else
     // nothingclear
     fillchar(Pointer(PMG_ADDR+$380+23),50,$3F);

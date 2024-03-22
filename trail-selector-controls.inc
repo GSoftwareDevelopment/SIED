@@ -25,7 +25,8 @@ begin
   if n>4 then exit;
   y:=_LISTY[n];
   putText(9,y,name);
-  addZoneN(LISTZONE+n,8,y-1,PATHNAMESIZE+2,7,@doSelectPath);
+  inc(n,LISTZONE);
+  addZoneN(n,8,y-1,PATHNAMESIZE+2,7,@doSelectPath);
 End;
 
 procedure blankList();

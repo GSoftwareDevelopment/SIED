@@ -17,6 +17,11 @@ const
 {$I 'core/utils.h.inc'}
 
 const
+  TR_JUMP = $80;
+  TR_STOP = $88;
+  TR_KILL = $8F;
+
+const
   PATHNAMESIZE  = 28;
 
 var
@@ -48,19 +53,26 @@ begin
     fillchar(pointer(PATHLISTV_ADDR),$1000,$00); // clear pathListPtr, pathNamePtr, pathNames
     for i:=0 to MAXPATHDEFINITIONS-1 do
     begin
-      pathStartEdge[i]:=_EDGERIGHT;
+      pathStartEdge[i]:=EDGE_RIGHT;
       pathStartEdgeShift[i]:=0;
     end;
     pathListPtr[0]:=pointer($A000);
     moduleInitialized:=moduleInitialized or $2;
   end;
   redrawList:=true; curAction:=-1;
-  fillchar(Pointer(PMG_ADDR+$180+24),48,%11110000);
-  fillchar(Pointer(PMG_ADDR+$180+24+65),7,$02);
+  // fillchar(Pointer(PMG_ADDR+$180+24),48,%01100000);
   fillchar(Pointer(PMG_ADDR+$300+23),50,$FF);
   fillchar(Pointer(PMG_ADDR+$380+23),50,$3F);
+  // fillchar(Pointer(PMG_ADDR+$180+24+65),7,$02);
+  poke(PMG_ADDR+$180+24+65,$02);
+  poke(PMG_ADDR+$180+24+66,$02);
+  poke(PMG_ADDR+$180+24+67,$00);
+  poke(PMG_ADDR+$180+24+68,$00);
+  poke(PMG_ADDR+$180+24+69,$00);
+  poke(PMG_ADDR+$180+24+70,$02);
+  poke(PMG_ADDR+$180+24+71,$02);
   PCOL[2]:=BASE_COLOR+$02; PCOL[3]:=BASE_COLOR+$02;
-  SIZEP[2]:=%11; SIZEP[3]:=%11; SIZEM:=%11110000;
+  SIZEP[2]:=%11; SIZEP[3]:=%11; SIZEM:=%00000000;
   HPOSP[2]:=44; // icon tray
   clearAllShortcutsKey();
   showTrailSelector();

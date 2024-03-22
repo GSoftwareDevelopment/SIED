@@ -28,7 +28,8 @@ begin
     putChar(x+byte(name[0]),y,'>');
   end;
   putText(x,y,name);
-  addZoneN(LISTZONE+n,x-1,y-1,ITEMSIZE,7,prc);
+  inc(n,LISTZONE);
+  addZoneN(n,x-1,y-1,ITEMSIZE,7,prc);
 End;
 
 procedure getLn(chn:Byte; buf:PString); Register; Assembler; Asm icl 'core/asm/get_line.a65' End;

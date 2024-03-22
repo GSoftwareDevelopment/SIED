@@ -15,6 +15,7 @@ begin
   _mZoneCall[n]:=prc;
   _mZoneInCall[n]:=@doHintZone;
   // _mZoneHint[n]:=nil;
+  if (nowZone=n) and (oldZone=n) then begin nowZone:=-1; oldZone:=-1; end;
 End;
 
 procedure clearZone(n:Byte);
@@ -27,6 +28,7 @@ begin
   _mZoneCall[n]:=@nullProc;
   _mZoneInCall[n]:=@doHintZone;
   // _mZoneHint[n]:=nil;
+  // if (nowZone=n) and (oldZone=n) then begin nowZone:=-1; oldZone:=-1; end;
 End;
 
 procedure clearWorkZones();

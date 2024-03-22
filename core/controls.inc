@@ -24,6 +24,7 @@ procedure clearWorkarea();
 begin
   fillchar(Pointer(EDITOR_ADDR),48*20,0);
   clearWorkZones();
+  nowZone:=-1; oldZone:=-1; selZone:=-1;
 End;
 
 procedure clearStatus();
@@ -287,6 +288,7 @@ begin
   until (false);
   if _exit then
   begin
+    if isCrs then drawCursor(false);
     storeValue(); result:=curZone xor $FF;
   End;
 
