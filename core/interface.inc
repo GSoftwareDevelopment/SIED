@@ -5,6 +5,30 @@ var
 
 procedure nullProc(); Assembler; asm end;
 
+//
+procedure clearHintInZone(n:shortint); Assembler;
+asm
+  lda n
+  asl @
+  tay
+  lda #0 // nil
+  sta adr._mZoneHint,y
+  lda #0 // nil
+  sta adr._mZoneHint+1,y
+end;
+
+procedure assignHintToZone(n:shortint; hint:PString); Assembler;
+asm
+  lda n
+  asl @
+  tay
+  lda hint
+  sta adr._mZoneHint,y
+  lda hint+1
+  sta adr._mZoneHint+1,y
+end;
+//
+
 procedure setZone(n:Shortint; act:Boolean; x,y,w,h:Byte; prc:TZoneProc);
 begin
   _mZoneActive[n]:=act;
@@ -14,7 +38,9 @@ begin
   _mZoneY2[n]:=y+h-1; __h:=h;
   _mZoneCall[n]:=prc;
   _mZoneInCall[n]:=@doHintZone;
-  // _mZoneHint[n]:=nil;
+  // _mZoneHint[n]:=nil;  // BUG: MP issue
+  clearHintInZone(n);
+  if (n=hintZone) then hintZone:=-1;
   if (nowZone=n) and (oldZone=n) then begin nowZone:=-1; oldZone:=-1; end;
 End;
 
@@ -27,8 +53,10 @@ begin
   _mZoneY2[n]:=255;
   _mZoneCall[n]:=@nullProc;
   _mZoneInCall[n]:=@doHintZone;
-  // _mZoneHint[n]:=nil;
-  // if (nowZone=n) and (oldZone=n) then begin nowZone:=-1; oldZone:=-1; end;
+  // _mZoneHint[n]:=nil;  // BUG: MP Issue
+  clearHintInZone(n);
+  if (n=hintZone) then hintZone:=-1;
+  if (nowZone=n) and (oldZone=n) then begin nowZone:=-1; oldZone:=-1; end;
 End;
 
 procedure clearWorkZones();
@@ -40,6 +68,8 @@ End;
 procedure initInterface();
 begin
   selZone:=-1; oldZone:=-1; curZone:=-1; ombutton:=MBUT_NONE;
+  hintZone:=-1;
+
   for i:=0 to MAX_ZONES do
     clearZone(i);
 End;
@@ -98,21 +128,27 @@ end;
 
 procedure refreshZone();
 begin
-  if (oldZone>=USER_ZONES_BEGIN) then
+  if (oldZone<>-1) then
   begin
     if _mZoneActive[oldZone] then
     begin
       callInZone(oldZone);
-      if allowInverZone then invertZone(oldZone);
+      if (oldZone>=USER_ZONES_BEGIN) then
+      begin
+        if allowInverZone then invertZone(oldZone);
+      end;
     end;
     oldZone:=-1;
   End;
-  if (nowZone>=USER_ZONES_BEGIN) then
+  if (nowZone<>-1) then
   begin
     if _mZoneActive[nowZone] then
     begin
       callInZone(nowZone);
-      if allowInverZone then invertZone(nowZone);
+      if (nowZone>=USER_ZONES_BEGIN) then
+      begin
+        if allowInverZone then invertZone(nowZone);
+      end;
     end;
     oldZone:=nowZone;
   End;
@@ -166,7 +202,7 @@ begin
       End
       else
       begin // trigger pressed
-        if (nowZone<>oldZone) then
+        if (omButton=MBUT_NONE) then
         begin // action when trigger is pressed
           if nowZone<3 then  // for module
           begin

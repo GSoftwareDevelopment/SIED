@@ -65,6 +65,8 @@ exports
 
 // interface
   nullProc,
+  clearHintInZone,
+  assignHintToZone,
   setZone,
   clearZone,
   clearWorkZones,
@@ -108,6 +110,7 @@ exports
   keyscan2asc,
   convASC2INT,
   findText,
+  BIN2BCD,
 
 // keyboard
   __SCKeyVec,

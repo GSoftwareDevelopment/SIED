@@ -7,7 +7,6 @@ var
   curSection:Shortint;
   trailLength:Smallint;
   totalTrailLength:Smallint;
-  adr:Pointer;
   TLPtr:pointer;
   TLPosition:SmallInt;
   curTLPos:SmallInt;
@@ -36,32 +35,27 @@ var
   cursorInViewPort:Boolean;
 
   curTool:Byte;
-  curTOOL_SK:Pointer;
-  curTOOL_SK_COUNT:Byte;
+  SK_curTool:Pointer;
+  SKcount_curTool:Byte;
 
 procedure registerToolShortKeys(SK:Pointer; count:Byte);
 begin
-  curTOOL_SK:=SK; curTOOL_SK_COUNT:=count;
+  SK_curTool:=SK; SKcount_curTool:=count;
   registerShortcutKeys(SK,count);
 end;
 
 procedure unregisterToolShortKeys();
 begin
-  if (curTOOL_SK<>nil) or (curTOOL_SK_COUNT<>0) then
+  if (SK_curTool<>nil) and (SKcount_curTool<>0) then
   begin
-    unregisterShortcutKeys(curTOOL_SK,curTOOL_SK_COUNT);
-    curTOOL_SK:=nil; curTOOL_SK_COUNT:=0;
+    unregisterShortcutKeys(SK_curTool,SKcount_curTool);
+    SK_curTool:=nil; SKcount_curTool:=0;
   end;
 end;
 
 //
 //
 //
-
-function getTrailSize():word;
-begin
-  result:=word(pathListPtr[curTrailID])-word(pathListPtr[curTrailID+1]);
-end;
 
 procedure point(x,y:Shortint; c:Byte);
 var
@@ -95,21 +89,6 @@ begin
     poke(TLPtr,(peek(TLPtr) and m) or b); inc(TLPtr,TIMELINE_SIZEB);
     poke(TLPtr,(peek(TLPtr) and m) or b);
   end;
-end;
-
-function BIN2BCD(bin:Byte):Byte; Assembler;
-asm
-  lda #0
-  sta result+0
-
-loop8Bits:
-  ldy #{sed}
-  asl bin
-  adc result+0
-  sta result+0
-  iny
-  bne loop8Bits+1
-  cld
 end;
 
 //
@@ -162,10 +141,14 @@ begin
   updateGameScreen();
 
   putImage(@_RT_EDGES,18,0,2,48);
-   addZone(36,0,4,12,@doSetBeginEdge);  // Top
-  addZoneV(@doSetBeginEdge);            // Right
-  addZoneV(@doSetBeginEdge);            // Bottom
-  addZoneV(@doSetBeginEdge);            // Left
+  n:=addZone(36,0,4,12,@doSetBeginEdge);   // Top
+  assignHintToZone(n,'SET BEGIN TO TOP EDGE');
+  n:=addZoneV(@doSetBeginEdge);            // Left
+  assignHintToZone(n,'SET BEGIN TO LEFT EDGE');
+  n:=addZoneV(@doSetBeginEdge);            // Right
+  assignHintToZone(n,'SET BEGIN TO RIGHT EDGE');
+  n:=addZoneV(@doSetBeginEdge);            // Bottom
+  assignHintToZone(n,'SET BEGIN TO BOTTOM EDGE');
 
   HPOSP[3]:=180; updateStartPoint();
 end;
@@ -175,10 +158,14 @@ begin
   updateGameScreen();
 
   putImage(@_LT_TOOLS,18,0,2,48);
-   addZone(36,0,4,12,@doMovePoint);
-  addZoneV(@doAddPoint);            // Add point
-  addZoneV(@doDeletePoint);         // Delete point
-  addZoneV(@nullProc);              // More...
+  n:=addZone(36,0,4,12,@doMovePoint);
+  assignHintToZone(n,'MOVE PATH POINT');
+  n:=addZoneV(@doAddPoint);            // Add point
+  assignHintToZone(n,'ADD NEW PATH POINT');
+  n:=addZoneV(@doDeletePoint);         // Delete point
+  assignHintToZone(n,'DELETE PATH POINT');
+  n:=addZoneV(@nullProc);              // More...
+  assignHintToZone(n,'MORE TOOLS...');
 
   _curPx:=-128; _curPy:=-128;
   _curDx:=-128; _curDy:=-128;
@@ -210,29 +197,35 @@ begin
   clearStatus();
   setControls(%001111); // only Prev/Play/Stop/Next controls
   setControl(-1);
-  setStatus('EDIT:');
-  putTextC(6,69,pathNameSearch);
+
+  name:=getTrailName(curTrailID);
+  setStatus('EDIT:'); putTextC(6,69,name);
 
   SetScreenWidth(20);
   putImage(@_LT_SECTIONS,0,0,3,48);
 
-   addZone(0,0,3,12,@doBack2Selector);      // Back to trail selector
-  addZoneH(@nullProc);                      // Options
-   addZone(0,12,6,12,@doSwitchPathSection); // Begin trail
-  addZoneV(@doSwitchPathSection);           // Path
-  addZoneV(@doSwitchPathSection);           // Finish trail
+  n:=addZone(0,0,3,12,@doBack2Selector);      // Back to trail selector
+  assignHintToZone(n,'BACK TO TRAIL SELECTOR');
+  n:=addZoneH(@nullProc);                      // Options
+  assignHintToZone(n,'EDITOR CONFIGURATION');
+  n:=addZone(0,12,6,12,@doSwitchPathSection); // Begin trail
+  assignHintToZone(n,'BEGIN TRAIL SETUP');
+  n:=addZoneV(@doSwitchPathSection);           // Path
+  assignHintToZone(n,'PATH EDIT');
+  n:=addZoneV(@doSwitchPathSection);           // Finish trail
+  assignHintToZone(n,'FINISH TRAIL SETUP');
 
   _mZoneCall[3]:=@doTLPrevEvent;
   _mZoneCall[6]:=@doTLNextEvent;
 
   curSection:=-1;
-  if getTrailSize=0 then
+  if getTrailSize(curTrailID)=0 then
     selZone:=11   // show Begin path
   else
     selZone:=12;  // show trail path
 
   TLShift:=0; curTLPos:=0;
   doSwitchPathSection();
-  curTOOL_SK:=nil; curTOOL_SK_COUNT:=0;
+ SK_curTool:=nil;SKcount_curTool:=0;
   registerShortcutKeys(@globalShortKeys,SK_GLOBAL_COUNT);
 End;

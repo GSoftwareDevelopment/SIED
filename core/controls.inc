@@ -39,19 +39,65 @@ begin
   putTextC(0,69,s);
 End;
 
+//
+
 procedure doHintZone(); Keep;
 begin
   allowInverZone:=(selZone=nowZone) or (oldZone<>nowZone);
-  // if (nowZone=oldZone) then // cursor enter zone
+  if (nowZone=oldZone) then exit;
+  if (nowZone=-1) then begin
+    if hintZone<>-1 then
+    begin
+      asm
+        lda hintZone
+        asl @
+        tay
+        lda adr._mZoneHint,y
+        ora adr._mZoneHint+1,y
+        beq noHintClear
+      end;
+      clearStatus();
+      asm
+        noHintClear:
+      end;
+      hintZone:=-1;
+    end;
+  end;
+  if (nowZone=hintZone) then exit;
+
+  // if (_mZoneHint[nowZone]<>nil) then // BUG: Not implemented in MP
   // begin
-  //   if _mZoneHint[nowZone]<>nil then
-  //     setStatus(_mZoneHint[nowZone]);
-  // end
-  // else if (nowZone<>oldZone) then // cursor leave zone
-  // begin
-  //   clearStatus();
+  // store actual `_LNWIDTH` (LineWidth)
+  //   setStatus(_mZoneHint[nowZone]);
+  // restore `_LNWIDTH`
   // end;
+  asm
+    lda nowZone
+    asl @
+    tay
+    lda adr._mZoneHint,y
+    ora adr._mZoneHint+1,y
+    beq noHint
+
+    lda MAIN.PUTIMAGE._LNWIDTH
+    pha
+
+    lda adr._mZoneHint,y
+    sta MAIN.setStatus.S
+    lda adr._mZoneHint+1,y
+    sta MAIN.setStatus.S+1
+    jsr MAIN.setStatus
+
+    pla
+    jsr MAIN.setScreenWidth
+    lda nowZone
+    sta hintZone
+    noHint:
+  end;
+  // hintZone:=nowZone;
 end;
+
+//
 
 procedure setIcon(n:Shortint);
 var
@@ -163,7 +209,7 @@ var
   isCrs:Boolean;
   firstKey:Boolean;
   value:String[40] absolute $400;
-  _exit:Boolean;
+  oAllowSK,_exit:Boolean;
 
   procedure refreshValue();
   begin
@@ -220,7 +266,7 @@ begin
     if (KEYB<>255) then
     begin
       if isCrs then drawCursor(false);
-      allowShortcutKeys:=true;
+      oAllowSK:=allowShortcutKeys;
       _modKey:=KEYB and (KMOD_CTRL+KMOD_SHIFT);
       KEYB:=KEYB and $3f;
       if _modKey=KMOD_CTRL then
@@ -235,11 +281,13 @@ begin
         case KEYB of
           K_ESC:
           begin
+            allowShortcutKeys:=oAllowSK;
             blankZone(curZone); putText(__x,__y+1,sEdit);
             result:=-128; break;
           End;
           K_RETURN:
           begin
+            allowShortcutKeys:=oAllowSK;
             if value<>sEDIT then
             begin
               storeValue();
@@ -283,15 +331,17 @@ begin
       end;
       ctm:=Byte(tm);
       KEYB:=255;
+      allowShortcutKeys:=oAllowSK;
       firstKey:=false;
     End;
   until (false);
+
+  if _callShortcutKeys=$FF then KEYB:=255;
+  _mZoneInCall[curZone]:=@inInputZone;
+
   if _exit then
   begin
     if isCrs then drawCursor(false);
     storeValue(); result:=curZone xor $FF;
   End;
-
-  if _callShortcutKeys=$FF then KEYB:=255;
-  _mZoneInCall[curZone]:=@inInputZone;
 End;

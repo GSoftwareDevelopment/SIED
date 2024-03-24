@@ -4,6 +4,21 @@ procedure reduceFileName(var inFN; outFN:PString); Register; Assembler; Asm icl 
 function keyscan2asc(keyscan:Byte):Byte; Assembler; Asm icl 'asm/keyscan2asc.a65' End;
 procedure convASC2INT(var s:PString); Register; Assembler; Asm icl 'asm/asc2int.a65' End;
 
+function BIN2BCD(bin:Byte):Byte; Assembler;
+asm
+  lda #0
+  sta result+0
+
+loop8Bits:
+  ldy #{sed}
+  asl bin
+  adc result+0
+  sta result+0
+  iny
+  bne loop8Bits+1
+  cld
+end;
+
 function findText(sPhrase,sText:PString):Byte;
 var
   p:Byte;

@@ -28,25 +28,23 @@ CCROSS_ADDR         = ASSETS_ADDR   +  56;
 RLEBUFFER_ADDR      = $3C00;                // address of RLE Compression buffer
 RLEBUFFERSIZE       = 1024;                 // RLE Compression buffer size
 
-TLBUF_ADDR      = $3F00;                    // TimeLine Drawing Buffer
+TLBUF_ADDR          = $3F00;                // TimeLine Drawing Buffer
 
 MODULE_ADDR         = $4000;                // module base address
 
 DLIST_ADDR          = $8000;                // Display List definition
 
-MAXPATHDEFINITIONS  = 63;                   // Max trail definitions
+MAXPATHDEFINITIONS  = 100;                  // Max trail definitions
 
 CARD_ADDR           = $A000;
 
 PATHLISTV_ADDR      = $C000;                // Table of path vectors ((MAXPATHDEFINITIONS+1)*Pointer)
-PATHNAMEV_ADDR      = $C080;                // Table of path names vectors (MAXPATHDEFINITIONS*Pointer)
-PATHSTARTX_ADDR     = $C100;                // Table of start point X (MAXPATHDEFINITIONS*Byte)
-PATHSTARTY_ADDR     = $C180;                // Table of start point Y (MAXPATHDEFINITIONS*Byte)
+PATHSTARTEDGE_ADDR  = $C100;                // Table of start point X (MAXPATHDEFINITIONS*Byte)
 PATHNAMES_ADDR      = $C200;                // Address of path names table
 
 SCREEN_LINES_ADDR   = $D800;                // table of screen lines addresses
 IZONE_ADDR          = $DA00;                // interface work tables
-ITIMER_ADDR         = $DB20;                // interface timers
+ITIMER_ADDR         = $DB60;                // interface timers
 
 SCKEYVEC_ADDR       = $DB80;                // shortcur keyboard vectors
 CORE_LIB            = $DC00;                // core library base address

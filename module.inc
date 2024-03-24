@@ -76,8 +76,12 @@ begin
   moduleInitialized:=0;
 {$ENDIF}
   setZone(0,false,28,49,3,15,@setModule);
+  assignHintToZone(0,'DISK OPERATIONS');
   setZone(1,false,32,49,3,15,@setModule);
+  assignHintToZone(1,'TRAIL EDITOR');
   setZone(2,false,36,49,3,15,@setModule);
+  assignHintToZone(2,'SCENARIO EDITOR');
+
    addZoneN(3,1,YCONTROLS,3,8,@nullProc);   // previous
   addZoneHN(4,@nullProc);                   // play
   addZoneHN(5,@nullProc);                   // stop

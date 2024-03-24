@@ -25,11 +25,40 @@ const
   PATHNAMESIZE  = 28;
 
 var
-  pathListPtr:Array[0..MAXPATHDEFINITIONS] of pointer       absolute PATHLISTV_ADDR;
-  pathNamePtr:Array[0..MAXPATHDEFINITIONS-1] of pointer     absolute PATHNAMEV_ADDR;
-  pathStartEdge:Array[0..MAXPATHDEFINITIONS-1] of byte      absolute PATHSTARTX_ADDR;
-  pathStartEdgeShift:Array[0..MAXPATHDEFINITIONS-1] of byte absolute PATHSTARTY_ADDR;
+  pathListPtr:Array[0..MAXPATHDEFINITIONS] of pointer  absolute PATHLISTV_ADDR;
+  pathStartEdge:Array[0..MAXPATHDEFINITIONS-1] of byte absolute PATHSTARTEDGE_ADDR;
   pathNameSearch:String[PATHNAMESIZE];
+  name:PString;
+  adr:Pointer;
+  p:PByte;
+  curTrailID:Shortint absolute $E0;
+  n:shortint;
+
+//
+//
+//
+
+function getTrailName(n:Byte):Pointer;
+begin
+  // find 'i' entry in table of trail names
+  p:=pointer(PATHNAMES_ADDR);
+  while (n<>0) do
+  begin
+    if p^=0 then exit(pointer(0));
+    dec(n);
+    inc(p,p^+1);
+  end;
+  result:=p;
+end;
+
+function getTrailSize(n:Byte):word;
+begin
+  result:=word(pathListPtr[n])-word(pathListPtr[n+1]);
+end;
+
+//
+//
+//
 
 procedure showTrailEditor(); forward;
 {$I 'trail-selector.inc'}
@@ -52,11 +81,9 @@ begin
   begin
     fillchar(pointer(PATHLISTV_ADDR),$1000,$00); // clear pathListPtr, pathNamePtr, pathNames
     for i:=0 to MAXPATHDEFINITIONS-1 do
-    begin
       pathStartEdge[i]:=EDGE_RIGHT;
-      pathStartEdgeShift[i]:=0;
-    end;
     pathListPtr[0]:=pointer($A000);
+    curTrailID:=-1;
     moduleInitialized:=moduleInitialized or $2;
   end;
   redrawList:=true; curAction:=-1;

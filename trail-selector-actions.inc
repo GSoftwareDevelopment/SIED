@@ -1,31 +1,27 @@
 procedure doSearchPath();
 begin
-  // if doInput(pathNameSearch) and 64=0 then
-  // begin
   doInput(pathNameSearch);
-    updateSearchField();
-    refreshList();
-  // end;
+  updateSearchField();
+  listShift:=0; refreshList();
 end;
 
 procedure doSelectPath();
-var
-  name:PString;
-
 begin
   n:=curZone-LISTZONE;
-  curTrailID:=listNEntry[n];
-  name:=pathNamePtr[curTrailID];
-  pathNameSearch:=name; updateSearchField();
+  n:=listNEntry[n];
+  if curTrailID=n then
+    curTrailID:=-1
+  else
+    curTrailID:=n;
+  refreshList();
 end;
 
 procedure doEraseSearch();
 begin
   pathNameSearch:=''; updateSearchField();
+  curTrailID:=-1;
   refreshList();
-  // setCursorInZone(13);
-  curZone:=13;  // must be set as call zone
-  selZone:=13;  // must be set as select zone
+  curZone:=13; selZone:=curZone; // must be set as call zone
   doSearchPath();
 end;
 
@@ -45,77 +41,63 @@ begin
     else
       listShift:=0;
   end;
-  redrawList:=false; showPathList(listShift);
-  if foundItems=0 then listShift:=0;
   showPathList(listShift);
+  if foundItems=0 then listShift:=0;
+  refreshList();
 end;
 
-procedure doCreate();
-var
-  adr:Pointer;
-  p:PByte;
-  ln:Byte;
+//
+//
+//
 
+procedure doCreate();
 begin
-// check for exist name in list
-  redrawList:=false; showPathList(0);
-  if foundItems=0 then
+  if pathNameSearch[0]=#0 then
+    p:=@MSG_CREATE_NONANE
+  else
   begin
-    // find first free entry in table of trail definition pointer
-    i:=0; adr:=pointer($a000);
-    while (i<MAXPATHDEFINITIONS) do
+  // check for exist name in list
+    redrawList:=false; showPathList(0);
+    if foundItems=0 then
     begin
-      if pathListPtr[i]<adr then begin dec(i); break; end;
-      adr:=pathListPtr[i];
-      inc(i);
-    end;
-    if (i=MAXPATHDEFINITIONS) then exit;
-    p:=getTrailName(i); // find 'i' entry in table of trail names
-    if p<>nil then
-    begin
-      curTrailID:=i;
-      pathNamePtr[i]:=p;
-      ln:=byte(pathNameSearch[0])+1;
-      move(@pathNameSearch,p,ln);
-      pathListPtr[i]:=adr;
-      poke(adr,$00); inc(adr);
-      // poke(adr,$FF); inc(adr);
-      // poke(adr,$FF); inc(adr);
-      // poke(adr,$FF); inc(adr);
-      // poke(adr,$F0); inc(adr);
-      // poke(adr,$F1); inc(adr);
-      // poke(adr,$F1); inc(adr);
-      // poke(adr,$F1); inc(adr);
-      // poke(adr,$F1); inc(adr);
-      // poke(adr,$F1); inc(adr);
-      // poke(adr,$F1); inc(adr);
-      // poke(adr,$F0); inc(adr);
-      // poke(adr,$FF); inc(adr);
-      // poke(adr,$FF); inc(adr);
-      // poke(adr,$FF); inc(adr);
-      poke(adr,TR_STOP); inc(adr);
-      // dpoke(adr,word(p)+1); inc(adr,2);
-      pathListPtr[i+1]:=adr;
-      // move(p,pointer(word(p)+ln),$800-ln);
-      listShift:=0; showPathList(0);
-      p:=@MSG_NAMECREATED;
+      // find first free entry in table of trail definition pointer
+      i:=0; adr:=pointer($a000);
+      while (i<MAXPATHDEFINITIONS) do
+      begin
+        if pathListPtr[i]<adr then begin dec(i); break; end;
+        adr:=pathListPtr[i];
+        inc(i);
+      end;
+      if (i=MAXPATHDEFINITIONS) then exit;
+      p:=getTrailName(i); // find 'i' entry in table of trail names
+      if p<>nil then
+      begin
+        curTrailID:=i;
+        move(@pathNameSearch,p,byte(pathNameSearch[0])+1);
+        pathListPtr[i]:=adr;
+        poke(adr,$00); inc(adr);
+        poke(adr,TR_STOP); inc(adr);
+        // dpoke(adr,word(p)+1); inc(adr,2);
+        pathListPtr[i+1]:=adr;
+        // move(p,pointer(word(p)+ln),$800-ln);
+        listShift:=0; refreshList();
+        p:=@MSG_NAMECREATED;
+      end
+      else
+      begin
+        p:=@MSG_FULLLIST;
+        curTrailID:=-1;
+      end;
     end
     else
-    begin
-      p:=@MSG_FULLLIST;
-      curTrailID:=-1;
-    end;
-  end
-  else
-    p:=@MSG_DUPLICATEDNAME;
+      p:=@MSG_DUPLICATEDNAME;
+  end;
   setStatus(p);
 end;
 
 procedure doEdit();
 begin
-// check for exist name in list
-  redrawList:=false; showPathList(0);
-  if foundItems=0 then
+  if curTrailID=-1 then
     setStatus(@MSG_EDIT_NOTRAIL)
   else
   begin
@@ -128,30 +110,23 @@ procedure doName();
 begin
 end;
 
-procedure doSearch();
-begin
-end;
-
 procedure doDelete();
 begin
 end;
 
-procedure doSetAction();
+procedure doSelectorAction();
 begin
-  if byte(pathNameSearch[0])>0 then
-  begin
-    case selZone of
-      9 : doCreate();
-      10: doEdit();
-      11: doName();
-      12: doDelete();
-    end;
-  end
-  else
-  begin
-    setStatus(MSG_CERD_NOTRAIL);
+  case selZone of
+    9 : doCreate();
+    10: doEdit();
+    11: doName();
+    12: doDelete();
   end;
 end;
+
+//
+//
+//
 
 procedure keyName(); Keep;
 begin
@@ -165,25 +140,25 @@ end;
 procedure keyCreate(); Keep;
 begin
   if (_modKey<>(KMOD_CTRL)) then exit;
-  if setCursorInZone(9) then doSetAction();
+  if setCursorInZone(9) then doSelectorAction();
 end;
 
 procedure keyEdit(); Keep;
 begin
   if (_modKey<>(KMOD_CTRL)) then exit;
-  if setCursorInZone(10) then doSetAction();
+  if setCursorInZone(10) then doSelectorAction();
 end;
 
 procedure keyRename(); Keep;
 begin
   if (_modKey<>(KMOD_CTRL)) then exit;
-  if setCursorInZone(11) then doSetAction();
+  if setCursorInZone(11) then doSelectorAction();
 end;
 
 procedure keyDelete(); Keep;
 begin
   if (_modKey<>(KMOD_CTRL+KMOD_SHIFT)) then exit;
-  if setCursorInZone(12) then doSetAction();
+  if setCursorInZone(12) then doSelectorAction();
 end;
 
 procedure keySelectPath(); Keep;
@@ -192,36 +167,32 @@ const
   MAX=LISTZONE+4;
   STEP=5;
 
-var
-  modKey:Byte;
-  // curZone:shortint;
-
 begin
   if _modKey<>0 then exit;
-  KEYB:=KEYB and $3F;
-  // curZone:=oldZone;
-  if (curZone<MIN) or (curZone>MAX) then
+  if (nowZone<MIN) or (nowZone>MAX) then
     setCursorInZone(MIN)
   else
   begin
-    case KEYB of
-      k_UP: if curZone>MIN then
-              dec(curZone)
+    case (KEYB and $3f) of
+      k_UP: if nowZone>MIN then
+              dec(nowZone)
             else // page change
             if _mZoneActive[LISTZONE-1] then
             begin
               selZone:=LISTZONE-1; doPageChange();
-              curZone:=MAX; oldZone:=-1;
+              nowZone:=MAX; oldZone:=-1;
             end;
-      k_DOWN: if curZone<MAX then
-                inc(curZone)
+      k_DOWN: if nowZone<MAX then
+              begin
+                if _mZoneActive[nowZone+1] then inc(nowZone);
+              end
               else
               if _mZoneActive[LISTZONE+5] then
               begin
                 selZone:=LISTZONE+5; doPageChange();
-                curZone:=MIN; oldZone:=-1;
+                nowZone:=MIN; oldZone:=-1;
               end;
     end;
-    setCursorInZone(curZone);
+    setCursorInZone(nowZone);
   end;
 end;

@@ -1,6 +1,8 @@
 {$i 'core/interface.var.inc'}
 
 procedure nullProc(); external 'core';
+procedure assignHintToZone(n:shortint; hint:PString); external 'core';
+procedure clearHintInZone(n:shortint); external 'core';
 procedure setZone(n:Shortint; act:Boolean; x,y,w,h:Byte; prc:TZoneProc); external 'core';
 procedure clearZone(n:Byte); external 'core';
 procedure clearWorkZones(); external 'core';

@@ -21,3 +21,4 @@ var
   nowZone:Shortint absolute $6D;
   curZone:Shortint absolute $6E;
   allowInverZone:Boolean absolute $6F;
+  hintZone:shortint absolute $70;

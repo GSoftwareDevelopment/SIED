@@ -46,6 +46,7 @@ var
   filemask:string[16] absolute $04EC; //3f2C;
   dirName:Array[0..MAXLISTITEMS-1] of string[12];
   dirPageBegin:smallint;
+  n:shortint;
 
   rlebuf:Array[0..RLEBUFFERSIZE-1] of byte absolute RLEBUFFER_ADDR;
 //
@@ -83,10 +84,14 @@ begin
   addZoneN(LISTZONE-1,38,10,2,5,@doPrevPageDir);
   addZoneN(LISTZONE+MAXLISTITEMS,38,43,2,5,@doNextPageDir);
 
-  addZoneN(9 ,0,0 ,6,12,@doSaveToDisk);
-  addZoneN(10,0,12,6,12,@doLoadFromDisk);
-  addZoneN(11,0,24,6,12,@nullProc);
-  addZoneN(12,0,36,6,12,@nullProc);
+  n:=addZoneN(9 ,0,0 ,6,12,@doSaveToDisk);
+  assignHintToZone(n,'SAVE ON DISK');
+  n:=addZoneN(10,0,12,6,12,@doLoadFromDisk);
+  assignHintToZone(n,'LOAD FROM DISK');
+  n:=addZoneN(11,0,24,6,12,@nullProc);
+  assignHintToZone(n,'EXPORT TO CARTRIDGE');
+  n:=addZoneN(12,0,36,6,12,@nullProc);
+  assignHintToZone(n,'IMPORT FROM CARTRIDGE');
   putText(9,1,'DEV');
   putText(20,1,'FILE');
   addInput(13,1,4,dev,@doDevice);

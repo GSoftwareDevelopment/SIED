@@ -4,3 +4,4 @@ procedure reduceFileName(var inFN; outFN:PString); Register; Assembler; external
 function keyscan2asc(keyscan:Byte):Byte; Assembler; external 'core';
 procedure convASC2INT(var s:PString); Register; Assembler; external 'core';
 function findText(sPhrase,sText:PString):Byte; external 'core';
+function BIN2BCD(bin:Byte):Byte; Assembler; external 'core';

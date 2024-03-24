@@ -22,6 +22,7 @@ begin
       fn:=dirName[curZone-LISTZONE]; updateFileNameField();
     End;
   End;
+  if selZone<>curZone then curZone:=-1;
 End;
 
 procedure doEraseFileName(); Keep;
@@ -164,49 +165,51 @@ const
   MIN=LISTZONE;
   MAX=LISTZONE+MAXLISTITEMS-1;
   STEP=5;
-
 var
-  modKey:Byte;
+  i:shortint;
 
 begin
   if _modKey<>0 then exit;
-  KEYB:=KEYB and $3F;
-  if (curZone<MIN) or (curZone>MAX) then
+  if (nowZone<MIN) or (nowZone>MAX) then
     setCursorInZone(MIN)
   else
   begin
-    case KEYB of
-      k_UP: if curZone>MIN then
-              dec(curZone)
+    case (KEYB and $3F) of
+      k_UP: if nowZone>MIN then
+              dec(nowZone)
             else // page change
             if _mZoneActive[LISTZONE-1] then
             begin
               doPrevPageDir();
-              curZone:=MAX; oldZone:=-1;
+              nowZone:=MAX; oldZone:=-1;
             end;
-      k_DOWN: if curZone<MAX then
-                inc(curZone)
+      k_DOWN: if nowZone<MAX then
+                inc(nowZone)
               else
               if _mZoneActive[LISTZONE+MAXLISTITEMS] then
               begin
                 doNextPageDir();
-                curZone:=MIN; oldZone:=-1;
+                nowZone:=MIN; oldZone:=-1;
               end;
-      k_LEFT: if curZone-5>=MIN then
-                dec(curZone,STEP)
+      k_LEFT: if nowZone-5>=MIN then
+                dec(nowZone,STEP)
               else
               if _mZoneActive[LISTZONE-1] then
               begin
+                i:=nowZone+5;
                 doPrevPageDir(); oldZone:=-1;
+                nowZone:=i;
               end;
-      k_RIGHT: if curZone+5<=MAX then
-                inc(curZone,STEP)
+      k_RIGHT: if nowZone+5<=MAX then
+                inc(nowZone,STEP)
               else
               if _mZoneActive[LISTZONE+MAXLISTITEMS] then
               begin
+                i:=nowZone-5;
                 doNextPageDir(); oldZone:=-1;
+                nowZone:=i;
               end;
     end;
-    setCursorInZone(curZone);
+    setCursorInZone(nowZone);
   end;
 end;

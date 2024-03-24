@@ -89,7 +89,6 @@ procedure doSetBeginEdge();
 begin
   i:=selZone-14;
   pathStartEdge[curTrailID]:=i;
-  pathStartEdgeShift[curTrailID]:=0;
   updateStartPoint();
   trailLength:=processTrail(PT_CALCLEN+PT_UPDATETIMELINE);
 end;
