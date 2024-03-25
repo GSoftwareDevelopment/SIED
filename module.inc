@@ -47,18 +47,18 @@ begin
 
   for i:=0 to 3 do HPOSM[i]:=0;
   HPOSP[3]:=0;
-  _mZoneActive[0]:=true;
-  _mZoneActive[1]:=true;
-  _mZoneActive[2]:=true;
+  zoneActive[0]:=true;
+  zoneActive[1]:=true;
+  zoneActive[2]:=true;
   fillchar(YSCR[56+48],800,0);
   HPOSP[2]:=0;
   setIcon(curZone);
   clearStatus();
   clearWorkarea();
   setControls(0);
-  _mZoneActive[0]:=(curZone<>0);
-  _mZoneActive[1]:=(curZone<>1);
-  _mZoneActive[2]:=(curZone<>2);
+  zoneActive[0]:=(curZone<>0);
+  zoneActive[1]:=(curZone<>1);
+  zoneActive[2]:=(curZone<>2);
   case curZone of
     0: loadModule('D:DISK.LIB');
     1: loadModule('D:TRAIL.LIB');

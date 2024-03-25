@@ -1,7 +1,7 @@
 // {$define BASICOFF}
 // {$define ROMOFF}
 // {$define NOROMFONT}
-library core:$DC00;
+library core:$DA00;
 
 const
 {$I '../data/data-mem.inc'}
@@ -92,6 +92,8 @@ exports
 // controls
   invertZone,
   blankZone,
+  registerTabControl,
+  unregisterTabControl,
   clearWorkarea,
   clearStatus,
   doHintZone,

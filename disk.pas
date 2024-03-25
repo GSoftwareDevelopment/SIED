@@ -47,11 +47,108 @@ var
   dirName:Array[0..MAXLISTITEMS-1] of string[12];
   dirPageBegin:smallint;
   n:shortint;
+  j:Shortint;
+  totalFiles:smallint;
 
   rlebuf:Array[0..RLEBUFFERSIZE-1] of byte absolute RLEBUFFER_ADDR;
+  src,dst:Pointer;
+  blockSize:Word;
+
+//
+
+procedure prepareFileName(f:PString);
+begin
+  fillchar(@_fn,21,$9b);
+  _fn:=dev; move(f[1],_fn[Byte(_fn[0])+1],Byte(f[0]));
+end;
+
+procedure getLn(chn:Byte; buf:PString); Register; Assembler; Asm icl 'core/asm/get_line.a65' End;
+
+function getDirectory():Byte;
+var
+  name:PString;
+  isDir:Boolean;
+
+begin
+  if dev[1]<>'D' then exit(160);
+  setCursor(_WAIT);
+  prepareFileName(filemask);
+  totalFiles:=0;
+  if dirPageBegin>0 then setStatus(MSG_SEEKING) else setStatus(MSG_READING);
+  opn(1,6,0,_fn);
+  n:=-1;
+  while (IOResult=1) do
+  begin
+    getLn(1,_fn);
+    if (_fn[1]>='0') then
+    begin
+      _fn[0]:=char(Byte(_fn[0])-1); setStatus(_fn);
+      IOResult:=3;
+      break;
+    End;
+    inc(totalFiles);
+    if totalFiles>=dirPageBegin then
+    begin
+      if (n=-1) then setStatus(MSG_READING);
+      if (n<MAXLISTITEMS-1) then
+      begin
+        inc(n);
+        name:=dirName[n];
+        isDir:=((_fn[2]=':') or (_fn[14]='>'));
+        reduceFileName(_fn,name);
+        if isDir then
+          name[1]:=char(byte(name[1]) or $80);
+      End;
+    End;
+  End;
+  result:=IOResult;
+  cls(1);
+  setCursor(_ARROW);
+end;
+
+function loadFromDisk(fn:PString):byte;
+begin
+  setCursor(_WAIT);
+  prepareFileName(fn);
+  opn(1,4,0,_fn);
+  if IOResult=1 then
+  begin
+    dst:=pointer(CARD_ADDR);
+    repeat
+      BGet(1,@blockSize,2);
+      BGet(1,@rlebuf,blockSize);
+      blockSize:=RLEDecompress(@rlebuf,dst,blockSize);
+      inc(dst,blockSize);
+    until word(dst)=$d000;
+  end;
+  result:=IOResult;
+  cls(1);
+  setCursor(_ARROW);
+end;
+
+function saveToDisk(fn:PString):Byte;
+begin
+  setCursor(_WAIT);
+  prepareFileName(fn);
+  opn(1,8,0,_fn);
+  if IOResult=1 then
+  begin
+    src:=pointer(CARD_ADDR);
+    repeat
+      blockSize:=RLECompress(src,@rlebuf,RLEBUFFERSIZE);
+      BPut(1,@blockSize,2);
+      BPut(1,@rlebuf,blockSize);
+      inc(src,RLEBUFFERSIZE);
+    until word(src)=$D000;
+  end;
+  result:=IOResult;
+  cls(1);
+  setCursor(_ARROW);
+end;
+
 //
 procedure showIOError(); Forward;
-procedure readDirectory(); Forward;
+procedure updateDirList(); Forward;
 procedure updateFileNameField(); Forward;
 {$I 'disk-actions.inc'}
 {$I 'disk-controls.inc'}
@@ -69,12 +166,13 @@ asm
   dta k_LEFT,a(MAIN.keySelectFile)
   dta k_RIGHT,a(MAIN.keySelectFile)
   dta k_CLEAR,a(MAIN.doEraseFileName)
-  dta k_RETURN,a(MAIN.doChoiceFile)
+  // dta k_RETURN,a(MAIN.doChoiceFile)
 end;
 
 procedure showDiskDirectory();
 begin
-  registerShortcutKeys(@shortKeys,12);
+  registerShortcutKeys(@shortKeys,11);
+  registerTabControl();
   setScreenWidth(20);
   fillchar(YSCR[56+8]+4,16,$FF);
   putImage(@_IDISK,0,0,3,48);
@@ -94,8 +192,8 @@ begin
   assignHintToZone(n,'IMPORT FROM CARTRIDGE');
   putText(9,1,'DEV');
   putText(20,1,'FILE');
-  addInput(13,1,4,dev,@doDevice);
-  addInput(25,1,12,fn,@doFilename);
+  n:=addInput(13,1,4,dev,@doDevice); zoneTabIndex[n]:=1;
+  n:=addInput(25,1,12,fn,@doFilename); zoneTabIndex[n]:=2;
   addZoneN(31,38,0,2,7,@doEraseFileName);
   startDirectory();
 End;

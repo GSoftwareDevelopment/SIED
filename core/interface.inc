@@ -6,15 +6,20 @@ var
 procedure nullProc(); Assembler; asm end;
 
 //
+procedure setStatusBuf(adr:word); inline;
+begin
+  dpoke(DLIST_ADDR+$51,adr);
+end;
+
 procedure clearHintInZone(n:shortint); Assembler;
 asm
   lda n
   asl @
   tay
   lda #0 // nil
-  sta adr._mZoneHint,y
+  sta adr.zoneHint,y
   lda #0 // nil
-  sta adr._mZoneHint+1,y
+  sta adr.zoneHint+1,y
 end;
 
 procedure assignHintToZone(n:shortint; hint:PString); Assembler;
@@ -23,39 +28,41 @@ asm
   asl @
   tay
   lda hint
-  sta adr._mZoneHint,y
+  sta adr.zoneHint,y
   lda hint+1
-  sta adr._mZoneHint+1,y
+  sta adr.zoneHint+1,y
 end;
 //
 
 procedure setZone(n:Shortint; act:Boolean; x,y,w,h:Byte; prc:TZoneProc);
 begin
-  _mZoneActive[n]:=act;
+  zoneActive[n]:=act;
   _mZoneX1[n]:=x;     __x:=x;
   _mZoneY1[n]:=y;     __y:=y;
   _mZoneX2[n]:=x+w-1; __w:=w;
   _mZoneY2[n]:=y+h-1; __h:=h;
-  _mZoneCall[n]:=prc;
-  _mZoneInCall[n]:=@doHintZone;
-  // _mZoneHint[n]:=nil;  // BUG: MP issue
-  clearHintInZone(n);
-  if (n=hintZone) then hintZone:=-1;
+  zoneTabIndex[n]:=-128;
+  zoneCall[n]:=prc;
+  zoneInOutCall[n]:=@doHintZone;
+  clearHintInZone(n); // zoneHint[n]:=nil;  // BUG: MP issue
+  if (n=hintZone) then begin hintZone:=-1; setStatusBuf(STATUS_ADDR); end;
+  // if (n=tabZone) then tabZone:=-1;
   if (nowZone=n) and (oldZone=n) then begin nowZone:=-1; oldZone:=-1; end;
 End;
 
 procedure clearZone(n:Byte);
 begin
-  _mZoneActive[n]:=false;
+  zoneActive[n]:=false;
   _mZoneX1[n]:=255;
   _mZoneX2[n]:=255;
   _mZoneY1[n]:=255;
   _mZoneY2[n]:=255;
-  _mZoneCall[n]:=@nullProc;
-  _mZoneInCall[n]:=@doHintZone;
-  // _mZoneHint[n]:=nil;  // BUG: MP Issue
-  clearHintInZone(n);
-  if (n=hintZone) then hintZone:=-1;
+  zoneTabIndex[n]:=-128;
+  zoneCall[n]:=@nullProc;
+  zoneInOutCall[n]:=@doHintZone;
+  clearHintInZone(n); // zoneHint[n]:=nil;  // BUG: MP Issue
+  if (n=hintZone) then begin hintZone:=-1; setStatusBuf(STATUS_ADDR); end;
+  // if (n=tabZone) then tabZone:=-1;
   if (nowZone=n) and (oldZone=n) then begin nowZone:=-1; oldZone:=-1; end;
 End;
 
@@ -68,7 +75,7 @@ End;
 procedure initInterface();
 begin
   selZone:=-1; oldZone:=-1; curZone:=-1; ombutton:=MBUT_NONE;
-  hintZone:=-1;
+  hintZone:=-1; tabZone:=-1; tabIndex:=-128;
 
   for i:=0 to MAX_ZONES do
     clearZone(i);
@@ -119,9 +126,9 @@ procedure callInZone(n:Byte); assembler;
 asm
   asl @
   tay
-  lda adr._mZoneInCall,y
+  lda adr.zoneInOutCall,y
   sta jaddr
-  lda adr._mZoneInCall+1,y
+  lda adr.zoneInOutCall+1,y
   sta jaddr+1
   jmp jaddr:$ffff
 end;
@@ -130,7 +137,7 @@ procedure refreshZone();
 begin
   if (oldZone<>-1) then
   begin
-    if _mZoneActive[oldZone] then
+    if zoneActive[oldZone] then
     begin
       callInZone(oldZone);
       if (oldZone>=USER_ZONES_BEGIN) then
@@ -142,7 +149,7 @@ begin
   End;
   if (nowZone<>-1) then
   begin
-    if _mZoneActive[nowZone] then
+    if zoneActive[nowZone] then
     begin
       callInZone(nowZone);
       if (nowZone>=USER_ZONES_BEGIN) then
@@ -160,8 +167,10 @@ begin
   nowZone:=-1;
   curZone:=n; selZone:=n;
   refreshZone();
-  if not _mZoneActive[n] then exit;
+  if not zoneActive[n] then exit;
   curZone:=n;
+  tabIndex:=zoneTabIndex[n];
+  tabZone:=n;
   i:=_mZoneX2[n] shl 2; inc(i,2);
   setCursorPos(i,_mZoneY2[n]-1);
   result:=true;
@@ -182,7 +191,7 @@ begin
   nowZone:=-1; selZone:=-1;
   for i:=0 to MAX_ZONES do
   begin
-    if _mZoneActive[i] then
+    if zoneActive[i] then
       if (mx>=_mZoneX1[i]) and (mx<=_mZoneX2[i]) and
           (my>=_mZoneY1[i]) and (my<=_mZoneY2[i]) then
       begin
@@ -248,13 +257,17 @@ procedure callZoneProc(); Assembler;
 Asm
   lda selZone
   sta curZone
-
+  sta tabZone
+  tay
+  lda adr.zoneTabIndex,y
+  sta tabIndex
+  tya
   asl @
   tay
 
-  lda adr._mZoneCall,y
+  lda adr.zoneCall,y
   sta jaddr
-  lda adr._mZoneCall+1,y
+  lda adr.zoneCall+1,y
   sta jaddr+1
 
   jsr jaddr:$ffff

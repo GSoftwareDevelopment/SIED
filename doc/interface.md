@@ -12,12 +12,12 @@ type
   TZoneProc = procedure();
 
 var
-  _mZoneActive:Array[0..MAX_ZONES] of Boolean;
+  zoneActive:Array[0..MAX_ZONES] of Boolean;
   _mZoneX1:array[0..MAX_ZONES] of Byte;
   _mZoneY1:array[0..MAX_ZONES] of Byte;
   _mZoneX2:array[0..MAX_ZONES] of Byte;
   _mZoneY2:array[0..MAX_ZONES] of Byte;
-  _mZoneCall:Array[0..MAX_ZONES] of TZoneProc;
+  zoneCall:Array[0..MAX_ZONES] of TZoneProc;
 
 var
   selZone:Shortint;

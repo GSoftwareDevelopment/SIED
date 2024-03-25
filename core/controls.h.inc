@@ -2,6 +2,8 @@
 
 procedure invertZone(i:Shortint); external 'core';
 procedure blankZone(i:Shortint); external 'core';
+procedure registerTabControl(); external 'core';
+procedure unregisterTabControl(); external 'core';
 procedure clearWorkarea(); external 'core';
 procedure clearStatus(); external 'core';
 procedure setStatus(s:PString); external 'core';

@@ -171,10 +171,10 @@ begin
   _curDx:=-128; _curDy:=-128;
 
   addZoneN(ZONE_TIMELINE,8,65,32,7,@doSetTimeLinePos);
-  _mZoneInCall[ZONE_TIMELINE]:=@inTimeLine;
+  zoneInOutCall[ZONE_TIMELINE]:=@inTimeLine;
 
   addZoneN(ZONE_VIEWPORT,XVIEWPORT div 4,0,26,48,@doMovePoint); // @enterEditPath);
-  _mZoneInCall[ZONE_VIEWPORT]:=@inGameScreen;
+  zoneInOutCall[ZONE_VIEWPORT]:=@inGameScreen;
 
   HPOSM[0]:=48+XTIMELINE+curTLPos-TLShift;
 
@@ -215,8 +215,8 @@ begin
   n:=addZoneV(@doSwitchPathSection);           // Finish trail
   assignHintToZone(n,'FINISH TRAIL SETUP');
 
-  _mZoneCall[3]:=@doTLPrevEvent;
-  _mZoneCall[6]:=@doTLNextEvent;
+  zoneCall[3]:=@doTLPrevEvent;
+  zoneCall[6]:=@doTLNextEvent;
 
   curSection:=-1;
   if getTrailSize(curTrailID)=0 then

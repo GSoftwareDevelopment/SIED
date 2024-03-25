@@ -29,7 +29,7 @@ CCROSS_ADDR         = ASSETS_ADDR   +  56;
 RLEBUFFER_ADDR      = $3C00;                // address of RLE Compression buffer
 RLEBUFFERSIZE       = 1024;                 // RLE Compression buffer size
 
-HINTBUF_ADDR        = $3E00;                // hint draw buffer
+HINTBUF_ADDR        = $3C00;                // hint draw buffer
 TLBUF_ADDR          = $3F00;                // TimeLine Drawing Buffer
 
 MODULE_ADDR         = $4000;                // module base address
@@ -45,10 +45,10 @@ PATHSTARTEDGE_ADDR  = $C100;                // Table of start point X (MAXPATHDE
 PATHNAMES_ADDR      = $C200;                // Address of path names table
 
 SCREEN_LINES_ADDR   = $D800;                // table of screen lines addresses
-IZONE_ADDR          = $DA00;                // interface work tables
-ITIMER_ADDR         = $DB60;                // interface timers
 
-SCKEYVEC_ADDR       = $DB80;                // shortcur keyboard vectors
-CORE_LIB            = $DC00;                // core library base address
+CORE_LIB            = $DA00;                // core library base address
 
 FONTS_ADDR          = $F800;                // (1329) font tables, font 4x5 1bpp two half, font 4x5 2bpp
+SCKEYVEC_ADDR       = $FD40;                // shortcur keyboard vectors
+ITIMER_ADDR         = $FDC0;                // interface timers
+IZONE_ADDR          = $FE00;                // interface work tables

@@ -20,11 +20,82 @@ begin
   blank(_mZoneX1[i],_mZoneY1[i],_w,_h);
 end;
 
+//
+
+procedure doTabControl();
+var
+  tab,tabDir:shortint;
+
+begin
+  tabDir:=0;
+  if _modKey=0 then
+    tabDir:=1
+  else
+  if _modKey=KMOD_SHIFT then
+    tabDir:=-1;
+  if tabDir=0 then exit;
+  repeat
+    inc(tabIndex,tabDir);
+    for i:=0 to MAX_ZONES do
+    begin
+      tab:=zoneTabIndex[i];
+      if (tab<>-128) and (tab=tabIndex) then
+      begin
+        tabZone:=i;
+        setCursorInZone(i);
+        exit;
+      end;
+    end;
+  until false; // (tabIndex=-128);
+  // _callShortcutKeys:=KEYB;
+end;
+
+procedure doTabCall();
+var
+  tab:shortint;
+
+begin
+  if tabZone=-1 then
+  begin
+    for i:=0 to MAX_ZONES do
+    begin
+      tab:=zoneTabIndex[i];
+      if (tab<>-128) and (tab=tabIndex) then
+      begin
+        tabZone:=i;
+        break;
+      end;
+    end;
+    if tabZone=-1 then exit;
+  end;
+  oldZone:=tabZone; nowZone:=-1;
+  refreshZone();
+  selZone:=tabZone; nowZone:=tabZone;
+  callZoneProc();
+end;
+
+procedure registerTabControl();
+begin
+  tabZone:=-1; tabIndex:=-128;
+  addShortcutKey(K_TAB,@doTabControl);
+  addShortcutKey(K_RETURN,@doTabCall);
+end;
+
+procedure unregisterTabControl();
+begin
+  tabZone:=-1; tabIndex:=-128;
+  clearShortcutKey(K_TAB);
+  clearShortcutKey(K_RETURN);
+end;
+
+//
+
 procedure clearWorkarea();
 begin
   fillchar(Pointer(EDITOR_ADDR),48*20,0);
   clearWorkZones();
-  nowZone:=-1; oldZone:=-1; selZone:=-1;
+  nowZone:=-1; oldZone:=-1; selZone:=-1; tabIndex:=-128; hintZone:=-1;
+  setStatusBuf(STATUS_ADDR);
 End;
 
 procedure clearStatus();
@@ -40,10 +111,6 @@ begin
 End;
 
 //
-procedure setStatusBuf(adr:word); inline;
-begin
-  dpoke(DLIST_ADDR+$51,adr);
-end;
 
 procedure doHintZone(); Keep;
 begin
@@ -53,13 +120,13 @@ begin
   begin
     if hintZone<>-1 then
     begin
-      // if (_mZoneHint[nowZone]<>nil) then // BUG: Not implemented in MP
+      // if (zoneHint[nowZone]<>nil) then // BUG: Not implemented in MP
       asm
         lda hintZone
         asl @
         tay
-        lda adr._mZoneHint,y
-        ora adr._mZoneHint+1,y
+        lda adr.zoneHint,y
+        ora adr.zoneHint+1,y
         beq noHintClear
       end;
       setStatusBuf(STATUS_ADDR);
@@ -71,18 +138,18 @@ begin
   end;
   if (nowZone=hintZone) then exit;
 
-  // if (_mZoneHint[nowZone]<>nil) then // BUG: Not implemented in MP
+  // if (zoneHint[nowZone]<>nil) then // BUG: Not implemented in MP
   asm
     lda nowZone
     asl @
     tay
-    lda adr._mZoneHint,y
-    ora adr._mZoneHint+1,y
+    lda adr.zoneHint,y
+    ora adr.zoneHint+1,y
     beq @exit
   end;
 
   fillchar(pointer(HINTBUF_ADDR),280,0);
-  putTextC(pointer(HINTBUF_ADDR+$28),_mZoneHint[nowZone]);
+  putTextC(pointer(HINTBUF_ADDR+$28),zoneHint[nowZone]);
   setStatusBuf(HINTBUF_ADDR);
   hintZone:=nowZone;
 end;
@@ -99,7 +166,7 @@ begin
   for i:=0 to 2 do
   begin
     _x:=_mZoneX1[i];
-    if (_mZoneActive[i]) then
+    if (zoneActive[i]) then
     begin
       if i=n then
       begin
@@ -121,16 +188,16 @@ begin
   b:=1;
   for i:=3 to 8 do
   begin
-    _mZoneActive[i]:=(s and b)<>0;
-    _mZoneCall[i]:=@nullProc;
+    zoneActive[i]:=(s and b)<>0;
+    zoneCall[i]:=@nullProc;
     b:=b shl 1;
   end;
-  // _mZoneActive[3]:=(s and 1<>0);  // prev
-  // _mZoneActive[4]:=(s and 2<>0);  // play
-  // _mZoneActive[5]:=(s and 4<>0);  // stop
-  // _mZoneActive[6]:=(s and 8<>0);  // next
-  // _mZoneActive[7]:=(s and 16<>0); // insert
-  // _mZoneActive[8]:=(s and 32<>0); // delete
+  // zoneActive[3]:=(s and 1<>0);  // prev
+  // zoneActive[4]:=(s and 2<>0);  // play
+  // zoneActive[5]:=(s and 4<>0);  // stop
+  // zoneActive[6]:=(s and 8<>0);  // next
+  // zoneActive[7]:=(s and 16<>0); // insert
+  // zoneActive[8]:=(s and 32<>0); // delete
 End;
 
 procedure setControl(n:Shortint);
@@ -142,7 +209,7 @@ begin
   setScreenWidth(40);
   for i:=0 to 5 do
   begin
-    if _mZoneActive[i+3] then
+    if zoneActive[i+3] then
     begin
       _x:=_mZoneX1[i+3];
       _y:=_mZoneY1[i+3];
@@ -187,7 +254,7 @@ begin
   putText(x,y,value);
   result:=addZoneN(-1,x-1,y-1,w+2,7,prc);
   if result<>-1 then
-    _mZoneInCall[result]:=@inInputZone;
+    zoneInOutCall[result]:=@inInputZone;
 End;
 
 function doInput(var sEdit:String):Shortint;
@@ -228,12 +295,12 @@ var
 
 begin
   // curZone:=selZone; // remember zone id call
-  if not _mZoneActive[selZone] then exit(-3);
+  if not zoneActive[selZone] then exit(-3);
   setScreenWidth(20);
   __x:=_mZoneX1[selZone];
   __y:=_mZoneY1[selZone];
   __w:=(_mZoneX2[selZone]-__x)-1;
-  _mZoneInCall[curZone]:=@inInputEditZone;
+  zoneInOutCall[curZone]:=@inInputEditZone;
   inc(__x);
   ln:=byte(sEdit[0]);
   move(sEDIT,value,ln+1);
@@ -327,7 +394,7 @@ begin
   until (false);
 
   if _callShortcutKeys=$FF then KEYB:=255;
-  _mZoneInCall[curZone]:=@inInputZone;
+  zoneInOutCall[curZone]:=@inInputZone;
 
   if _exit then
   begin

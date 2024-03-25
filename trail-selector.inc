@@ -12,13 +12,6 @@ const
   MSG_EDIT_NOTRAIL = 'NO TRAIL SELECTED';
   MSG_CREATE_NONANE = 'TRAIL NAME NOT GIVEN';
   MSG_ITEMSFOUND = '   ITEM(S)';
-  HINT_OPTIONS: Array of String = [
-    'CREATE NEW ENTRY',
-    'EDIT SELECTED ENTRY',
-    'EDIT ENTRY NAME',
-    'DELETE SELECTED ENTRY'
-  ];
-  _ACTIONY: Array[0..3] of Shortint = ( 0,12,24,36 );
   _LISTY:Array[0..4] of shortint = (13,20,27,34,41);
 
 var
@@ -33,7 +26,7 @@ var
 
 procedure updateSearchField(); forward;
 procedure refreshList(); forward;
-procedure showPathList(start:byte); forward;
+procedure processPathList(start:byte); forward;
 procedure selectorShortKeys(); assembler; forward;
 {$I 'trail-selector-actions.inc'}
 {$I 'trail-selector-controls.inc'}
@@ -48,14 +41,14 @@ asm
   dta k_CLEAR,  a(MAIN.doEraseSearch)
   dta k_UP,     a(MAIN.keySelectPath)
   dta k_DOWN,   a(MAIN.keySelectPath)
-  dta k_RETURN, a(MAIN.doSelectPath)
   dta k_SPACE,  a(MAIN.doSelectPath)
 end;
 
 procedure showTrailSelector();
 begin
   clearStatus();
-  registerShortcutKeys(@selectorShortKeys,10);
+  registerShortcutKeys(@selectorShortKeys,9);
+  registerTabControl();
   setControls(0); // no controls
   setScreenWidth(20);
   fillchar(YSCR[56+8]+4,16,$FF);
@@ -63,14 +56,18 @@ begin
   putImage(_VSCROLL,19,11,1,3);
   putImage(_VSCROLL+2,19,44,1,3);
   putImage(_ERASEINPUT,19,1,1,5);
-  for i:=0 to 3 do
-  begin
-    n:=addZone(0,_ACTIONY[i],6,12,@doSelectorAction);
-    assignHintToZone(n,HINT_OPTIONS[i]);
-  end;
+  n:=addZone(0,0,6,12,@doCreate);
+  assignHintToZone(n,'CREATE NEW ENTRY');
+  n:=addZoneV(@doEdit);
+  assignHintToZone(n,'EDIT SELECTED ENTRY');
+  n:=addZoneV(@doName);
+  assignHintToZone(n,'RENAME SELECTED ENTRY');
+  n:=addZoneV(@doDelete);
+  assignHintToZone(n,'DELETE SELECTED ENTRY');
   addZoneN(LISTZONE-1,38,10,2,5,@doPageChange);
   addZoneN(LISTZONE+5,38,43,2,5,@doPageChange);
-  addInput(9,1,PATHNAMESIZE,pathNameSearch,@doSearchPath);
+  n:=addInput(9,1,PATHNAMESIZE,pathNameSearch,@doSearchPath);
+  zoneTabIndex[n]:=1;
   addZone(38,0,2,7,@doEraseSearch);
   updateSearchField();
   listShift:=0; refreshList();

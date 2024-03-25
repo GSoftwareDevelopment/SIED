@@ -15,32 +15,40 @@ var
 begin
   if n>4 then exit;
   y:=_LISTY[n];
-  if isChoice then
-  begin
-    putChar(8,y,'>');
-    putChar(8,y,'<');
-  end;
-  putText(9,y,name);
+  blank(8,y-1,PATHNAMESIZE+1,7);
   inc(n,LISTZONE);
-  addZoneN(n,8,y-1,PATHNAMESIZE+2,7,@doSelectPath);
-End;
-
-procedure blankList();
-begin
-  for i:=0 to 4 do
-  begin
-    blank(8,_LISTY[i]-1,PATHNAMESIZE+1,6);
-    clearZone(LISTZONE+i);
+  // if name<>nil then // BUG: Not implemented in MP
+  asm
+    lda name
+    ora name+1
+    bne make
   end;
-end;
+    zoneTabIndex[n]:=-128;
+    listNEntry[n]:=-1;
+    clearZone(n);
+    exit;
+  asm
+    make:
+  end;
+  begin
+    if isChoice then
+    begin
+      putChar(8,y,'>');
+      putChar(8,y,'<');
+    end;
+    putText(9,y,name);
+    addZoneN(n,8,y-1,PATHNAMESIZE+2,7,@doSelectPath);
+    zoneTabIndex[n]:=0;
+  end;
+End;
 
 procedure updateListScroll();
 begin
-  _mZoneActive[LISTZONE-1]:=(listShift>0);
-  _mZoneActive[LISTZONE+5]:=(listShift+5<totalItems);
+  zoneActive[LISTZONE-1]:=(listShift>0);
+  zoneActive[LISTZONE+5]:=(listShift+5<totalItems);
 end;
 
-procedure showPathList(start:byte);
+procedure processPathList(start:byte);
 begin
   foundItems:=0; n:=0;
   p:=pointer(PATHNAMES_ADDR);
@@ -82,28 +90,31 @@ var
   bcd:Byte;
 
 begin
-  showPathList(listShift);
+  processPathList(listShift);
   setScreenWidth(20);
-  blankList();
   i:=0;
-  while (i<foundItems) do
+  while (i<5) do
   begin
-    n:=listNEntry[i];
-    name:=listNamePtr[i]; // pathNamePtr[n];
-    addPathLabel(i,(n=curTrailID),name);
+    if i<foundItems then
+    begin
+      n:=listNEntry[i];
+      name:=listNamePtr[i]; // pathNamePtr[n];
+      addPathLabel(i,(n=curTrailID),name);
+    end
+    else
+      addPathLabel(i,false,nil);
     inc(i);
   end;
   updateListScroll();
   if foundItems=0 then
     putText(14,27,MSG_NOTFOUND);
-  // else
-    if listShift=0 then
-    begin
-      clearStatus();
-      bcd:=BIN2BCD(foundItems);
-      setStatus(MSG_ITEMSFOUND);
-      if (bcd>=$10) then
-        putCharC(0,69,char(48+bcd shr 4));
-      putCharC(1,69,char(48+bcd and $f));
-    end;
+  if listShift=0 then
+  begin
+    clearStatus();
+    bcd:=BIN2BCD(foundItems);
+    setStatus(MSG_ITEMSFOUND);
+    if (bcd>=$10) then
+      putCharC(0,69,char(48+bcd shr 4));
+    putCharC(1,69,char(48+bcd and $f));
+  end;
 end;

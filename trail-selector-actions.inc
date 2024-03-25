@@ -5,7 +5,7 @@ begin
   listShift:=0; refreshList();
 end;
 
-procedure doSelectPath();
+function doSelectPath():Boolean; Register;
 begin
   n:=curZone-LISTZONE;
   n:=listNEntry[n];
@@ -14,15 +14,17 @@ begin
   else
     curTrailID:=n;
   refreshList();
+  result:=true; // execute key shortcut
 end;
 
-procedure doEraseSearch();
+function doEraseSearch():Boolean; Register;
 begin
   pathNameSearch:=''; updateSearchField();
   curTrailID:=-1;
   refreshList();
   curZone:=13; selZone:=curZone; // must be set as call zone
   doSearchPath();
+  result:=true; // execute key shortcut
 end;
 
 procedure doPageChange();
@@ -41,7 +43,7 @@ begin
     else
       listShift:=0;
   end;
-  showPathList(listShift);
+  processPathList(listShift);
   if foundItems=0 then listShift:=0;
   refreshList();
 end;
@@ -57,7 +59,7 @@ begin
   else
   begin
   // check for exist name in list
-    redrawList:=false; showPathList(0);
+    redrawList:=false; processPathList(0);
     if foundItems=0 then
     begin
       // find first free entry in table of trail definition pointer
@@ -101,7 +103,7 @@ begin
     setStatus(@MSG_EDIT_NOTRAIL)
   else
   begin
-    unregisterShortcutKeys(@selectorShortKeys,10);
+    unregisterShortcutKeys(@selectorShortKeys,9);
     showTrailEditor();
   end;
 end;
@@ -114,54 +116,45 @@ procedure doDelete();
 begin
 end;
 
-procedure doSelectorAction();
-begin
-  case selZone of
-    9 : doCreate();
-    10: doEdit();
-    11: doName();
-    12: doDelete();
-  end;
-end;
-
 //
 //
 //
 
-procedure keyName(); Keep;
+function keyName():Boolean; Keep; Register;
 begin
   if (_modKey<>(KMOD_CTRL)) then exit;
   if setCursorInZone(13) then
   begin
     keyb:=$FF; doSearchPath();
   end;
+  result:=true; // execute key shortcut
 end;
 
-procedure keyCreate(); Keep;
+function keyCreate():Boolean; Keep; Register;
 begin
   if (_modKey<>(KMOD_CTRL)) then exit;
-  if setCursorInZone(9) then doSelectorAction();
+  doCreate();
 end;
 
-procedure keyEdit(); Keep;
+function keyEdit():Boolean; Keep; Register;
 begin
   if (_modKey<>(KMOD_CTRL)) then exit;
-  if setCursorInZone(10) then doSelectorAction();
+  doEdit();
 end;
 
-procedure keyRename(); Keep;
+function keyRename():Boolean; Keep; Register;
 begin
   if (_modKey<>(KMOD_CTRL)) then exit;
-  if setCursorInZone(11) then doSelectorAction();
+  doName();
 end;
 
-procedure keyDelete(); Keep;
+function keyDelete():Boolean; Keep; Register;
 begin
   if (_modKey<>(KMOD_CTRL+KMOD_SHIFT)) then exit;
-  if setCursorInZone(12) then doSelectorAction();
+  doDelete();
 end;
 
-procedure keySelectPath(); Keep;
+function keySelectPath():Boolean; Keep; Register;
 const
   MIN=LISTZONE;
   MAX=LISTZONE+4;
@@ -177,22 +170,25 @@ begin
       k_UP: if nowZone>MIN then
               dec(nowZone)
             else // page change
-            if _mZoneActive[LISTZONE-1] then
+            if zoneActive[LISTZONE-1] then
             begin
               selZone:=LISTZONE-1; doPageChange();
               nowZone:=MAX; oldZone:=-1;
             end;
       k_DOWN: if nowZone<MAX then
               begin
-                if _mZoneActive[nowZone+1] then inc(nowZone);
+                if zoneActive[nowZone+1] then inc(nowZone);
               end
               else
-              if _mZoneActive[LISTZONE+5] then
+              if zoneActive[LISTZONE+5] then
               begin
                 selZone:=LISTZONE+5; doPageChange();
                 nowZone:=MIN; oldZone:=-1;
               end;
     end;
+    for i:=0 to MAX_ZONES do if zoneTabIndex[i]=0 then zoneTabIndex[i]:=-128;
+    zoneTabIndex[nowZone]:=0; tabZone:=nowZone;
     setCursorInZone(nowZone);
   end;
+  result:=true; // execute key shortcut
 end;

@@ -18,11 +18,11 @@
 "$400","module-disk.inc","dev[4]",
 "$405","module-disk.inc","fn[16]",
 "$416","module-disk.inc","_fn[20]",
-"$500","interface.inc","_mZoneActive[32]",
+"$500","interface.inc","zoneActive[32]",
 "$520","interface.inc","_mZoneX1[32]",
 "$540","interface.inc","_mZoneY1[32]",
 "$560","interface.inc","_mZoneX2[32]",
 "$580","interface.inc","_mZoneY2[32]",
-"$5a0","interface.inc","_mZoneCall[32]","Pointer"
+"$5a0","interface.inc","zoneCall[32]","Pointer"
 "$600","graph.inc","YSCR[128]","Pointer"
 ,,,

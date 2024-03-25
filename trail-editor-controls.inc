@@ -35,9 +35,10 @@ begin
   result:=true;
   curSection:=selZone-10;
   KEYB:=$FF;  // Prevent a previous key click from overriding
-  _mZoneActive[11]:=(curSection<>1);
-  _mZoneActive[12]:=(curSection<>2);
-  _mZoneActive[13]:=(curSection<>3);
+  unregisterTabControl();
+  zoneActive[11]:=(curSection<>1);
+  zoneActive[12]:=(curSection<>2);
+  zoneActive[13]:=(curSection<>3);
   case curSection of
     1: scr:=@_TRAYLEFT+24; // Path Begin
     2: scr:=@_TRAYLEFT+12; // Inner Path
@@ -57,10 +58,10 @@ end;
 procedure updateStartPoint();
 begin
   n:=pathStartEdge[curTrailID];
-  _mZoneActive[14]:=(n<>0);
-  _mZoneActive[15]:=(n<>1);
-  _mZoneActive[16]:=(n<>2);
-  _mZoneActive[17]:=(n<>3);
+  zoneActive[14]:=(n<>0);
+  zoneActive[15]:=(n<>1);
+  zoneActive[16]:=(n<>2);
+  zoneActive[17]:=(n<>3);
   case n of
     EDGE_TOP    : scr:=@_TRAYRIGHT+36;
     EDGE_LEFT   : scr:=@_TRAYRIGHT+24;

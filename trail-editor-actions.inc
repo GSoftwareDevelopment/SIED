@@ -5,9 +5,9 @@ begin
   fillchar(Pointer(PMG_ADDR+$300+23),50,$FF);
   for i:=0 to 3 do HPOSM[i]:=0;
   HPOSP[3]:=0;
-  _mZoneActive[1]:=true;
+  zoneActive[1]:=true;
   setIcon(1);
-  _mZoneActive[1]:=false;
+  zoneActive[1]:=false;
   setControls(0);
   clearStatus();
   clearWorkarea();

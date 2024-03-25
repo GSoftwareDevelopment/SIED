@@ -145,6 +145,9 @@ asm
   lda #(-1)
   sta selZone
 
+  lda #0
+  sta :TMP    // result for function call with Register modyficator
+
   jsr keyJump:$FFFF
 
   lda _callShortcutKeys
@@ -156,6 +159,9 @@ asm
   lda #$00
   sta _modKey
 @:
+
+  lda :TMP
+  beq @exit
 
   lda curZone
   cmp nowZone

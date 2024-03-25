@@ -30,54 +30,12 @@ begin
   putText(x,y,name);
   inc(n,LISTZONE);
   addZoneN(n,x-1,y-1,ITEMSIZE,7,prc);
+  zoneTabIndex[n]:=0;
 End;
 
-procedure getLn(chn:Byte; buf:PString); Register; Assembler; Asm icl 'core/asm/get_line.a65' End;
-
-procedure readDirectory;
-var
-  n,j:Shortint;
-  totalFiles:smallint;
-  name:PString;
-  isDir:Boolean;
-
+procedure updateDirList;
 begin
-  if dev[1]='D' then
-  begin
-    setCursor(_WAIT);
-    _fn:=dev; move(filemask[1],_fn[Byte(_fn[0])+1],Byte(filemask[0]));
-    totalFiles:=0;
-    if dirPageBegin>0 then setStatus(MSG_SEEKING) else setStatus(MSG_READING);
-    opn(1,6,0,_fn);
-    n:=-1;
-    while (IOResult=1) do
-    begin
-      getLn(1,_fn);
-      if (_fn[1]>='0') then
-      begin
-        _fn[0]:=char(Byte(_fn[0])-1); setStatus(_fn);
-        IOResult:=3;
-        break;
-      End;
-      inc(totalFiles);
-      if totalFiles>=dirPageBegin then
-      begin
-        if (n=-1) then setStatus(MSG_READING);
-        if (n<MAXLISTITEMS-1) then
-        begin
-          inc(n);
-          name:=dirName[n];
-          isDir:=((_fn[2]=':') or (_fn[14]='>'));
-          reduceFileName(_fn,name);
-          if isDir then
-            name[1]:=char(byte(name[1]) or $80);
-        End;
-      End;
-    End;
-  End
-  else
-    IOResult:=160;
-  if IOResult>3 then
+  if getDirectory()>3 then
     showIOError()
   else
   begin
@@ -92,10 +50,8 @@ begin
       addFileLabel(j,@doChoiceFile);
       inc(j);
     End;
-    _mZoneActive[LISTZONE-1]:=(dirPageBegin>0);
-    _mZoneActive[LISTZONE+MAXLISTITEMS]:=((dirPageBegin+MAXLISTITEMS)<totalFiles);
+    zoneActive[LISTZONE-1]:=(dirPageBegin>0);
+    zoneActive[LISTZONE+MAXLISTITEMS]:=((dirPageBegin+MAXLISTITEMS)<totalFiles);
     if IOResult<3 then clearStatus();
   End;
-  cls(1);
-  setCursor(_ARROW);
 End;
