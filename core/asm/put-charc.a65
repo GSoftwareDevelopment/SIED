@@ -27,7 +27,7 @@ calcSCR:
 // --
 //
 
-lputchar:
+putChar:
   lda ch            // get string char
   and #127          // only char #0…#127
   tay

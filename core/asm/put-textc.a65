@@ -1,21 +1,3 @@
-  txa:pha
-
-sptr = $fa
-
-  lda S
-  sta sptr
-  lda s+1
-  sta sptr+1
-
-// get text length
-  clc
-  ldy #0
-  sty I
-  lda (sptr),y
-  sta tlen
-  inw sptr
-
-// putchar
 //  if activePage=1 then inc(y,56);
   lda y
   ldy activePage
@@ -36,6 +18,17 @@ calcSCR:
   sta scr+1
 
 //
+putText:
+  txa:pha
+// get text length
+  clc
+  ldy #0
+  sty I
+  lda (s),y
+  sta tlen
+  inw s
+
+//
 // --
 //
 
@@ -48,7 +41,7 @@ lputchar:
   tax
   inc I
 
-  lda (sptr),y      // get string char
+  lda (s),y      // get string char
   and #127          // only char #0…#127
   tay
   lda adr._asc2int,y

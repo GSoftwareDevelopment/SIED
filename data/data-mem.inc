@@ -8,6 +8,7 @@ SCAN2ASC_ADDR       = $2080;                // Keyboard SCANCODES to ATASCII con
 PMG_ADDR            = $2000;                // PMG Base address
 SCREEN_ADDR         = $2400;                // Game screen base address
 EDITOR_ADDR         = $2780;                // Editor screen base address
+STATUS_ADDR         = $2e60;                //
 
 // assets
 ASSETS_ADDR         = $3000;                // assets base address
@@ -28,6 +29,7 @@ CCROSS_ADDR         = ASSETS_ADDR   +  56;
 RLEBUFFER_ADDR      = $3C00;                // address of RLE Compression buffer
 RLEBUFFERSIZE       = 1024;                 // RLE Compression buffer size
 
+HINTBUF_ADDR        = $3E00;                // hint draw buffer
 TLBUF_ADDR          = $3F00;                // TimeLine Drawing Buffer
 
 MODULE_ADDR         = $4000;                // module base address

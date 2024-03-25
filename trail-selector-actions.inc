@@ -101,7 +101,7 @@ begin
     setStatus(@MSG_EDIT_NOTRAIL)
   else
   begin
-    unregisterShortcutKeys(@selectorShortKeys,9);
+    unregisterShortcutKeys(@selectorShortKeys,10);
     showTrailEditor();
   end;
 end;

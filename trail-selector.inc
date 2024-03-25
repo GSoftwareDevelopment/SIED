@@ -40,7 +40,7 @@ procedure selectorShortKeys(); assembler; forward;
 
 procedure selectorShortKeys(); assembler;
 asm
-  dta k_N,      a(MAIN.keyName)
+  dta k_S,      a(MAIN.keyName)
   dta k_C,      a(MAIN.keyCreate)
   dta k_E,      a(MAIN.keyEdit)
   dta k_R,      a(MAIN.keyRename)
@@ -49,12 +49,13 @@ asm
   dta k_UP,     a(MAIN.keySelectPath)
   dta k_DOWN,   a(MAIN.keySelectPath)
   dta k_RETURN, a(MAIN.doSelectPath)
+  dta k_SPACE,  a(MAIN.doSelectPath)
 end;
 
 procedure showTrailSelector();
 begin
   clearStatus();
-  registerShortcutKeys(@selectorShortKeys,9);
+  registerShortcutKeys(@selectorShortKeys,10);
   setControls(0); // no controls
   setScreenWidth(20);
   fillchar(YSCR[56+8]+4,16,$FF);

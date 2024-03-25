@@ -46,14 +46,13 @@ exports
   putImage,
   putSprite,
   putSpriteXOR,
-  putText,
   putChar,
-  putTextC,
   putCharC,
+  putText,
+  putTextC,
   invert,
   blank,
   SetScreenWidth,
-  clearPage,
   wait,
 
 // cursor

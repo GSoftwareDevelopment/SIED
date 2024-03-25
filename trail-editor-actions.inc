@@ -64,7 +64,8 @@ begin
   if _modKey=KMOD_CTRL then curTLPos:=0;
   HPOSM[0]:=48+XTIMELINE+curTLPos-TLShift;
   updateTimeLineTime();
-  if curZone=nowZone then begin setControl(-1); oldZone:=-1; end;
+  if curZone=3 then
+    setControl(-1)
 end;
 
 procedure doTLNextEvent(); Keep;
@@ -82,7 +83,8 @@ begin
   if _modKey=KMOD_CTRL then curTLPos:=totalTrailLength;
   HPOSM[0]:=48+XTIMELINE+curTLPos-TLShift;
   updateTimeLineTime();
-  if curZone=nowZone then begin setControl(-1); oldZone:=-1; end;
+  if curZone=6 then
+    setControl(-1)
 end;
 
 procedure doSetBeginEdge();
@@ -147,12 +149,9 @@ end;
 
 procedure doSwitchPathSection();
 begin
-  if curSection=(selZone-10) then exit;
-  KEYB:=$FF;  // Prevent a previous key click from overriding
+  if not updatePathSection() then exit;
   clearSection();
-  curSection:=selZone-10;
   unregisterShortcutKeys(@innerPathShortKeys,SK_INNER_COUNT);
-  updatePathSection();
   clearZone(ZONE_VIEWPORT);
   clearGameScreen();
   clearTimer(animTimer);

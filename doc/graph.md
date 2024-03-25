@@ -38,16 +38,27 @@ Poza dokładnością pozycjonowania, różnica jest taka, że sprite jest nakła
 Wyświetla sprite podany jako `adr` w pozycji `x` (piksel) i `y` (linia).
 Sprite jest nakładany na obszar operacją XOR.
 
-### `putText(x,y:Shortint; s:PString);`
+### `putText(x,y:Shortint; s:PString); overload;`
 
 Pozwala wyświetlić tekst `s` we wskazanej pozycji `x` (znak) i `y` (linia).
 Ilość znaków w wierszu to 40. Nie istnieje zmiana wiersza, a tekst który wyjdzie poza ekran, zostanie zawinięty i obniżony o jedną linię.
 Akceptowane znaki są z przedziału #32…#127 (nie występują małe litery!)
 Wyświetlany tekst jest monochromatyczny i jest nakładany na obszar operacją OR.
 
+### `putText(adr:pointer; s:PString); overload;`
+
+Tworzy tekst na podstawie podanego `s` ciągu znaków, rysując w podanym adresie `adr`.
+Bitmapa ma szerokość 20 bajtów, zaś wysokość 5 linii.
+Akceptowane znaki są z przedziału #32…#127 (nie występują małe litery!)
+Rysowany tekst jest monochromatyczny i jest nakładany na obszar operacją OR.
+
 ### `putTextC(x,y:Shortint; s:PString);`
 
 Podobnie jak `putText` z tą różnicą, że wyświetlany tekst jest kolorowy (4bpp) i jest nakładany na obszar operacją OR. Nie ma możliwości ustalenia koloru! (jeszcze?)
+
+### `putTextC(adr:pointer; s:PString); overload;`
+
+Analogicznie do `putText(adr:pointer; s:PString); overload;`  z tym, że bitmapa ma szerokość 40 bajtów, a rysowany tekst jest kolorowy.
 
 ### `invert(x,y,w,h:Shortint);`
 
@@ -65,12 +76,6 @@ Standardowe wartości `nSW` to:
 - 20, dla trybu monochromatycznego (1bpp)
 - 40, dla trybu kolorowego (4bpp)
 - 16, dla okna gry (monochromatyczne 1bpp)
-### `clearPage(page:Byte);`
-
-Czyści obszar strony `page` obrazu.
-Zmienna `page` wskazuje na:
-0 - obszar okna gry (monochromatyczny o szerokości linii 16 bajtów)
-1 - obszar interfejsu programu (mieszany o zmiennej długości linii)
 
 ### `wait(f:Byte);`
 

@@ -40,14 +40,20 @@ begin
 End;
 
 //
+procedure setStatusBuf(adr:word); inline;
+begin
+  dpoke(DLIST_ADDR+$51,adr);
+end;
 
 procedure doHintZone(); Keep;
 begin
   allowInverZone:=(selZone=nowZone) or (oldZone<>nowZone);
   if (nowZone=oldZone) then exit;
-  if (nowZone=-1) then begin
+  if (nowZone=-1) then
+  begin
     if hintZone<>-1 then
     begin
+      // if (_mZoneHint[nowZone]<>nil) then // BUG: Not implemented in MP
       asm
         lda hintZone
         asl @
@@ -56,7 +62,7 @@ begin
         ora adr._mZoneHint+1,y
         beq noHintClear
       end;
-      clearStatus();
+      setStatusBuf(STATUS_ADDR);
       asm
         noHintClear:
       end;
@@ -66,35 +72,19 @@ begin
   if (nowZone=hintZone) then exit;
 
   // if (_mZoneHint[nowZone]<>nil) then // BUG: Not implemented in MP
-  // begin
-  // store actual `_LNWIDTH` (LineWidth)
-  //   setStatus(_mZoneHint[nowZone]);
-  // restore `_LNWIDTH`
-  // end;
   asm
     lda nowZone
     asl @
     tay
     lda adr._mZoneHint,y
     ora adr._mZoneHint+1,y
-    beq noHint
-
-    lda MAIN.PUTIMAGE._LNWIDTH
-    pha
-
-    lda adr._mZoneHint,y
-    sta MAIN.setStatus.S
-    lda adr._mZoneHint+1,y
-    sta MAIN.setStatus.S+1
-    jsr MAIN.setStatus
-
-    pla
-    jsr MAIN.setScreenWidth
-    lda nowZone
-    sta hintZone
-    noHint:
+    beq @exit
   end;
-  // hintZone:=nowZone;
+
+  fillchar(pointer(HINTBUF_ADDR),280,0);
+  putTextC(pointer(HINTBUF_ADDR+$28),_mZoneHint[nowZone]);
+  setStatusBuf(HINTBUF_ADDR);
+  hintZone:=nowZone;
 end;
 
 //

@@ -26,7 +26,7 @@ skPage:
 //
 // --
 //
-lputchar:
+putChar:
   lda x
   lsr @
   ldy ch              // get string char
