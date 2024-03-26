@@ -16,11 +16,6 @@ begin
   showTrailSelector();
 end;
 
-procedure doBack2PathBegin();
-begin
-  selZone:=11; doSwitchPathSection();
-end;
-
 procedure inGameScreen();
 begin
   allowInverZone:=false;
@@ -44,7 +39,7 @@ end;
 procedure doSetTimeLinePos();
 begin
   curTLPos:=_mx-48-XTIMELINE-TLShift;
-  if curTLPos>trailLength then curTLPos:=trailLength;
+  if curTLPos>totalTrailLength then curTLPos:=totalTrailLength;
   HPOSM[0]:=48+XTIMELINE+curTLPos-TLShift;
   updateTimeLineTime();
 end;
@@ -89,7 +84,15 @@ end;
 
 procedure doSetBeginEdge();
 begin
-  i:=selZone-14;
+  case KEYB of
+    K_UP:     i:=0;
+    K_LEFT:   i:=1;
+    K_RIGHT:  i:=2;
+    K_DOWN:   i:=3;
+  else
+    i:=selZone-14;
+  end;
+
   pathStartEdge[curTrailID]:=i;
   updateStartPoint();
   trailLength:=processTrail(PT_CALCLEN+PT_UPDATETIMELINE);
@@ -149,9 +152,19 @@ end;
 
 procedure doSwitchPathSection();
 begin
+  if (KEYB<>$FF) and (_modKey=KMOD_CTRL) then
+  begin
+    case KEYB and $3F of
+      k_B: selZone:=11;
+      k_I: selZone:=12;
+      k_F: selZone:=13;
+    end;
+  end;
   if not updatePathSection() then exit;
   clearSection();
+  unregisterShortcutKeys(@beginPathShortKeys,SK_BEGIN_COUNT);
   unregisterShortcutKeys(@innerPathShortKeys,SK_INNER_COUNT);
+  unregisterToolShortKeys();
   clearZone(ZONE_VIEWPORT);
   clearGameScreen();
   clearTimer(animTimer);
@@ -174,7 +187,6 @@ end;
 procedure keySwitchPathSection(n:shortint); Keep;
 begin
   if _modKey<>KMOD_CTRL then exit;
-  setCursorInZone(n);
   doSwitchPathSection();
 end;
 

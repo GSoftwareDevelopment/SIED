@@ -96,13 +96,15 @@ end;
 //
 
 const
+  SK_BEGIN_COUNT      = 4;
   SK_INNER_COUNT      = 6;
   SK_GLOBAL_COUNT     = 3;
   SK_MOVEPOINT_COUNT  = 4;
 
-procedure movePointShortKeys(); Assembler; Forward; Keep;
 procedure globalShortKeys(); assembler; Forward;
+procedure beginPathShortKeys(); Assembler; Forward;
 procedure innerPathShortKeys(); Assembler; Forward;
+procedure movePointShortKeys(); Assembler; Forward; Keep;
 
 procedure doSwitchPathSection(); Forward;
 procedure showPathBegin(); Forward;
@@ -116,6 +118,14 @@ asm
   dta k_B,        a(MAIN.keySwitch2BeginPath)
   dta k_I,        a(MAIN.keySwitch2InnerPath)
   dta k_F,        a(MAIN.keySwitch2FinishPath)
+end;
+
+procedure beginPathShortKeys(); Assembler;
+asm
+  dta k_UP,       a(MAIN.doSetBeginEdge)
+  dta k_LEFT,     a(MAIN.doSetBeginEdge)
+  dta k_RIGHT,    a(MAIN.doSetBeginEdge)
+  dta k_DOWN,     a(MAIN.doSetBeginEdge)
 end;
 
 procedure innerPathShortKeys(); Assembler;
@@ -150,7 +160,8 @@ begin
   n:=addZoneV(@doSetBeginEdge);            // Bottom
   assignHintToZone(n,'SET BEGIN TO BOTTOM EDGE');
 
-  HPOSP[3]:=180; updateStartPoint();
+  updateStartPoint();
+  registerShortcutKeys(@beginPathShortKeys,SK_BEGIN_COUNT);
 end;
 
 procedure showPathInner();
@@ -178,7 +189,7 @@ begin
 
   HPOSM[0]:=48+XTIMELINE+curTLPos-TLShift;
 
-  HPOSP[3]:=180; curTool:=0; updateCurrentTool();
+  curTool:=0; updateCurrentTool();
 
   registerShortcutKeys(@innerPathShortKeys,SK_INNER_COUNT);
 end;
@@ -204,16 +215,11 @@ begin
   SetScreenWidth(20);
   putImage(@_LT_SECTIONS,0,0,3,48);
 
-  n:=addZone(0,0,3,12,@doBack2Selector);      // Back to trail selector
-  assignHintToZone(n,'BACK TO TRAIL SELECTOR');
-  n:=addZoneH(@nullProc);                      // Options
-  assignHintToZone(n,'EDITOR CONFIGURATION');
-  n:=addZone(0,12,6,12,@doSwitchPathSection); // Begin trail
-  assignHintToZone(n,'BEGIN TRAIL SETUP');
-  n:=addZoneV(@doSwitchPathSection);           // Path
-  assignHintToZone(n,'PATH EDIT');
-  n:=addZoneV(@doSwitchPathSection);           // Finish trail
-  assignHintToZone(n,'FINISH TRAIL SETUP');
+  n:=addZone(0,0,3,12,@doBack2Selector); assignHintToZone(n,'BACK TO TRAIL SELECTOR');
+  n:=addZoneH(@nullProc); assignHintToZone(n,'EDITOR CONFIGURATION');
+  n:=addZone(0,12,6,12,@doSwitchPathSection); assignHintToZone(n,'BEGIN TRAIL SETUP');
+  n:=addZoneV(@doSwitchPathSection); assignHintToZone(n,'PATH EDIT');
+  n:=addZoneV(@doSwitchPathSection); assignHintToZone(n,'FINISH TRAIL SETUP');
 
   zoneCall[3]:=@doTLPrevEvent;
   zoneCall[6]:=@doTLNextEvent;
@@ -226,6 +232,6 @@ begin
 
   TLShift:=0; curTLPos:=0;
   doSwitchPathSection();
- SK_curTool:=nil;SKcount_curTool:=0;
+  SK_curTool:=nil; SKcount_curTool:=0;
   registerShortcutKeys(@globalShortKeys,SK_GLOBAL_COUNT);
 End;

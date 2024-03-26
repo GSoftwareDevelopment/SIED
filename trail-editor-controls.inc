@@ -35,7 +35,6 @@ begin
   result:=true;
   curSection:=selZone-10;
   KEYB:=$FF;  // Prevent a previous key click from overriding
-  unregisterTabControl();
   zoneActive[11]:=(curSection<>1);
   zoneActive[12]:=(curSection<>2);
   zoneActive[13]:=(curSection<>3);
@@ -57,6 +56,7 @@ end;
 
 procedure updateStartPoint();
 begin
+  HPOSP[3]:=180;
   n:=pathStartEdge[curTrailID];
   zoneActive[14]:=(n<>0);
   zoneActive[15]:=(n<>1);
@@ -237,6 +237,7 @@ end;
 
 procedure updateCurrentTool();
 begin
+  HPOSP[3]:=180;
   curTool:=curZone-13;
   case curTool of
     TOOL_MOVEPOINT: scr:=@_TRAYRIGHT+36;

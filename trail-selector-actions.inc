@@ -104,6 +104,7 @@ begin
   else
   begin
     unregisterShortcutKeys(@selectorShortKeys,9);
+    unregisterTabControl();
     showTrailEditor();
   end;
 end;
