@@ -115,9 +115,9 @@ procedure showPathFinish(); Forward;
 
 procedure globalShortKeys(); assembler;
 asm
-  dta k_B,        a(MAIN.keySwitch2BeginPath)
-  dta k_I,        a(MAIN.keySwitch2InnerPath)
-  dta k_F,        a(MAIN.keySwitch2FinishPath)
+  dta k_B,        a(MAIN.doSwitchPathSection)
+  dta k_I,        a(MAIN.doSwitchPathSection)
+  dta k_F,        a(MAIN.doSwitchPathSection)
 end;
 
 procedure beginPathShortKeys(); Assembler;

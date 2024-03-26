@@ -272,14 +272,14 @@ var
   begin
     ch:=__x+cx-1;
     ln:=Byte(value[0]);
-    blank(ch,__y,0,7);
+    blank(ch,__y,1,7);
     putChar(ch,__y+1,value[cx]);
     blank(__x+ln,__y,__w-ln,7);
   End;
 
   procedure drawCursor(n:Boolean);
   begin
-    invert(__x+cx,__y,0,6);
+    invert(__x+cx,__y,1,7);
     isCrs:=n;
   end;
 
@@ -299,7 +299,7 @@ begin
   setScreenWidth(20);
   __x:=_mZoneX1[selZone];
   __y:=_mZoneY1[selZone];
-  __w:=(_mZoneX2[selZone]-__x)-1;
+  __w:=(_mZoneX2[selZone]-__x)-2;
   zoneInOutCall[curZone]:=@inInputEditZone;
   inc(__x);
   ln:=byte(sEdit[0]);

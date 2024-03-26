@@ -1,7 +1,7 @@
 procedure updateSearchField();
 begin
   setScreenWidth(20);
-  blank(8,1,PATHNAMESIZE+1,5);
+  blank(8,0,PATHNAMESIZE+2,7);
   if pathNameSearch[0]=#0 then
     putText(9,1,MSG_SEARCH)
   else
@@ -15,7 +15,7 @@ var
 begin
   if n>4 then exit;
   y:=_LISTY[n];
-  blank(8,y-1,PATHNAMESIZE+1,7);
+  blank(8,y-1,PATHNAMESIZE+2,7);
   inc(n,LISTZONE);
   // if name<>nil then // BUG: Not implemented in MP
   asm
@@ -33,8 +33,8 @@ begin
   begin
     if isChoice then
     begin
-      putChar(8,y,'>');
-      putChar(8,y,'<');
+      putChar(8,y,'*');
+      // putChar(8,y,'<');
     end;
     putText(9,y,name);
     addZoneN(n,8,y-1,PATHNAMESIZE+2,7,@doSelectPath);

@@ -39,8 +39,8 @@ begin
   zoneActive[n]:=act;
   _mZoneX1[n]:=x;     __x:=x;
   _mZoneY1[n]:=y;     __y:=y;
-  _mZoneX2[n]:=x+w-1; __w:=w;
-  _mZoneY2[n]:=y+h-1; __h:=h;
+  _mZoneX2[n]:=x+w;   __w:=w;
+  _mZoneY2[n]:=y+h;   __h:=h;
   zoneTabIndex[n]:=-128;
   zoneCall[n]:=prc;
   zoneInOutCall[n]:=@doHintZone;
@@ -171,8 +171,8 @@ begin
   curZone:=n;
   tabIndex:=zoneTabIndex[n];
   tabZone:=n;
-  i:=_mZoneX2[n] shl 2; inc(i,2);
-  setCursorPos(i,_mZoneY2[n]-1);
+  i:=_mZoneX2[n] shl 2; dec(i,2);
+  setCursorPos(i,_mZoneY2[n]-2);
   result:=true;
 end;
 
@@ -192,8 +192,8 @@ begin
   for i:=0 to MAX_ZONES do
   begin
     if zoneActive[i] then
-      if (mx>=_mZoneX1[i]) and (mx<=_mZoneX2[i]) and
-          (my>=_mZoneY1[i]) and (my<=_mZoneY2[i]) then
+      if (mx>=_mZoneX1[i]) and (mx<_mZoneX2[i]) and
+          (my>=_mZoneY1[i]) and (my<_mZoneY2[i]) then
       begin
         nowZone:=i; break;
       End;

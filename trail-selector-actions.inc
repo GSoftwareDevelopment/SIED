@@ -105,6 +105,7 @@ begin
   begin
     unregisterShortcutKeys(@selectorShortKeys,9);
     unregisterTabControl();
+    KEYB:=$FF;
     showTrailEditor();
   end;
 end;

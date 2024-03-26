@@ -31,9 +31,9 @@ end;
 
 function updatePathSection():boolean;
 begin
-  if curSection=(selZone-10) then exit(false);
+  // if curSection=(selZone-10) then exit(false);
   result:=true;
-  curSection:=selZone-10;
+  // curSection:=selZone-10;
   KEYB:=$FF;  // Prevent a previous key click from overriding
   zoneActive[11]:=(curSection<>1);
   zoneActive[12]:=(curSection<>2);

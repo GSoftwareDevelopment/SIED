@@ -23,10 +23,13 @@ calcSCR:
 //
 // --
 //
+  lda h
+  beq exPutImg
+
 lputchar:
   clc
   lda w
-  bmi exPutImg
+  beq exPutImg
   lda x
   ror @
   tay
@@ -53,8 +56,8 @@ lbyte:
   tay
 
   dex
-  bpl lln
-  bmi lputchar  // always jymp
+  bne lln
+  beq lputchar  // always jymp
 
 exPutImg:
   pla:tax

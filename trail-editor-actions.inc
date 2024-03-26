@@ -123,7 +123,7 @@ begin
       end;
       2: begin
           px:=8+curPX; py:=4+curPY; adr:=@_IPOINTARROW;
-          if px>_RIGHT then begin dec(px,7); inc(adr,5); end;
+          if px>_RIGHT then begin dec(px,6); inc(adr,5); end;
           if py>_BOTTOM then begin dec(py,4); inc(adr,10); end;
         end;
     end;
@@ -152,13 +152,13 @@ end;
 
 procedure doSwitchPathSection();
 begin
-  if (KEYB<>$FF) and (_modKey=KMOD_CTRL) then
-  begin
-    case KEYB and $3F of
-      k_B: selZone:=11;
-      k_I: selZone:=12;
-      k_F: selZone:=13;
-    end;
+  case KEYB of
+    k_B + KMOD_CTRL: curSection:=1;
+    k_I + KMOD_CTRL: curSection:=2;
+    k_F + KMOD_CTRL: curSection:=3;
+    $FF: curSection:=selZone-10;
+  else
+    exit;
   end;
   if not updatePathSection() then exit;
   clearSection();
@@ -182,25 +182,6 @@ begin
     totalTrailLength:=processTrail(PT_CALCLEN+PT_UPDATETIMELINE);
     onTimerAnim();
   end;
-end;
-
-procedure keySwitchPathSection(n:shortint); Keep;
-begin
-  if _modKey<>KMOD_CTRL then exit;
-  doSwitchPathSection();
-end;
-
-procedure keySwitch2BeginPath(); Keep;
-begin
-  keySwitchPathSection(11);
-end;
-procedure keySwitch2InnerPath(); Keep;
-begin
-  keySwitchPathSection(12);
-end;
-procedure keySwitch2FinishPath(); Keep;
-begin
-  keySwitchPathSection(13);
 end;
 
 //
@@ -266,7 +247,16 @@ end;
 
 procedure doAddPoint();
 begin
-  enterEditPath(15);
+  if curTool<>TOOL_ADDPOINT then
+  begin
+    enterEditPath(15); // registerToolShortKeys(@movePointShortKeys,SK_MOVEPOINT_COUNT);
+  end
+  else
+  begin
+    case KEYB of
+      k_INSERT:
+    end;
+  end;
 end;
 
 procedure doDeletePoint();
