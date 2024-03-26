@@ -1,3 +1,4 @@
+FPS                 = 25;                   // Timeline second divisor (for PAL)
 BASE_COLOR          = $E0;
 
 MAX_SPRITE          = 15;                   // max 16 enemys on screen

@@ -63,33 +63,27 @@ begin
     if foundItems=0 then
     begin
       // find first free entry in table of trail definition pointer
-      i:=0; adr:=pointer($a000);
-      while (i<MAXPATHDEFINITIONS) do
+      i:=getFirstFreeTrailID();
+      if i<>-1 then
       begin
-        if pathListPtr[i]<adr then begin dec(i); break; end;
-        adr:=pathListPtr[i];
-        inc(i);
-      end;
-      if (i=MAXPATHDEFINITIONS) then exit;
-      p:=getTrailName(i); // find 'i' entry in table of trail names
-      if p<>nil then
-      begin
-        curTrailID:=i;
-        move(@pathNameSearch,p,byte(pathNameSearch[0])+1);
-        pathListPtr[i]:=adr;
-        poke(adr,$00); inc(adr);
-        poke(adr,TR_STOP); inc(adr);
-        // dpoke(adr,word(p)+1); inc(adr,2);
-        pathListPtr[i+1]:=adr;
-        // move(p,pointer(word(p)+ln),$800-ln);
-        listShift:=0; refreshList();
-        p:=@MSG_NAMECREATED;
+        name:=getTrailName(i); // find 'i' entry in table of trail names
+        if name<>nil then
+        begin
+          curTrailID:=i;
+          move(@pathNameSearch,name,byte(pathNameSearch[0])+1); // copy path name to name area
+          pathListPtr[i]:=adr;  // set path definition start address
+          // create path base
+          poke(adr,$00); inc(adr);
+          poke(adr,TR_STOP); inc(adr);
+          pathListPtr[i+1]:=adr;
+          listShift:=0; refreshList();
+          p:=@MSG_NAMECREATED;
+        end
+        else
+          p:=@MSG_FULLLIST;
       end
       else
-      begin
         p:=@MSG_FULLLIST;
-        curTrailID:=-1;
-      end;
     end
     else
       p:=@MSG_DUPLICATEDNAME;
