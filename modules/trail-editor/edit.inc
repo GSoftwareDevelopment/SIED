@@ -5,7 +5,8 @@ begin
     cursorInViewPort:=false;
     setCursor(_ARROW);
     updateCurrentTool(-1);
-    registerShortcutKeys(@globalShortKeys,1); // register only ESC Event
+    addShortcutKey(k_ESC,@doBack2Selector);
+    // registerShortcutKeys(@globalShortKeys); // register only ESC Event
   end;
 end;
 
@@ -25,7 +26,7 @@ begin
   unregisterToolShortKeys();
   setCursorPos(XVIEWPORT+8+curPX,curPY);
   curZone:=30;
-  registerToolShortKeys(@editModeShortKeys,SK_MOVEPOINT_COUNT);
+  registerToolShortKeys(@editModeShortKeys);
 end;
 
 procedure doMovePoint(); Keep;

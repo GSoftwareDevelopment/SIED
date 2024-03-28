@@ -43,6 +43,7 @@ const
   TIMEX=32;
   TIMEY=61;
 begin
+  HPOSM[0]:=48+XTIMELINE+curTLPos-TLShift;
   setScreenWidth(40);
   frm:=curTLPos mod FPS;
   sec:=curTLPos div FPS;
@@ -138,6 +139,28 @@ begin
     TOOL_MOVEPOINT: scr:=@_TRAYRIGHT+36;
     TOOL_ADDPOINT : scr:=@_TRAYRIGHT+24;
     TOOL_DELPOINT : scr:=@_TRAYRIGHT+12;
+  else
+    // nothingclear
+    fillchar(Pointer(PMG_ADDR+$380+23),50,$3F);
+    exit;
+  end;
+  move(scr,Pointer(PMG_ADDR+$380+24),48);
+end;
+
+//
+
+procedure updateFinishMode(n:byte);
+begin
+  HPOSP[3]:=180;
+  zoneActive[14]:=(n<>0);
+  zoneActive[15]:=(n<>1);
+  zoneActive[16]:=(n<>2);
+  zoneActive[17]:=(n<>3);
+  case n of
+    0 : scr:=@_TRAYRIGHT+36;
+    1 : scr:=@_TRAYRIGHT+24;
+    2 : scr:=@_TRAYRIGHT+12;
+    3 : scr:=@_TRAYRIGHT+0;
   else
     // nothingclear
     fillchar(Pointer(PMG_ADDR+$380+23),50,$3F);

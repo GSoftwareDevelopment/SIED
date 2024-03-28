@@ -28,14 +28,14 @@ begin
   __SCKeyVec[key]:=prc;
 end;
 
-procedure registerShortcutKeys(SCList:Pointer; count:Byte); register; assembler;
+procedure registerShortcutKeys(SCList:Pointer); register; assembler;
 asm
   txa:pha
+
   ldy #0
 lreg:
-  lda count
-  beq xit
   lda (SCList),y  ; get key
+  bmi xit
   and #$3F
   asl @
   tax
@@ -46,21 +46,20 @@ lreg:
   lda (SCList),y  ; get MSB of address
   sta adr.__SCKeyVec+1,x
   iny
-  dec count
   jmp lreg
 
 xit:
   pla:tax
 end;
 
-procedure unregisterShortcutKeys(SCList:Pointer; count:Byte); register; assembler;
+procedure unregisterShortcutKeys(SCList:Pointer); register; assembler;
 asm
   txa:pha
+
   ldy #0
 lreg:
-  lda count
-  beq xit
   lda (SCList),y  ; get key
+  bmi xit
   and #$3F
   asl @
   tax
@@ -71,7 +70,6 @@ lreg:
   iny
   iny
   iny
-  dec count
   jmp lreg
 
 xit:

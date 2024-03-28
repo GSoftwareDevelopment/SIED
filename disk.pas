@@ -153,7 +153,7 @@ procedure updateFileNameField(); Forward;
 {$I 'disk-actions.inc'}
 {$I 'disk-controls.inc'}
 
-procedure shortKeys(); assembler;
+procedure diskShortKeys(); assembler;
 asm
   dta k_D,a(MAIN.keyDevice)
   dta k_F,a(MAIN.keyFileName)
@@ -167,11 +167,12 @@ asm
   dta k_RIGHT,a(MAIN.keySelectFile)
   dta k_CLEAR,a(MAIN.doEraseFileName)
   // dta k_RETURN,a(MAIN.doChoiceFile)
+  dta $FF
 end;
 
 procedure showDiskDirectory();
 begin
-  registerShortcutKeys(@shortKeys,11);
+  registerShortcutKeys(@diskShortKeys);
   registerTabControl();
   setScreenWidth(20);
   fillchar(YSCR[56+8]+4,16,$FF);

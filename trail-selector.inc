@@ -42,12 +42,13 @@ asm
   dta k_UP,     a(MAIN.keySelectPath)
   dta k_DOWN,   a(MAIN.keySelectPath)
   dta k_SPACE,  a(MAIN.doSelectPath)
+  dta $FF
 end;
 
 procedure showTrailSelector();
 begin
   clearStatus();
-  registerShortcutKeys(@selectorShortKeys,9);
+  registerShortcutKeys(@selectorShortKeys);
   registerTabControl();
   setControls(0); // no controls
   setScreenWidth(20);

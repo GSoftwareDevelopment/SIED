@@ -11,7 +11,6 @@ procedure doSetTimeLinePos();
 begin
   curTLPos:=_mx-48-XTIMELINE-TLShift;
   if curTLPos>totalTrailLength then curTLPos:=totalTrailLength;
-  HPOSM[0]:=48+XTIMELINE+curTLPos-TLShift;
   updateTimeLineTime();
 end;
 
@@ -29,7 +28,6 @@ begin
   end
   else
   if _modKey=KMOD_CTRL then curTLPos:=0;
-  HPOSM[0]:=48+XTIMELINE+curTLPos-TLShift;
   updateTimeLineTime();
   if curZone=3 then
     setControl(-1)
@@ -49,7 +47,6 @@ begin
   end
   else
   if _modKey=KMOD_CTRL then curTLPos:=totalTrailLength;
-  HPOSM[0]:=48+XTIMELINE+curTLPos-TLShift;
   updateTimeLineTime();
   if curZone=6 then
     setControl(-1)

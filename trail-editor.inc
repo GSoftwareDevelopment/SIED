@@ -36,20 +36,19 @@ var
 
   curTool:Byte;
   SK_curTool:Pointer;
-  SKcount_curTool:Byte;
 
-procedure registerToolShortKeys(SK:Pointer; count:Byte);
+procedure registerToolShortKeys(SK:Pointer);
 begin
-  SK_curTool:=SK; SKcount_curTool:=count;
-  registerShortcutKeys(SK,count);
+  SK_curTool:=SK;
+  registerShortcutKeys(SK);
 end;
 
 procedure unregisterToolShortKeys();
 begin
-  if (SK_curTool<>nil) and (SKcount_curTool<>0) then
+  if (SK_curTool<>nil) then
   begin
-    unregisterShortcutKeys(SK_curTool,SKcount_curTool);
-    SK_curTool:=nil; SKcount_curTool:=0;
+    unregisterShortcutKeys(SK_curTool);
+    SK_curTool:=nil;
   end;
 end;
 
@@ -90,6 +89,7 @@ asm
   dta k_B,        a(MAIN.doSwitchPathSection)
   dta k_I,        a(MAIN.doSwitchPathSection)
   dta k_F,        a(MAIN.doSwitchPathSection)
+  dta $FF
 end;
 
 procedure beginPathShortKeys(); Assembler;
@@ -98,6 +98,7 @@ asm
   dta k_LEFT,     a(MAIN.doSetBeginEdge)
   dta k_RIGHT,    a(MAIN.doSetBeginEdge)
   dta k_DOWN,     a(MAIN.doSetBeginEdge)
+  dta $FF
 end;
 
 procedure innerPathShortKeys(); Assembler;
@@ -108,6 +109,7 @@ asm
   dta k_INSERT,   a(MAIN.doAddPoint)
   dta k_DELETE,   a(MAIN.doDeletePoint)
   dta k_ESC,      a(MAIN.doExitEditMode)
+  dta $FF
 end;
 
 procedure editModeShortKeys(); Assembler; Keep;
@@ -117,76 +119,62 @@ asm
   dta K_DOWN,     a(MAIN.doMovePoint)
   dta K_LEFT,     a(MAIN.doMovePoint)
   dta K_RIGHT,    a(MAIN.doMovePoint)
+  dta $FF
 end;
 
 procedure showPathBegin();
 begin
   fillchar(YSCR[56+48],280,0);
-  updateGameScreen();
-  zoneActive[3]:=false;
-  zoneActive[6]:=false;
+  setControls(%000000);
 
   putImage(@_RT_EDGES,18,0,2,48);
-  n:=addZone(36,0,4,12,@doSetBeginEdge);   // Top
-  assignHintToZone(n,'SET BEGIN TO TOP EDGE');
-  n:=addZoneV(@doSetBeginEdge);            // Left
-  assignHintToZone(n,'SET BEGIN TO LEFT EDGE');
-  n:=addZoneV(@doSetBeginEdge);            // Right
-  assignHintToZone(n,'SET BEGIN TO RIGHT EDGE');
-  n:=addZoneV(@doSetBeginEdge);            // Bottom
-  assignHintToZone(n,'SET BEGIN TO BOTTOM EDGE');
+  n:=addZone(36,0,4,12,@doSetBeginEdge); assignHintToZone(n,'SET BEGIN TO TOP EDGE');
+  n:=addZoneV(@doSetBeginEdge);          assignHintToZone(n,'SET BEGIN TO LEFT EDGE');
+  n:=addZoneV(@doSetBeginEdge);          assignHintToZone(n,'SET BEGIN TO RIGHT EDGE');
+  n:=addZoneV(@doSetBeginEdge);          assignHintToZone(n,'SET BEGIN TO BOTTOM EDGE');
 
   updateStartPoint();
-  registerShortcutKeys(@beginPathShortKeys,SK_BEGIN_COUNT);
+  updateTimeLineTime();
+  registerShortcutKeys(@beginPathShortKeys);
 end;
 
 procedure showPathInner();
 begin
-  updateGameScreen();
+  setControls(%001001);
 
   putImage(@_RT_TOOLS,18,0,2,48);
-  n:=addZone(36,0,4,12,@doMovePoint);
-  assignHintToZone(n,'MOVE PATH POINT');
-  n:=addZoneV(@doAddPoint);            // Add point
-  assignHintToZone(n,'ADD NEW PATH POINT');
-  n:=addZoneV(@doDeletePoint);         // Delete point
-  assignHintToZone(n,'DELETE PATH POINT');
-  n:=addZoneV(@nullProc);              // More...
-  assignHintToZone(n,'MORE TOOLS...');
+  n:=addZone(36,0,4,12,@doMovePoint);  assignHintToZone(n,'MOVE PATH POINT');
+  n:=addZoneV(@doAddPoint);            assignHintToZone(n,'ADD NEW PATH POINT');
+  n:=addZoneV(@doDeletePoint);         assignHintToZone(n,'DELETE PATH POINT');
+  n:=addZoneV(@nullProc);              assignHintToZone(n,'MORE TOOLS...');
 
   _curPx:=-128; _curPy:=-128;
   _curDx:=-128; _curDy:=-128;
-  zoneActive[3]:=true;
-  zoneActive[6]:=true;
   addZoneN(ZONE_TIMELINE,(XTIMELINE div 4),62,TIMELINE_SIZEB,7,@doSetTimeLinePos);
   zoneInOutCall[ZONE_TIMELINE]:=@inTimeLine;
 
   addZoneN(ZONE_VIEWPORT,XVIEWPORT div 4,0,26,48,@doMovePoint);
   zoneInOutCall[ZONE_VIEWPORT]:=@inGameScreen;
 
-  HPOSM[0]:=48+XTIMELINE+curTLPos-TLShift;
-
+  updateTimeLineTime();
   updateCurrentTool(-1);
 
-  registerShortcutKeys(@innerPathShortKeys,SK_INNER_COUNT);
+  registerShortcutKeys(@innerPathShortKeys);
 end;
 
 procedure showPathFinish();
 begin
-  zoneActive[3]:=false;
-  zoneActive[6]:=false;
+  setControls(%000000);
   fillchar(YSCR[56+48],280,0);
 
-  HPOSP[3]:=180;
   putImage(@_RT_FINISH,18,0,2,48);
-  n:=addZone(36,0,4,12,@nullProc);
-  assignHintToZone(n,'LOOP');
-  n:=addZoneV(@nullProc);
-  assignHintToZone(n,'STOP');
-  n:=addZoneV(@nullProc);
-  assignHintToZone(n,'KILL');
-  n:=addZoneV(@nullProc);
-  assignHintToZone(n,'JUMP...');
+  n:=addZone(36,0,4,12,@nullProc);  assignHintToZone(n,'SET LOOP POINT');
+  n:=addZoneV(@nullProc);           assignHintToZone(n,'STOP OBJECT');
+  n:=addZoneV(@nullProc);           assignHintToZone(n,'KILL OBJECT');
+  n:=addZoneV(@nullProc);           assignHintToZone(n,'JUMP TO DIFFERENT TRAIL');
+
+  updateTimeLineTime();
+  updateFinishMode(0);
 end;
 
 //
@@ -195,6 +183,11 @@ end;
 
 procedure showTrailEditor();
 begin
+  curSection:=-1;
+  TLShift:=0; curTLPos:=0;
+  SK_curTool:=nil;
+  cursorInViewport:=false;
+
   for n:=0 to 2 do zoneActive[n]:=false;
   fillchar(YSCR[56+48],960,0);
   clearWorkarea();
@@ -205,13 +198,11 @@ begin
   addZoneN(3,0,61,2,7,@doTLPrevEvent);   // previous
   addZoneHN(6,@doTLNextEvent);           // next
 
-  setControls(%001001); // only Prev/Play/Stop/Next controls
+  setControls(%001001); // only Prev & Next controls
   setControl(-1);
 
   name:=getTrailName(curTrailID);
   setStatus('TRAIL EDITOR');
-  // putTextC(0,56,'NAME:')
-  // putTextC(6,56,name);
 
   SetScreenWidth(20);
   putImage(@_LT_SECTIONS,0,0,3,48);
@@ -222,14 +213,10 @@ begin
   n:=addZoneV(@doSwitchPathSection); assignHintToZone(n,'PATH EDIT');
   n:=addZoneV(@doSwitchPathSection); assignHintToZone(n,'FINISH TRAIL SETUP');
 
-  curSection:=-1;
   if getTrailSize(curTrailID)=0 then
     selZone:=11   // show Begin path
   else
     selZone:=12;  // show trail path
 
-  TLShift:=0; curTLPos:=0;
   doSwitchPathSection();
-  SK_curTool:=nil; SKcount_curTool:=0;
-  cursorInViewport:=false;
 End;

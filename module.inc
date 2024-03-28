@@ -17,6 +17,7 @@ asm
   dta k_1,  a(MAIN.setModule)
   dta k_2,  a(MAIN.setModule)
   dta k_3,  a(MAIN.setModule)
+  dta $FF
 end;
 
 procedure setModule(); Keep;
@@ -58,7 +59,7 @@ begin
     2: loadModule('D:SCENED.LIB');
    -1: loadModule('D:ABOUT.LIB');
   end;
-  registerShortcutKeys(@moduleShortKeys,3);
+  registerShortcutKeys(@moduleShortKeys);
 End;
 
 procedure initModules();

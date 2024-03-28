@@ -108,16 +108,6 @@ begin
   setCursorInZone(12);
 end;
 
-// procedure keyPrevPageDir(); Keep;
-// begin
-//   setCursorInZone(LISTZONE-1); doPrevPageDir();
-// end;
-
-// procedure keyNextPageDir(); Keep;
-// begin
-//   setCursorInZone(LISTZONE+MAXLISTITEMS); doNextPageDir();
-// end;
-
 procedure keySelectFile(); Keep;
 const
   MIN=LISTZONE;

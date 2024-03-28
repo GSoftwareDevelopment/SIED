@@ -12,8 +12,8 @@ begin
   setControls(0);
   clearStatus();
   clearWorkarea();
-  unregisterShortcutKeys(@globalShortKeys,SK_GLOBAL_COUNT);
-  unregisterShortcutKeys(@innerPathShortKeys,SK_INNER_COUNT);
+  unregisterShortcutKeys(@globalShortKeys);
+  unregisterShortcutKeys(@innerPathShortKeys);
   showTrailSelector();
 end;
 
@@ -109,8 +109,8 @@ begin
     curSection:=selZone-10;
   if not updatePathSection() then exit;
   clearSection();
-  unregisterShortcutKeys(@beginPathShortKeys,SK_BEGIN_COUNT);
-  unregisterShortcutKeys(@innerPathShortKeys,SK_INNER_COUNT);
+  unregisterShortcutKeys(@beginPathShortKeys);
+  unregisterShortcutKeys(@innerPathShortKeys);
   unregisterToolShortKeys();
   clearZone(ZONE_VIEWPORT);
   clearTimer(animTimer);
@@ -129,6 +129,6 @@ begin
     totalTrailLength:=processTrail(PT_CALCLEN+PT_UPDATETIMELINE);
     onTimerAnim();
   end;
-  registerShortcutKeys(@globalShortKeys,SK_GLOBAL_COUNT);
+  registerShortcutKeys(@globalShortKeys);
   result:=true;
 end;
