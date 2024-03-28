@@ -17,6 +17,7 @@ end;
 
 procedure doTLPrevEvent(); Keep;
 begin
+  if curSection<>2 then exit;
   if (_modKey=0) then
   begin
     if curTLPos>0 then dec(curTLPos)
@@ -36,6 +37,7 @@ end;
 
 procedure doTLNextEvent(); Keep;
 begin
+  if curSection<>2 then exit;
   if (_modKey=0) then
   begin
     if curTLPos<totalTrailLength then inc(curTLPos);

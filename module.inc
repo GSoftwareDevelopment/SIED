@@ -11,37 +11,30 @@ begin
   setCursor(_ARROW);
 end;
 
-procedure setModule(); forward;
-
-procedure keyDisk(); Keep;
-begin
-  if _modKey<>(KMOD_CTRL+KMOD_SHIFT) then exit;
-  setCursorInZone(0); setModule();
-end;
-
-procedure keyTrailEd();Keep;
-begin
-  if _modKey<>(KMOD_CTRL+KMOD_SHIFT) then exit;
-  setCursorInZone(1); setModule();
-end;
-
-procedure keyScenarioEd();Keep;
-begin
-  if _modKey<>(KMOD_CTRL+KMOD_SHIFT) then exit;
-  setCursorInZone(2); setModule();
-end;
-
-procedure shortKeys(); Assembler;
+procedure setModule(); Keep; Forward;
+procedure moduleShortKeys(); Assembler;
 asm
-  dta k_1,a(MAIN.keyDisk)
-  dta k_2,a(MAIN.keyTrailEd)
-  dta k_3,a(MAIN.keyScenarioEd)
+  dta k_1,  a(MAIN.setModule)
+  dta k_2,  a(MAIN.setModule)
+  dta k_3,  a(MAIN.setModule)
 end;
 
-procedure setModule();
+procedure setModule(); Keep;
 begin
-  if curZone=curModule then exit;
-  curModule:=curZone;
+  if KEYB<>$FF then
+  begin
+    case byte(KEYB+_modKey) of
+      k_1 + KMOD_CTRL+KMOD_SHIFT: curModule:=0;
+      k_2 + KMOD_CTRL+KMOD_SHIFT: curModule:=1;
+      k_3 + KMOD_CTRL+KMOD_SHIFT: curModule:=2;
+    else
+      exit;
+    end;
+  end
+  else
+    curModule:=curZone;
+
+  if not zoneActive[curModule] then exit;
 
   initTimers();
 
@@ -52,20 +45,20 @@ begin
   zoneActive[2]:=true;
   fillchar(YSCR[56+48],800,0);
   HPOSP[2]:=0;
-  setIcon(curZone);
+  setIcon(curModule);
   clearStatus();
   clearWorkarea();
   setControls(0);
-  zoneActive[0]:=(curZone<>0);
-  zoneActive[1]:=(curZone<>1);
-  zoneActive[2]:=(curZone<>2);
-  case curZone of
+  zoneActive[0]:=(curModule<>0);
+  zoneActive[1]:=(curModule<>1);
+  zoneActive[2]:=(curModule<>2);
+  case curModule of
     0: loadModule('D:DISK.LIB');
     1: loadModule('D:TRAIL.LIB');
     2: loadModule('D:SCENED.LIB');
    -1: loadModule('D:ABOUT.LIB');
   end;
-  registerShortcutKeys(@shortKeys,3);
+  registerShortcutKeys(@moduleShortKeys,3);
 End;
 
 procedure initModules();
@@ -81,14 +74,6 @@ begin
   assignHintToZone(1,'TRAIL EDITOR');
   setZone(2,false,36,49,3,15,@setModule);
   assignHintToZone(2,'SCENARIO EDITOR');
-
-   addZoneN(3,1,YCONTROLS,3,8,@nullProc);   // previous
-  addZoneHN(4,@nullProc);                   // play
-  addZoneHN(5,@nullProc);                   // stop
-  addZoneHN(6,@nullProc);                   // next
-
-   addZoneN(7,15,YCONTROLS,3,8,@nullProc);  // insert
-  addZoneHN(8,@nullProc);                   // delete
 
   curZone:=-1; setModule();
 End;

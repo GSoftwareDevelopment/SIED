@@ -1,3 +1,0 @@
-const
-  YCONTROLS         = 55;
-

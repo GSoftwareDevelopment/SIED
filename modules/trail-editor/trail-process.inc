@@ -87,12 +87,12 @@ begin
 
   if (mode and PT_UPDATETIMELINE)<>0 then
   begin
-    while TLPosition<160 do
+    while TLPosition<TIMELINELENGTH do
     begin
       TLPoint(v); inc(TLPosition);
     end;
     TLPtr:=pointer(TLBUF_ADDR);
-    scr:=YSCR[56+48+15]+(XTIMELINE div 4);
+    scr:=YSCR[56+48+14]+(XTIMELINE div 4);
     for i:=0 to 4 do
     begin
       move(TLPtr,scr,TIMELINE_SIZEB);
@@ -102,17 +102,18 @@ begin
   end;
 end;
 
-procedure addTrailPoint(adr:pointer);
+procedure addTrailPoint(TLPos:SmallInt);
 begin
-  // adr:=pathListPtr[curTrailID]+curTLPos;
+  adr:=pathListPtr[curTrailID]+TLPos;
   move(adr,adr+1,$BFFF-word(adr));
   poke(adr,$00);
   trailLength:=processTrail(PT_CALCLEN);
   totalTrailLength:=processTrail(PT_CALCLEN+PT_UPDATETIMELINE);
 end;
 
-procedure delTrailPoint(adr:pointer);
+procedure delTrailPoint(TLPos:SmallInt);
 begin
+  adr:=pathListPtr[curTrailID]+TLPos;
   v:=peek(adr);
   if (v<>TR_JUMP) and (v<>TR_STOP) and (v<>TR_KILL) then
   begin

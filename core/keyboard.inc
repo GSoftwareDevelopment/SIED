@@ -117,6 +117,12 @@ skipMod:
   bne setTrue
   lda adr.__SCKeyVec+1,y
   cmp #>__noShortcurKey
+  bne setTrue
+
+  lda #$FF
+  sta KEYB
+  lda #$00
+  sta _modKey
   beq @exit
 
 setTrue:
@@ -132,6 +138,7 @@ procedure callShortcutKeyboard(); assembler;
 asm
   lda _callShortcutKeys
   and #%00111111   ; remove mod-keys (Control, Shift)
+  sta KEYB
   asl @
   tay
 

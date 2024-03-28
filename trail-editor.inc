@@ -65,17 +65,17 @@ end;
 //
 
 const
+  SK_GLOBAL_COUNT     = 4;
   SK_BEGIN_COUNT      = 4;
   SK_INNER_COUNT      = 6;
-  SK_GLOBAL_COUNT     = 3;
-  SK_MOVEPOINT_COUNT  = 4;
+  SK_MOVEPOINT_COUNT  = 5;
 
-procedure globalShortKeys(); assembler; Forward;
+procedure globalShortKeys(); assembler; Forward; Keep;
 procedure beginPathShortKeys(); Assembler; Forward;
 procedure innerPathShortKeys(); Assembler; Forward;
 procedure editModeShortKeys(); Assembler; Forward; Keep;
 
-procedure doSwitchPathSection(); Forward;
+function doSwitchPathSection():boolean; Forward;
 procedure showPathBegin(); Forward;
 procedure showPathInner(); Forward;
 procedure showPathFinish(); Forward;
@@ -84,7 +84,7 @@ procedure showPathFinish(); Forward;
 {$I 'modules/trail-editor/timeline.inc'}
 {$I 'modules/trail-editor/edit.inc'}
 
-procedure globalShortKeys(); assembler;
+procedure globalShortKeys(); assembler; Keep;
 asm
   dta k_ESC,      a(MAIN.doBack2Selector)
   dta k_B,        a(MAIN.doSwitchPathSection)
@@ -121,7 +121,10 @@ end;
 
 procedure showPathBegin();
 begin
+  fillchar(YSCR[56+48],280,0);
   updateGameScreen();
+  zoneActive[3]:=false;
+  zoneActive[6]:=false;
 
   putImage(@_RT_EDGES,18,0,2,48);
   n:=addZone(36,0,4,12,@doSetBeginEdge);   // Top
@@ -141,7 +144,7 @@ procedure showPathInner();
 begin
   updateGameScreen();
 
-  putImage(@_LT_TOOLS,18,0,2,48);
+  putImage(@_RT_TOOLS,18,0,2,48);
   n:=addZone(36,0,4,12,@doMovePoint);
   assignHintToZone(n,'MOVE PATH POINT');
   n:=addZoneV(@doAddPoint);            // Add point
@@ -153,22 +156,37 @@ begin
 
   _curPx:=-128; _curPy:=-128;
   _curDx:=-128; _curDy:=-128;
-
-  addZoneN(ZONE_TIMELINE,8,65,32,7,@doSetTimeLinePos);
+  zoneActive[3]:=true;
+  zoneActive[6]:=true;
+  addZoneN(ZONE_TIMELINE,(XTIMELINE div 4),62,TIMELINE_SIZEB,7,@doSetTimeLinePos);
   zoneInOutCall[ZONE_TIMELINE]:=@inTimeLine;
 
-  addZoneN(ZONE_VIEWPORT,XVIEWPORT div 4,0,26,48,@doMovePoint); // @enterEditPath);
+  addZoneN(ZONE_VIEWPORT,XVIEWPORT div 4,0,26,48,@doMovePoint);
   zoneInOutCall[ZONE_VIEWPORT]:=@inGameScreen;
 
   HPOSM[0]:=48+XTIMELINE+curTLPos-TLShift;
 
-  curTool:=0; updateCurrentTool();
+  updateCurrentTool(-1);
 
   registerShortcutKeys(@innerPathShortKeys,SK_INNER_COUNT);
 end;
 
 procedure showPathFinish();
 begin
+  zoneActive[3]:=false;
+  zoneActive[6]:=false;
+  fillchar(YSCR[56+48],280,0);
+
+  HPOSP[3]:=180;
+  putImage(@_RT_FINISH,18,0,2,48);
+  n:=addZone(36,0,4,12,@nullProc);
+  assignHintToZone(n,'LOOP');
+  n:=addZoneV(@nullProc);
+  assignHintToZone(n,'STOP');
+  n:=addZoneV(@nullProc);
+  assignHintToZone(n,'KILL');
+  n:=addZoneV(@nullProc);
+  assignHintToZone(n,'JUMP...');
 end;
 
 //
@@ -177,13 +195,23 @@ end;
 
 procedure showTrailEditor();
 begin
+  for n:=0 to 2 do zoneActive[n]:=false;
+  fillchar(YSCR[56+48],960,0);
   clearWorkarea();
   clearStatus();
-  setControls(%001111); // only Prev/Play/Stop/Next controls
+
+  // addZoneN(4,0,52,2,7,@nullProc);        // play
+  // addZoneHN(5,@nullProc);                // stop
+  addZoneN(3,0,61,2,7,@doTLPrevEvent);   // previous
+  addZoneHN(6,@doTLNextEvent);           // next
+
+  setControls(%001001); // only Prev/Play/Stop/Next controls
   setControl(-1);
 
   name:=getTrailName(curTrailID);
-  setStatus('EDIT:'); putTextC(6,69,name);
+  setStatus('TRAIL EDITOR');
+  // putTextC(0,56,'NAME:')
+  // putTextC(6,56,name);
 
   SetScreenWidth(20);
   putImage(@_LT_SECTIONS,0,0,3,48);
@@ -194,9 +222,6 @@ begin
   n:=addZoneV(@doSwitchPathSection); assignHintToZone(n,'PATH EDIT');
   n:=addZoneV(@doSwitchPathSection); assignHintToZone(n,'FINISH TRAIL SETUP');
 
-  zoneCall[3]:=@doTLPrevEvent;
-  zoneCall[6]:=@doTLNextEvent;
-
   curSection:=-1;
   if getTrailSize(curTrailID)=0 then
     selZone:=11   // show Begin path
@@ -206,5 +231,5 @@ begin
   TLShift:=0; curTLPos:=0;
   doSwitchPathSection();
   SK_curTool:=nil; SKcount_curTool:=0;
-  registerShortcutKeys(@globalShortKeys,SK_GLOBAL_COUNT);
+  cursorInViewport:=false;
 End;

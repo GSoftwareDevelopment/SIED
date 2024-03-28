@@ -132,7 +132,7 @@ begin
     setCursorInZone(MIN)
   else
   begin
-    case (KEYB and $3F) of
+    case KEYB of
       k_UP: if nowZone>MIN then
               dec(nowZone)
             else // page change

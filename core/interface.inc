@@ -8,7 +8,7 @@ procedure nullProc(); Assembler; asm end;
 //
 procedure setStatusBuf(adr:word); inline;
 begin
-  dpoke(DLIST_ADDR+$51,adr);
+  dpoke(DLIST_ADDR+$50,adr);
 end;
 
 procedure clearHintInZone(n:shortint); Assembler;

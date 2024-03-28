@@ -6,7 +6,7 @@ begin
   fillchar(Pointer(PMG_ADDR+$300+23),50,$FF);
   for i:=0 to 3 do HPOSM[i]:=0;
   HPOSP[3]:=0;
-  zoneActive[1]:=true;
+  for n:=0 to 2 do zoneActive[n]:=true;
   setIcon(1);
   zoneActive[1]:=false;
   setControls(0);
@@ -71,7 +71,8 @@ begin
   end
   else
   begin
-    if (curTLPos>=trailLength) and (curTool<>TOOL_ADDPOINT) then
+    if ((curTLPos>=trailLength) and (curTool<>TOOL_ADDPOINT)) or
+       ((curTLPos>trailLength) and (curTool=TOOL_ADDPOINT)) then
       setCursor(@_STOP)
     else
       setCursor(_CROSS);
@@ -91,16 +92,21 @@ end;
 
 //
 
-procedure doSwitchPathSection();
+function doSwitchPathSection():Boolean;
 begin
-  case KEYB of
-    k_B + KMOD_CTRL: curSection:=1;
-    k_I + KMOD_CTRL: curSection:=2;
-    k_F + KMOD_CTRL: curSection:=3;
-    $FF: curSection:=selZone-10;
+  result:=false;
+  if KEYB<>$FF then
+  begin
+    case byte(KEYB+_modKey) of
+      k_B + KMOD_CTRL: curSection:=1;
+      k_I + KMOD_CTRL: curSection:=2;
+      k_F + KMOD_CTRL: curSection:=3;
+    else
+      exit;
+    end;
+  end
   else
-    exit;
-  end;
+    curSection:=selZone-10;
   if not updatePathSection() then exit;
   clearSection();
   unregisterShortcutKeys(@beginPathShortKeys,SK_BEGIN_COUNT);
@@ -110,11 +116,12 @@ begin
   clearTimer(animTimer);
   updateTimeLineTime();
   case curSection of
+    0: begin end; // TODO: Editor config - not implemented yet
     1: showPathBegin();
     2: showPathInner();
     3: showPathFinish();
   end;
-  if curSection<>3 then
+  if curSection<>0 then
   begin
     trailPattern:=%111111111111111111111111;
     loopPattern:=%100100100100100100100100;
@@ -122,4 +129,6 @@ begin
     totalTrailLength:=processTrail(PT_CALCLEN+PT_UPDATETIMELINE);
     onTimerAnim();
   end;
+  registerShortcutKeys(@globalShortKeys,SK_GLOBAL_COUNT);
+  result:=true;
 end;

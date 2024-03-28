@@ -26,11 +26,68 @@ end;
 
 //
 
+procedure updateCoord(x,y,v:Shortint);
+begin
+  s:='  ';
+  if v>=0 then bcd:=bin2bcd(v)
+  else
+  begin s[1]:='-'; bcd:=bin2bcd(-v); end;
+  if bcd>$10 then s[1]:=char(48+bcd shr 4);
+  s[2]:=char(48+bcd and $f);
+  putTextC(x,y,s);
+end;
+
+//
+procedure updateTimeLineTime();
+const
+  TIMEX=32;
+  TIMEY=61;
+begin
+  setScreenWidth(40);
+  frm:=curTLPos mod FPS;
+  sec:=curTLPos div FPS;
+  putImage(@_ICOORD,TIMEX,TIMEY,8,7);
+  s:='  .  ';
+  bcd:=bin2bcd(sec);
+  s[1]:=char(48+bcd shr 4);
+  s[2]:=char(48+bcd and $f);
+  bcd:=bin2bcd(frm);
+  s[4]:=char(48+bcd shr 4);
+  s[5]:=char(48+bcd and $f);
+  putTextC(TIMEX+2,TIMEY+1,s);
+  setScreenWidth(20);
+end;
+
+//
+
+procedure updateStepInfo();
+const
+  COORDX=12;
+  COORDY=48;
+begin
+  setScreenWidth(40);
+  if (curPX<>_curPX) or (curPY<>_curPY) then
+  begin
+    putImage(@_ICOORD+56,COORDX,COORDY,8,7);
+    updateCoord(COORDX+3,COORDY+1,curPX); updateCoord(COORDX+6,COORDY+1,curPY);
+    _curPX:=curPX; _curPY:=curPY;
+  end;
+
+  if (curDX<>_curDX) or (curDY<>_curDY) then
+  begin
+    putImage(@_ICOORD+112,COORDX+8,COORDY,8,7);
+    updateCoord(COORDX+10,COORDY+1,curDX); updateCoord(COORDX+13,COORDY+1,curDY);
+    _curDX:=curDX; _curDY:=curDY;
+  end;
+  setScreenWidth(20);
+end;
+
+//
+
 function updatePathSection():boolean;
 begin
-  // if curSection=(selZone-10) then exit(false);
+  if not zoneActive[10+curSection] then exit(false);
   result:=true;
-  // curSection:=selZone-10;
   KEYB:=$FF;  // Prevent a previous key click from overriding
   zoneActive[11]:=(curSection<>1);
   zoneActive[12]:=(curSection<>2);
@@ -72,66 +129,11 @@ end;
 
 //
 
-procedure updateCoord(x,y,v:Shortint);
+procedure updateCurrentTool(nTool:shortint);
 begin
-  s:='  ';
-  if v>=0 then bcd:=bin2bcd(v)
-  else
-  begin s[1]:='-'; bcd:=bin2bcd(-v); end;
-  if bcd>$10 then s[1]:=char(48+bcd shr 4);
-  s[2]:=char(48+bcd and $f);
-  // blank(x*2,y,3,4);
-  putTextC(x,y,s);
-end;
-
-//
-
-procedure updateTimeLineTime();
-begin
-  frm:=curTLPos mod FPS;
-  sec:=curTLPos div FPS;
-  min:=sec div 60;
-  for i:=56+63 to 56+67 do fillchar(YSCR[i],8,0);
-  s:='  :  .  ';
-  bcd:=bin2bcd(min);
-  s[1]:=char(48+bcd shr 4);
-  s[2]:=char(48+bcd and $f);
-  bcd:=bin2bcd(sec);
-  s[4]:=char(48+bcd shr 4);
-  s[5]:=char(48+bcd and $f);
-  bcd:=bin2bcd(frm);
-  s[7]:=char(48+bcd shr 4);
-  s[8]:=char(48+bcd and $f);
-  putTextC(0,63,s);
-end;
-
-//
-
-procedure updateStepInfo();
-begin
-  setScreenWidth(40);
-  if (curPX<>_curPX) or (curPY<>_curPY) then
-  begin
-    putImage(@_ICOORD,11,48,8,6);
-    updateCoord(14,48,curPX); updateCoord(17,48,curPY);
-    _curPX:=curPX; _curPY:=curPY;
-  end;
-
-  if (curDX<>_curDX) or (curDY<>_curDY) then
-  begin
-    putImage(@_ICOORD+48,19,48,8,6);
-    updateCoord(21,48,curDX); updateCoord(24,48,curDY);
-    _curDX:=curDX; _curDY:=curDY;
-  end;
-  setScreenWidth(20);
-end;
-
-//
-
-procedure updateCurrentTool();
-begin
+  curTool:=nTool;
   HPOSP[3]:=180;
-  curTool:=curZone-13;
+  // curTool:=curZone-13;
   case curTool of
     TOOL_MOVEPOINT: scr:=@_TRAYRIGHT+36;
     TOOL_ADDPOINT : scr:=@_TRAYRIGHT+24;

@@ -34,6 +34,7 @@ begin
   if _modKey=KMOD_SHIFT then
     tabDir:=-1;
   if tabDir=0 then exit;
+// FIXME: Infinity loop
   repeat
     inc(tabIndex,tabDir);
     for i:=0 to MAX_ZONES do
@@ -46,8 +47,7 @@ begin
         exit;
       end;
     end;
-  until false; // (tabIndex=-128);
-  // _callShortcutKeys:=KEYB;
+  until false;
 end;
 
 procedure doTabCall();
@@ -189,7 +189,7 @@ begin
   for i:=3 to 8 do
   begin
     zoneActive[i]:=(s and b)<>0;
-    zoneCall[i]:=@nullProc;
+    // zoneCall[i]:=@nullProc;
     b:=b shl 1;
   end;
   // zoneActive[3]:=(s and 1<>0);  // prev
@@ -217,7 +217,7 @@ begin
         p:=_CONTROLS[i+6]
       else
         p:=_CONTROLS[i];
-      putImage(p,_x,_y,3,8);
+      putImage(p,_x,_y,2,7);
     end;
   End;
 End;
@@ -313,7 +313,6 @@ begin
       drawCursor(not isCrs);
     End;
 
-    // checkShortcutKeyboard(0); // (KMOD_CTRL+KMOD_SHIFT);
     checkZones();
     if (nowZone<>curZone) and (mbutton<>MBUT_NONE) then
     begin
@@ -325,7 +324,7 @@ begin
       if isCrs then drawCursor(false);
       oAllowSK:=allowShortcutKeys;
       _modKey:=KEYB and (KMOD_CTRL+KMOD_SHIFT);
-      KEYB:=KEYB and $3f;
+      KEYB:=KEYB and $3F;
       if _modKey=KMOD_CTRL then
       begin
         case KEYB of

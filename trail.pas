@@ -103,13 +103,13 @@ begin
   fillchar(Pointer(PMG_ADDR+$300+23),50,$FF);
   fillchar(Pointer(PMG_ADDR+$380+23),50,$3F);
   // fillchar(Pointer(PMG_ADDR+$180+24+65),7,$02);
-  poke(PMG_ADDR+$180+24+65,$02);
-  poke(PMG_ADDR+$180+24+66,$02);
-  poke(PMG_ADDR+$180+24+67,$00);
-  poke(PMG_ADDR+$180+24+68,$00);
-  poke(PMG_ADDR+$180+24+69,$00);
-  poke(PMG_ADDR+$180+24+70,$02);
-  poke(PMG_ADDR+$180+24+71,$02);
+  poke(PMG_ADDR+$180+24+62,$02);
+  poke(PMG_ADDR+$180+24+63,$02);
+  poke(PMG_ADDR+$180+24+64,$00);
+  poke(PMG_ADDR+$180+24+65,$00);
+  poke(PMG_ADDR+$180+24+66,$00);
+  poke(PMG_ADDR+$180+24+67,$02);
+  poke(PMG_ADDR+$180+24+68,$02);
   PCOL[2]:=BASE_COLOR+$02; PCOL[3]:=BASE_COLOR+$02;
   SIZEP[2]:=%11; SIZEP[3]:=%11; SIZEM:=%00000000;
   HPOSP[2]:=44; // icon tray

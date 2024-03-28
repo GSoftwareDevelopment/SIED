@@ -55,7 +55,7 @@ dli3: // controls
 dli4: // status
   pha:txa:pha
   lda #(BASE_COLOR+$04)
-  ldx #(BASE_COLOR+$0f)
+  ldx #(BASE_COLOR+$00)
   sta wsync
   sta COLPF4
   stx COLPF1

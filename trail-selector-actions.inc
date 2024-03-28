@@ -67,23 +67,35 @@ begin
       if i<>-1 then
       begin
         name:=getTrailName(i); // find 'i' entry in table of trail names
-        if name<>nil then
+        // if name<>nil then // BUG: MP not implemented
+        asm
+          lda name
+          ora name+1
+          jeq @fullList
+        end;
         begin
           curTrailID:=i;
-          move(@pathNameSearch,name,byte(pathNameSearch[0])+1); // copy path name to name area
-          pathListPtr[i]:=adr;  // set path definition start address
+          // copy path name to name area
+          move(pathNameSearch,pointer(name),byte(pathNameSearch[0])+1); // BUG: MP PString problem
+          // set path definition start address
+          pathListPtr[i]:=adr;
           // create path base
           poke(adr,$00); inc(adr);
           poke(adr,TR_STOP); inc(adr);
           pathListPtr[i+1]:=adr;
           listShift:=0; refreshList();
           p:=@MSG_NAMECREATED;
-        end
-        else
-          p:=@MSG_FULLLIST;
+        end;
+        // else
+          // p:=@MSG_FULLLIST;
       end
       else
+      begin
+        asm
+          @fullList:
+        end;
         p:=@MSG_FULLLIST;
+      end;
     end
     else
       p:=@MSG_DUPLICATEDNAME;
@@ -162,7 +174,7 @@ begin
     setCursorInZone(MIN)
   else
   begin
-    case (KEYB and $3f) of
+    case KEYB of
       k_UP: if nowZone>MIN then
               dec(nowZone)
             else // page change
